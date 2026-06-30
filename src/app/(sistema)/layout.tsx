@@ -72,14 +72,14 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
                     {!sidebarCollapsed && <span className="truncate">Visão Geral</span>}
                   </Link>
                   <Link
-                    href="/admin"
+                    href="/admin/clientes"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
                   >
                     <i className="ti ti-building-store text-base" />
                     {!sidebarCollapsed && <span className="truncate">Barbearias</span>}
                   </Link>
                   <Link
-                    href="/admin"
+                    href="/admin/planos"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
                   >
                     <i className="ti ti-credit-card text-base" />
@@ -148,6 +148,37 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
                     >
                       <i className="ti ti-box text-base" />
                       {!sidebarCollapsed && <span className="truncate">Estoque</span>}
+                    </Link>
+                    <Link
+                      href="/cliente/relatorios"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-chart-bar text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Relatórios</span>}
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  {!sidebarCollapsed && (
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-2">
+                      Configurações
+                    </span>
+                  )}
+                  <div className="flex flex-col gap-1">
+                    <Link
+                      href="/cliente/configuracoes/fidelidade"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-award text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Fidelidade</span>}
+                    </Link>
+                    <Link
+                      href="/cliente/configuracoes/plano"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-shield-check text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Plano & Assinatura</span>}
                     </Link>
                   </div>
                 </div>

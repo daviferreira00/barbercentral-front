@@ -35,13 +35,19 @@ export default async function PortalAgendamentoPage({ params }: { params: { slug
       cache: "no-store",
     })
     if (!res.ok) {
-      if (res.status === 404 || res.status === 403) {
+      if (res.status === 404) {
         redirect(`/agendamento/${slug}/nao-encontrado`)
+      }
+      if (res.status === 403) {
+        redirect(`/agendamento/${slug}/bloqueado`)
       }
       throw new Error("Erro ao buscar barbearia")
     }
     config = await res.json().then((r) => r.data || null)
   } catch (error) {
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error // permite redirecionamento nativo do next
+    }
     redirect(`/agendamento/${slug}/nao-encontrado`)
   }
 
