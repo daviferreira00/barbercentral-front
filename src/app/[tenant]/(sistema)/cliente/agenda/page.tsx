@@ -53,7 +53,7 @@ const VIEW_MODES = [
 export default function ClienteAgendaPage() {
   const [professionals, setProfessionals] = useState<Professional[]>([])
   const [selectedProfId, setSelectedProfId] = useState<string>("")
-  const [currentDate, setCurrentDate] = useState<Date>(new Date("2026-06-29")) // Defasado para o dia do seed
+  const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<"day" | "week">("day")
 
   const [appointments, setAppointments] = useState<EnrichedAppointment[]>([])
@@ -91,10 +91,21 @@ export default function ClienteAgendaPage() {
     }
   }
 
-  // Helper para formatar data YYYY-MM-DD
+  // Helper para formatar data YYYY-MM-DD sem shift de timezone
   const formatDateString = (d: Date) => {
-    return d.toISOString().split("T")[0]
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
   }
+
+  // Helper para limpar data recebida da API que pode vir no formato ISO (com T) ou com hora
+  const cleanDate = (dateStr?: string) => {
+    if (!dateStr) return ""
+    return dateStr.split("T")[0].split(" ")[0]
+  }
+
+  const activeDateStr = formatDateString(currentDate)
 
   const loadAgenda = async () => {
     setLoading(true)
@@ -175,7 +186,7 @@ export default function ClienteAgendaPage() {
   const navigateDate = (dir: "prev" | "next" | "today") => {
     const d = new Date(currentDate)
     if (dir === "today") {
-      setCurrentDate(new Date("2026-06-29")) // Hoje fixa na segunda do seed
+      setCurrentDate(new Date())
     } else {
       const step = viewMode === "day" ? 1 : 7
       d.setDate(currentDate.getDate() + (dir === "next" ? step : -step))
@@ -420,8 +431,8 @@ export default function ClienteAgendaPage() {
               {professionals
                 .filter((p) => !selectedProfId || p.id === selectedProfId)
                 .map((prof) => {
-                  const profApps = appointments.filter((a) => a.professional_id === prof.id)
-                  const profBlocks = blockedSlots.filter((b) => !b.professional_id || b.professional_id === prof.id)
+                  const profApps = appointments.filter((a) => a.professional_id === prof.id && cleanDate(a.date) === activeDateStr)
+                  const profBlocks = blockedSlots.filter((b) => (!b.professional_id || b.professional_id === prof.id) && cleanDate(b.date) === activeDateStr)
 
                   return (
                     <Card key={prof.id} className="border-slate-100 flex flex-col min-h-[450px]">
@@ -501,7 +512,7 @@ export default function ClienteAgendaPage() {
                 start.setDate(diff + idx)
 
                 const dayStr = formatDateString(start)
-                const dayApps = appointments.filter((a) => a.date === dayStr)
+                const dayApps = appointments.filter((a) => cleanDate(a.date) === dayStr)
 
                 const isToday = formatDateString(new Date()) === dayStr
 
@@ -690,7 +701,7 @@ export default function ClienteAgendaPage() {
                     <span className="text-[10px] font-bold text-slate-400 uppercase">Profissional / Horário</span>
                     <p className="font-bold text-slate-800">{selectedApp.professional_name}</p>
                     <p className="text-[10px] text-slate-500 font-bold">
-                      {new Date(selectedApp.date + "T00:00:00").toLocaleDateString("pt-BR")} às {selectedApp.start_time.substring(0, 5)}
+                      {new Date(cleanDate(selectedApp.date) + "T00:00:00").toLocaleDateString("pt-BR")} às {selectedApp.start_time.substring(0, 5)}
                     </p>
                   </div>
                 </div>
@@ -811,7 +822,7 @@ export default function ClienteAgendaPage() {
                         variant="ghost"
                         onClick={() => {
                           setEditProfId(selectedApp.professional_id)
-                          setEditDate(selectedApp.date)
+                          setEditDate(cleanDate(selectedApp.date))
                           setEditTime(selectedApp.start_time.substring(0, 5))
                           setIsEditing(true)
                         }}

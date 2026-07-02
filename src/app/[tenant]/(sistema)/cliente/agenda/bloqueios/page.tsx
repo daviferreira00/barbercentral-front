@@ -29,7 +29,13 @@ export default function AgendaBloqueiosPage() {
 
   // Form Fields
   const [professionalId, setProfessionalId] = useState<string>("all") // "all" = toda a barbearia
-  const [date, setDate] = useState("2026-06-29")
+  const [date, setDate] = useState(() => {
+    const d = new Date()
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+  })
   const [startTime, setStartTime] = useState("12:00")
   const [endTime, setEndTime] = useState("13:00")
   const [reason, setReason] = useState("")
