@@ -55,6 +55,11 @@ const config: Config = {
           indigo: "#6366f1",
           gold: "#d97706",
           dark: "#0f172a",
+        },
+        // Tenant dynamic branding
+        tenant: {
+          primary: "var(--color-primary)",
+          secondary: "var(--color-secondary)",
         }
       },
       borderRadius: {
@@ -63,7 +68,7 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Montserrat", "system-ui", "sans-serif"],
+        sans: ["var(--font-family, Montserrat)", "system-ui", "sans-serif"],
       },
     },
   },

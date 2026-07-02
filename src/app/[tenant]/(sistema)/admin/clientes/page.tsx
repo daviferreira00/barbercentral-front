@@ -37,10 +37,10 @@ export default function AdminClientesPage() {
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
-  // Dialog de Criação
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [newName, setNewName] = useState("")
   const [newSlug, setNewSlug] = useState("")
+  const [newCustomDomain, setNewCustomDomain] = useState("")
   const [newPlan, setNewPlan] = useState("")
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -98,6 +98,7 @@ export default function AdminClientesPage() {
     const res = await http.post<ClientSaaS>("/admin/clients", {
       name: newName,
       slug: newSlug,
+      custom_domain: newCustomDomain || null,
       plan_id: newPlan,
     })
     setSaving(false)
@@ -110,6 +111,7 @@ export default function AdminClientesPage() {
     setIsCreateOpen(false)
     setNewName("")
     setNewSlug("")
+    setNewCustomDomain("")
     loadData()
   }
 
@@ -282,6 +284,14 @@ export default function AdminClientesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => router.push(`/admin/clientes/${c.id}`)}
+                          className="text-slate-600 hover:bg-slate-100 font-bold"
+                        >
+                          Gerenciar
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleImpersonate(c.id)}
                           className="text-indigo-600 hover:bg-indigo-50 font-bold"
                         >
@@ -331,6 +341,15 @@ export default function AdminClientesPage() {
                 value={newSlug}
                 onChange={(e) => setNewSlug(e.target.value)}
                 required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase">Domínio Customizado (Opcional)</label>
+              <Input
+                placeholder="ex: agendamento.barbeariadopovo.com"
+                value={newCustomDomain}
+                onChange={(e) => setNewCustomDomain(e.target.value)}
               />
             </div>
 

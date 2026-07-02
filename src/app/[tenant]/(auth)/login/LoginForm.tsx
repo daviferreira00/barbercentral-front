@@ -9,7 +9,7 @@ import { authService } from "@/shared/auth/auth-service"
 
 type LoginMode = "credentials" | "magic-link"
 
-export function LoginForm() {
+export function LoginForm({ logoUrl = "/logo/barbercentral-logo-horizontal.svg" }: { logoUrl?: string }) {
   const router = useRouter()
 
   const [mode, setMode] = useState<LoginMode>("credentials")
@@ -72,9 +72,9 @@ export function LoginForm() {
       {/* Logo mobile */}
       <div className="flex lg:hidden justify-center mb-2">
         <img
-          src="/logo/barbercentral-logo-horizontal.svg"
+          src={logoUrl}
           alt="BarberCentral"
-          className="h-10 w-auto"
+          className="h-10 w-auto object-contain"
         />
       </div>
 
@@ -144,7 +144,12 @@ export function LoginForm() {
         {formSuccess && <Alert variant="success" message={formSuccess} />}
 
         {/* Botão de submit com Skeleton/Loading */}
-        <Button type="submit" className="w-full h-11 mt-2 text-sm font-semibold" disabled={submitting}>
+        <Button
+          type="submit"
+          className="w-full h-11 mt-2 text-sm font-semibold hover:opacity-90"
+          style={{ backgroundColor: "var(--color-button, var(--color-primary))", color: "#fff" }}
+          disabled={submitting}
+        >
           {submitting ? (
             <div className="flex items-center justify-center gap-2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

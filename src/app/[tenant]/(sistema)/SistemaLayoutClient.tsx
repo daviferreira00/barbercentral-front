@@ -6,7 +6,13 @@ import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
-export default function SistemaLayout({ children }: { children: React.ReactNode }) {
+export default function SistemaLayoutClient({ 
+  children,
+  tenantData
+}: { 
+  children: React.ReactNode
+  tenantData: any
+}) {
   const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout } = useApp()
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
 
@@ -31,7 +37,8 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
       <aside
         className={`${
           sidebarCollapsed ? "w-20" : "w-64"
-        } bg-slate-900 border-r border-slate-800 text-white flex flex-col justify-between transition-all duration-300 ease-in-out z-30`}
+        } ${tenantData ? "bg-primary" : "bg-slate-900"} border-r border-slate-800 text-white flex flex-col justify-between transition-all duration-300 ease-in-out z-30`}
+        style={tenantData ? { backgroundColor: "var(--color-primary)" } : {}}
       >
         <div>
           {/* Header da Sidebar */}
@@ -39,15 +46,15 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
             <Link href={isAdmin ? "/admin" : "/cliente"} className="flex items-center min-w-0 justify-center w-full">
               {sidebarCollapsed ? (
                 <img
-                  src="/logo/barbercentral-icon-white.svg"
-                  alt="BarberCentral Icon"
-                  className="h-8 w-8"
+                  src={tenantData && (tenantData.logo_central || tenantData.logo_url) ? (tenantData.logo_central || tenantData.logo_url) : "/logo/barbercentral-icon-white.svg"}
+                  alt="Logo Icon"
+                  className="h-8 w-auto max-w-[2rem] object-contain"
                 />
               ) : (
                 <img
-                  src="/logo/barbercentral-logo-horizontal-white.svg"
-                  alt="BarberCentral Logo"
-                  className="h-7 w-auto"
+                  src={tenantData && (tenantData.logo_url || tenantData.logo_central) ? (tenantData.logo_url || tenantData.logo_central) : "/logo/barbercentral-logo-horizontal-white.svg"}
+                  alt="Logo"
+                  className="max-h-12 w-auto max-w-[80%] object-contain"
                 />
               )}
             </Link>
@@ -66,21 +73,21 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
                 <div className="flex flex-col gap-1">
                   <Link
                     href="/admin"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                   >
                     <i className="ti ti-layout-dashboard text-base" />
                     {!sidebarCollapsed && <span className="truncate">Visão Geral</span>}
                   </Link>
                   <Link
                     href="/admin/clientes"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                   >
                     <i className="ti ti-building-store text-base" />
                     {!sidebarCollapsed && <span className="truncate">Barbearias</span>}
                   </Link>
                   <Link
                     href="/admin/planos"
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                   >
                     <i className="ti ti-credit-card text-base" />
                     {!sidebarCollapsed && <span className="truncate">Planos SaaS</span>}
@@ -99,28 +106,28 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
                   <div className="flex flex-col gap-1">
                     <Link
                       href="/cliente/agenda"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-calendar text-base" />
                       {!sidebarCollapsed && <span className="truncate">Agenda</span>}
                     </Link>
                     <Link
                       href="/cliente/profissionais"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-users text-base" />
                       {!sidebarCollapsed && <span className="truncate">Profissionais</span>}
                     </Link>
                     <Link
                       href="/cliente/servicos"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-cut text-base" />
                       {!sidebarCollapsed && <span className="truncate">Serviços</span>}
                     </Link>
                     <Link
                       href="/cliente/clientes"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-users-group text-base" />
                       {!sidebarCollapsed && <span className="truncate">Clientes CRM</span>}
@@ -137,21 +144,21 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
                   <div className="flex flex-col gap-1">
                     <Link
                       href="/cliente/caixa"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-cash text-base" />
                       {!sidebarCollapsed && <span className="truncate">Fluxo de Caixa</span>}
                     </Link>
                     <Link
                       href="/cliente/estoque"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-box text-base" />
                       {!sidebarCollapsed && <span className="truncate">Estoque</span>}
                     </Link>
                     <Link
                       href="/cliente/relatorios"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-chart-bar text-base" />
                       {!sidebarCollapsed && <span className="truncate">Relatórios</span>}
@@ -168,14 +175,14 @@ export default function SistemaLayout({ children }: { children: React.ReactNode 
                   <div className="flex flex-col gap-1">
                     <Link
                       href="/cliente/configuracoes/fidelidade"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-award text-base" />
                       {!sidebarCollapsed && <span className="truncate">Fidelidade</span>}
                     </Link>
                     <Link
                       href="/cliente/configuracoes/plano"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition duration-150"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-shield-check text-base" />
                       {!sidebarCollapsed && <span className="truncate">Plano & Assinatura</span>}

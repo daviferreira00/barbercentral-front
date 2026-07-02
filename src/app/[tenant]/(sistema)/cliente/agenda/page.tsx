@@ -162,7 +162,7 @@ export default function ClienteAgendaPage() {
   useEffect(() => {
     if (isEditing && editProfId && editDate && selectedApp) {
       setLoadingEditSlots(true)
-      const svcParam = selectedApp.services.map((s) => `service_ids=${s.service_id}`).join("&")
+      const svcParam = (selectedApp.services || []).map((s) => `service_ids=${s.service_id}`).join("&")
       http.get<any[]>(`/appointments/availability?date=${editDate}&professional_id=${editProfId}&${svcParam}`).then((res) => {
         setLoadingEditSlots(false)
         if (res.data) setEditSlots(res.data)
@@ -203,7 +203,7 @@ export default function ClienteAgendaPage() {
     if (!selectedApp) return
 
     setUpdatingStatus(true)
-    const totalAmount = selectedApp.services.reduce((acc: number, curr: any) => acc + curr.price, 0)
+    const totalAmount = (selectedApp.services || []).reduce((acc: number, curr: any) => acc + curr.price, 0)
 
     // 1. Muda status do agendamento para concluído
     const resStatus = await http.patch(`/appointments/${selectedApp.id}/status`, {
@@ -378,11 +378,10 @@ export default function ClienteAgendaPage() {
               <button
                 key={mode.value}
                 onClick={() => setViewMode(mode.value as any)}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition ${
-                  viewMode === mode.value
+                className={`px-3 py-1 text-xs font-bold rounded-md transition ${viewMode === mode.value
                     ? "bg-white text-slate-800 shadow-sm border border-slate-200/40"
                     : "text-slate-500 hover:text-slate-800"
-                }`}
+                  }`}
               >
                 {mode.label}
               </button>
@@ -478,10 +477,10 @@ export default function ClienteAgendaPage() {
                               </p>
                               <div className="flex justify-between items-center text-[10px] text-slate-500/80 font-bold border-t border-slate-200/50 pt-2 mt-1">
                                 <span className="truncate max-w-[120px]">
-                                  {app.services.map((s) => s.service_name).join(", ")}
+                                  {(app.services || []).map((s) => s.service_name).join(", ")}
                                 </span>
                                 <span>
-                                  R$ {app.services.reduce((acc, s) => acc + s.price, 0).toFixed(2)}
+                                  R$ {(app.services || []).reduce((acc, s) => acc + s.price, 0).toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -541,7 +540,7 @@ export default function ClienteAgendaPage() {
                               Pro: {app.professional_name.split(" ")[0]}
                             </p>
                             <p className="text-[10px] text-slate-500 truncate leading-none">
-                              {app.services.map((s) => s.service_name).join(", ")}
+                              {(app.services || []).map((s) => s.service_name).join(", ")}
                             </p>
                           </div>
                         ))
@@ -646,11 +645,10 @@ export default function ClienteAgendaPage() {
                             type="button"
                             variant="ghost"
                             onClick={() => setEditTime(slot.start_time)}
-                            className={`h-8 text-[10px] font-bold border ${
-                              editTime === slot.start_time
+                            className={`h-8 text-[10px] font-bold border ${editTime === slot.start_time
                                 ? "bg-slate-900 text-white border-slate-900"
                                 : "bg-white text-slate-700 border-slate-200 hover:border-slate-400"
-                            }`}
+                              }`}
                           >
                             {slot.start_time.substring(0, 5)}
                           </Button>
@@ -700,7 +698,7 @@ export default function ClienteAgendaPage() {
                 <div className="space-y-1">
                   <span className="text-[10px] font-bold text-slate-400 uppercase">Serviços Contratados</span>
                   <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 space-y-1.5">
-                    {selectedApp.services.map((s) => (
+                    {(selectedApp.services || []).map((s) => (
                       <div key={s.service_id} className="flex justify-between items-center text-[11px]">
                         <span className="font-semibold text-slate-700">{s.service_name} ({s.duration_minutes} min)</span>
                         <span className="font-bold text-slate-800">R$ {s.price.toFixed(2)}</span>
@@ -708,7 +706,7 @@ export default function ClienteAgendaPage() {
                     ))}
                     <div className="border-t border-slate-200/50 pt-1.5 flex justify-between items-center font-extrabold text-slate-800">
                       <span>Total Estimado</span>
-                      <span>R$ {selectedApp.services.reduce((acc, s) => acc + s.price, 0).toFixed(2)}</span>
+                      <span>R$ {(selectedApp.services || []).reduce((acc, s) => acc + s.price, 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -868,7 +866,7 @@ export default function ClienteAgendaPage() {
                 <div className="flex justify-between items-center font-extrabold border-t border-slate-200/50 pt-2 text-slate-800 text-sm">
                   <span>Total a Pagar:</span>
                   <span className="text-primary text-base font-black">
-                    R$ {selectedApp.services.reduce((acc: number, curr: any) => acc + curr.price, 0).toFixed(2)}
+                    R$ {(selectedApp.services || []).reduce((acc: number, curr: any) => acc + curr.price, 0).toFixed(2)}
                   </span>
                 </div>
               </div>
