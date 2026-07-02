@@ -11,8 +11,8 @@ export default async function SistemaLayout({
   
   if (params.tenant && params.tenant !== "barbercentral" && params.tenant !== "barbearia-modelo") {
     try {
-      const res = await fetch(`http://localhost:8080/api/v1/public/${params.tenant}`, {
-        cache: "force-cache",
+      const backendUrl = process.env.BACKEND_URL || "http://localhost:8080"
+      const res = await fetch(`${backendUrl}/api/v1/public/${params.tenant}`, {
         next: { revalidate: 60 },
       })
       if (res.ok) {

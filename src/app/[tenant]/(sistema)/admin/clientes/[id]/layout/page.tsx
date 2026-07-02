@@ -72,34 +72,19 @@ export default function LayoutConfigPage() {
   }
 
   const handleUpload = async (file: File, type: "header" | "central") => {
-    const formData = new FormData()
-    formData.append("file", file)
-    
-    // Custom fetch for multipart since our http wrapper might not handle FormData optimally
-    const token = localStorage.getItem("@BarberCentral:token")
-    try {
-      const res = await fetch(`/api/admin/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData,
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        alert(data.message || data.error?.message || "Erro no upload")
-        return
-      }
-      
-      const fullUrl = `http://localhost:8080${data.data?.url}`
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const base64String = reader.result as string
       if (type === "header") {
-        setLogoHeader(fullUrl)
+        setLogoHeader(base64String)
       } else {
-        setLogoCentral(fullUrl)
+        setLogoCentral(base64String)
       }
-    } catch (err) {
-      alert("Erro ao fazer upload da imagem")
     }
+    reader.onerror = () => {
+      alert("Erro ao ler o arquivo de imagem")
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleSave = async (e: React.FormEvent) => {

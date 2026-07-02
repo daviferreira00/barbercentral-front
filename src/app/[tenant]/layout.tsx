@@ -15,7 +15,8 @@ interface TenantData {
 async function getTenantData(tenant: string): Promise<TenantData | null> {
   try {
     // O backend Go deve estar rodando na porta 8080 ou ajustar conforme sua env
-    const res = await fetch(`http://localhost:8080/api/v1/public/${tenant}`, {
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8080"
+    const res = await fetch(`${backendUrl}/api/v1/public/${tenant}`, {
       next: { revalidate: 60 }, // Cache de 60 segundos
     });
     if (!res.ok) return null;

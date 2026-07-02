@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     )
   }
 
-  const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080/api/v1"
+  const BACKEND_URL = process.env.BACKEND_URL ? (process.env.BACKEND_URL + "/api/v1") : (process.env.BACKEND_API_URL || "http://localhost:8080/api/v1")
 
   try {
     const backendRes = await fetch(`${BACKEND_URL}/auth/password-reset/confirm`, {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
-const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080/api/v1"
+const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:8080") + "/api/v1"
 
 /**
  * Encapsula a lógica de proxy entre o BFF Next.js e o backend Go.
@@ -38,7 +38,7 @@ export async function bffProxy(
 
   try {
     const headers: Record<string, string> = {
-      "X-Frontend-Host": process.env.FRONTEND_URL || "http://localhost:3000",
+      "X-Frontend-Host": process.env.FRONTEND_URL || "http://localhost:3002",
       ...additionalHeaders,
     }
 

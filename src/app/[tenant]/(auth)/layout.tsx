@@ -17,7 +17,8 @@ interface TenantData {
 
 async function getTenantData(tenant: string): Promise<TenantData | null> {
   try {
-    const res = await fetch(`http://localhost:8080/api/v1/public/${tenant}`, {
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8080"
+    const res = await fetch(`${backendUrl}/api/v1/public/${tenant}`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) return null;

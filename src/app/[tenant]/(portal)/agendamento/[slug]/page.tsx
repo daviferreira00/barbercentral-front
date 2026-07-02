@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import PortalAgendamentoClient from "./PortalAgendamentoClient"
 
-const BACKEND_URL = process.env.BACKEND_API_URL || "http://localhost:8080/api/v1"
+const BACKEND_URL = process.env.BACKEND_URL ? (process.env.BACKEND_URL + "/api/v1") : (process.env.BACKEND_API_URL || "http://localhost:8080/api/v1")
 
 interface PublicClientData {
   client_id: string
