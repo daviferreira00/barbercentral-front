@@ -82,3 +82,10 @@ body {
 .animate-loading-bar {
   animation: loading-progress 1.5s infinite ease-in-out;
 }
+
+/* Fix Radix UI Select & Dropdown Item highlights contrast */
+[data-highlighted] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
