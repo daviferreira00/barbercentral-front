@@ -61,7 +61,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     let cookieDomain = undefined
     if (hostname.includes(".")) {
       if (hostname.endsWith(".localhost")) {
-        cookieDomain = ".localhost"
+        cookieDomain = undefined
       } else {
         const parts = hostname.split(".")
         if (parts.length >= 2) {
@@ -69,7 +69,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
         }
       }
     } else if (hostname === "localhost") {
-      cookieDomain = ".localhost"
+      cookieDomain = undefined
     }
 
     // Sobrescreve o cookie com o novo token de impersonação

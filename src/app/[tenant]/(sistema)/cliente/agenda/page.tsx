@@ -417,14 +417,21 @@ export default function ClienteAgendaPage() {
           </div>
 
           <a href="/cliente/agenda/bloqueios">
-            <Button size="sm" variant="ghost" className="border border-slate-200 bg-white h-9 font-semibold flex items-center gap-1">
-              <i className="ti ti-lock text-sm" />
+            <Button size="sm" variant="outline" className="border-slate-200 bg-white h-9 font-semibold flex items-center gap-1.5 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm">
+              <i className="ti ti-lock text-sm text-slate-500" />
               Bloquear Horário
             </Button>
           </a>
 
+          <Link href="/cliente/agenda/kds" target="_blank">
+            <Button size="sm" variant="outline" className="border-slate-200 bg-white h-9 font-semibold flex items-center gap-1.5 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm">
+              <i className="ti ti-device-tv text-sm text-indigo-600" />
+              Painel KDS
+            </Button>
+          </Link>
+
           <Link href="/cliente/agenda/novo">
-            <Button size="sm" className="h-9 font-semibold flex items-center gap-1 bg-slate-900 text-white">
+            <Button size="sm" className="h-9 font-semibold flex items-center gap-1.5 bg-slate-900 text-white hover:bg-slate-800">
               <i className="ti ti-plus text-sm" />
               Novo Agendamento
             </Button>
@@ -439,12 +446,17 @@ export default function ClienteAgendaPage() {
             {currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
           </span>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost" onClick={() => navigateDate("today")} className="h-7 text-[10px] font-bold border border-slate-200 bg-white px-2">
+            <Button size="sm" variant="outline" onClick={() => navigateDate("today")} className="h-7 text-[10px] font-bold border-slate-200 bg-white px-2 text-slate-750 hover:bg-slate-50">
               Hoje
             </Button>
+            <Link href="/cliente/agenda/kds" target="_blank">
+              <Button size="sm" variant="outline" className="h-7 w-7 p-0 border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50">
+                <i className="ti ti-device-tv text-sm text-indigo-600" />
+              </Button>
+            </Link>
             <Link href="/cliente/agenda/bloqueios">
-              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 border border-slate-200 bg-white flex items-center justify-center">
-                <i className="ti ti-lock text-sm" />
+              <Button size="sm" variant="outline" className="h-7 w-7 p-0 border-slate-200 bg-white flex items-center justify-center hover:bg-slate-50">
+                <i className="ti ti-lock text-sm text-slate-500" />
               </Button>
             </Link>
           </div>

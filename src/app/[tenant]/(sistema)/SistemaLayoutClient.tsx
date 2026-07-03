@@ -1,7 +1,7 @@
 "use client"
 
 import { useApp } from "@/shared/context/AppContext"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,7 @@ export default function SistemaLayoutClient({
   const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout } = useApp()
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false)
+  const pathname = usePathname()
 
   if (loading) {
     return (
@@ -31,6 +32,15 @@ export default function SistemaLayoutClient({
   if (!user) return null
 
   const isAdmin = user.role === "admin"
+  const isKds = pathname?.endsWith("/agenda/kds")
+
+  if (isKds) {
+    return (
+      <div className="h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
+        {children}
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50 font-sans">

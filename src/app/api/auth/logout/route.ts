@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   let cookieDomain = undefined
   if (hostname.includes(".")) {
     if (hostname.endsWith(".localhost")) {
-      cookieDomain = ".localhost"
+      cookieDomain = undefined
     } else {
       const parts = hostname.split(".")
       if (parts.length >= 2) {
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       }
     }
   } else if (hostname === "localhost") {
-    cookieDomain = ".localhost"
+    cookieDomain = undefined
   }
 
   const response = NextResponse.json({ data: { ok: true } })
