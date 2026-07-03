@@ -169,7 +169,7 @@ export default function AdminClientesPage() {
   const handleImpersonate = async (client: ClientSaaS) => {
     const host = window.location.host
     const protocol = window.location.protocol
-    
+
     if (host.includes("localhost")) {
       const port = host.split(":")[1] || "3002"
       window.location.href = `${protocol}//${client.slug}.localhost:${port}/login`
@@ -257,11 +257,10 @@ export default function AdminClientesPage() {
                       </td>
                       <td className="p-4">
                         <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
-                            c.status === "active"
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                              : "bg-red-50 text-red-700 border-red-100"
-                          }`}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border ${c.status === "active"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                            : "bg-red-50 text-red-700 border-red-100"
+                            }`}
                         >
                           {c.status === "active" ? "Ativo" : "Bloqueado"}
                         </span>
