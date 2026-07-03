@@ -326,6 +326,21 @@ export default function ClienteAgendaPage() {
     }
   }
 
+  const getWeekDays = () => {
+    const dayOfWeek = currentDate.getDay() // 0 = Sunday, 1 = Monday...
+    const start = new Date(currentDate)
+    const diff = currentDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // adjust to Monday
+    start.setDate(diff)
+
+    const list = []
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(start)
+      day.setDate(start.getDate() + i)
+      list.push(day)
+    }
+    return list
+  }
+
   // Formatador de Data de exibição no header
   const getHeaderDateLabel = () => {
     if (viewMode === "day") {
@@ -349,9 +364,11 @@ export default function ClienteAgendaPage() {
   }
 
   return (
-    <div className="space-y-6 w-full animate-fade-in">
-      {/* Header agenda controls */}
-      <div className="flex justify-between items-center flex-wrap gap-4 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">
+    <div className="space-y-4 md:space-y-6 w-full animate-fade-in">
+      {/* 1. CONTROLES: DESKTOP (hidden md:flex) vs MOBILE (flex md:hidden) */}
+      
+      {/* Desktop Controls */}
+      <div className="hidden md:flex justify-between items-center flex-wrap gap-4 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
           <Button variant="ghost" onClick={() => navigateDate("prev")} className="border border-slate-200 h-9 px-3">
             <i className="ti ti-chevron-left text-base" />
@@ -415,9 +432,84 @@ export default function ClienteAgendaPage() {
         </div>
       </div>
 
+      {/* Mobile Controls */}
+      <div className="flex md:hidden flex-col gap-3 bg-white border border-slate-100 p-4 rounded-2xl shadow-sm animate-fade-in">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-extrabold text-slate-800 capitalize">
+            {currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="ghost" onClick={() => navigateDate("today")} className="h-7 text-[10px] font-bold border border-slate-200 bg-white px-2">
+              Hoje
+            </Button>
+            <Link href="/cliente/agenda/bloqueios">
+              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 border border-slate-200 bg-white flex items-center justify-center">
+                <i className="ti ti-lock text-sm" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Date Carousel */}
+        <div className="flex justify-between items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none w-full">
+          {getWeekDays().map((day, idx) => {
+            const isSelected = formatDateString(day) === activeDateStr
+            const isToday = formatDateString(new Date()) === formatDateString(day)
+            return (
+              <button
+                key={idx}
+                onClick={() => setCurrentDate(day)}
+                className={`flex flex-col items-center justify-center min-w-[42px] h-13 rounded-xl transition duration-150 border focus:outline-none cursor-pointer ${
+                  isSelected
+                    ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                    : isToday
+                    ? "bg-slate-50 text-indigo-600 border-indigo-200"
+                    : "bg-white text-slate-600 border-slate-100 hover:border-slate-300"
+                }`}
+              >
+                <span className={`text-[8px] font-bold uppercase tracking-wider ${isSelected ? "text-white/70" : "text-slate-400"}`}>
+                  {day.toLocaleDateString("pt-BR", { weekday: "short" }).substring(0, 3)}
+                </span>
+                <span className="text-xs font-extrabold mt-0.5 leading-none">
+                  {day.getDate()}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Professional Scrollbar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-t border-slate-100 pt-2.5 w-full">
+          <button
+            onClick={() => setSelectedProfId("")}
+            className={`px-3 py-1 text-[9px] font-extrabold rounded-full transition whitespace-nowrap focus:outline-none border cursor-pointer ${
+              selectedProfId === ""
+                ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
+                : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-400"
+            }`}
+          >
+            Todos
+          </button>
+          {professionals.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setSelectedProfId(p.id)}
+              className={`px-3 py-1 text-[9px] font-extrabold rounded-full transition whitespace-nowrap focus:outline-none border cursor-pointer ${
+                selectedProfId === p.id
+                  ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
+                  : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-400"
+              }`}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {errorMsg && <Alert variant="error" message={errorMsg} />}
 
       {/* Visualização de Agenda */}
+      {/* 2. CONTEÚDO PRINCIPAL: DESKTOP (hidden md:block) vs MOBILE (block md:hidden) */}
       {loading ? (
         <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-16 flex flex-col items-center justify-center gap-2 text-slate-400">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -425,75 +517,234 @@ export default function ClienteAgendaPage() {
         </div>
       ) : (
         <div className="w-full">
-          {viewMode === "day" ? (
-            // Day view timeline
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {professionals
-                .filter((p) => !selectedProfId || p.id === selectedProfId)
-                .map((prof) => {
-                  const profApps = appointments.filter((a) => a.professional_id === prof.id && cleanDate(a.date) === activeDateStr)
-                  const profBlocks = blockedSlots.filter((b) => (!b.professional_id || b.professional_id === prof.id) && cleanDate(b.date) === activeDateStr)
+          {/* MOBILE VIEW TIMELINE */}
+          <div className="block md:hidden space-y-4">
+            {/* Display list of unified appointments */}
+            {(() => {
+              const activeApps = appointments.filter(
+                (a) =>
+                  (!selectedProfId || a.professional_id === selectedProfId) &&
+                  cleanDate(a.date) === activeDateStr
+              )
+              const activeBlocks = blockedSlots.filter(
+                (b) =>
+                  (!selectedProfId || b.professional_id === selectedProfId) &&
+                  cleanDate(b.date) === activeDateStr
+              )
 
-                  return (
-                    <Card key={prof.id} className="border-slate-100 flex flex-col min-h-[450px]">
-                      <CardHeader className="bg-slate-50 border-b border-slate-100 py-3 px-5">
-                        <CardTitle className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[10px]">
-                            {prof.name[0]}
-                          </div>
-                          {prof.name}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 flex-1 space-y-3 bg-slate-50/20">
-                        {/* Exibe bloqueios daquele dia */}
-                        {profBlocks.map((block) => (
-                          <div
-                            key={block.id}
-                            className="bg-slate-200/50 border border-dashed border-slate-300 text-slate-500 rounded-xl p-3 text-xs flex items-center gap-2 font-semibold"
-                          >
-                            <i className="ti ti-lock text-sm" />
+              if (activeApps.length === 0 && activeBlocks.length === 0) {
+                return (
+                  <div className="bg-white border border-slate-100 rounded-2xl shadow-sm py-16 px-6 text-center text-slate-400">
+                    <i className="ti ti-calendar-event text-4xl mb-2 text-slate-300 block" />
+                    <span className="text-xs font-bold">Sem compromissos hoje</span>
+                  </div>
+                )
+              }
+
+              // Combine and sort by start_time
+              const timelineItems = [
+                ...activeApps.map((a) => ({ type: "app" as const, time: a.start_time, data: a })),
+                ...activeBlocks.map((b) => ({ type: "block" as const, time: b.start_time, data: b })),
+              ].sort((x, y) => x.time.localeCompare(y.time))
+
+              return (
+                <div className="space-y-3">
+                  {timelineItems.map((item) => {
+                    if (item.type === "block") {
+                      const block = item.data as BlockedSlot
+                      return (
+                        <div
+                          key={`block-${block.id}`}
+                          className="bg-slate-100 border border-dashed border-slate-200 text-slate-500 rounded-xl p-3 flex items-center justify-between gap-3 text-xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <i className="ti ti-lock text-sm text-slate-400" />
                             <div>
-                              <p className="font-bold">
+                              <p className="font-extrabold text-slate-700">
                                 {block.start_time.substring(0, 5)} - {block.end_time.substring(0, 5)}
                               </p>
                               <p className="text-[10px] text-slate-400">Bloqueio: {block.reason || "Indisponível"}</p>
                             </div>
                           </div>
-                        ))}
+                          {block.professional_id && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 bg-slate-200 rounded text-slate-600">
+                              {professionals.find((p) => p.id === block.professional_id)?.name || "Barbeiro"}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    }
 
-                        {profApps.length === 0 && profBlocks.length === 0 ? (
-                          <div className="h-full flex flex-col items-center justify-center text-slate-300 py-24 text-center">
-                            <i className="ti ti-calendar-event text-4xl mb-2" />
-                            <span className="text-xs font-bold">Sem compromissos hoje</span>
+                    const app = item.data as EnrichedAppointment
+                    return (
+                      <div
+                        key={`app-${app.id}`}
+                        onClick={() => setSelectedApp(app)}
+                        className={`border rounded-xl p-3.5 shadow-sm active:scale-[0.99] transition duration-100 cursor-pointer flex flex-col gap-2 font-sans ${getStatusStyle(
+                          app.status
+                        )}`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-extrabold leading-none">
+                              {app.start_time.substring(0, 5)} - {app.end_time.substring(0, 5)}
+                            </span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 bg-slate-900/5 rounded text-slate-700">
+                              {app.professional_name}
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-bold uppercase tracking-wider">
+                            {getStatusLabel(app.status)}
+                          </span>
+                        </div>
+                        <p className="text-xs font-extrabold text-slate-900 leading-tight">
+                          {app.customer_name || "Cliente Avulso"}
+                        </p>
+                        <div className="flex justify-between items-center text-[10px] text-slate-500/80 font-bold border-t border-slate-200/50 pt-2 mt-1">
+                          <span className="truncate max-w-[150px]">
+                            {(app.services || []).map((s) => s.service_name).join(", ")}
+                          </span>
+                          <span>
+                            R$ {(app.services || []).reduce((acc, s) => acc + s.price, 0).toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </div>
+
+          {/* DESKTOP VIEW TIMELINE */}
+          <div className="hidden md:block">
+            {viewMode === "day" ? (
+              // Day view timeline
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {professionals
+                  .filter((p) => !selectedProfId || p.id === selectedProfId)
+                  .map((prof) => {
+                    const profApps = appointments.filter((a) => a.professional_id === prof.id && cleanDate(a.date) === activeDateStr)
+                    const profBlocks = blockedSlots.filter((b) => (!b.professional_id || b.professional_id === prof.id) && cleanDate(b.date) === activeDateStr)
+
+                    return (
+                      <Card key={prof.id} className="border-slate-100 flex flex-col min-h-[450px]">
+                        <CardHeader className="bg-slate-50 border-b border-slate-100 py-3 px-5">
+                          <CardTitle className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                            <div className="h-6 w-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[10px]">
+                              {prof.name[0]}
+                            </div>
+                            {prof.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 flex-1 space-y-3 bg-slate-50/20">
+                          {profBlocks.map((block) => (
+                            <div
+                              key={block.id}
+                              className="bg-slate-200/50 border border-dashed border-slate-300 text-slate-500 rounded-xl p-3 text-xs flex items-center gap-2 font-semibold"
+                            >
+                              <i className="ti ti-lock text-sm" />
+                              <div>
+                                <p className="font-bold">
+                                  {block.start_time.substring(0, 5)} - {block.end_time.substring(0, 5)}
+                                </p>
+                                <p className="text-[10px] text-slate-400">Bloqueio: {block.reason || "Indisponível"}</p>
+                              </div>
+                            </div>
+                          ))}
+
+                          {profApps.length === 0 && profBlocks.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-slate-300 py-24 text-center">
+                              <i className="ti ti-calendar-event text-4xl mb-2" />
+                              <span className="text-xs font-bold">Sem compromissos hoje</span>
+                            </div>
+                          ) : (
+                            profApps.map((app) => (
+                              <div
+                                key={app.id}
+                                onClick={() => setSelectedApp(app)}
+                                className={`border rounded-xl p-3.5 shadow-sm hover:shadow transition duration-150 cursor-pointer flex flex-col gap-2 font-sans ${getStatusStyle(
+                                  app.status
+                                )}`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-extrabold leading-none">
+                                    {app.start_time.substring(0, 5)} - {app.end_time.substring(0, 5)}
+                                  </span>
+                                  <span className="text-[10px] font-bold uppercase tracking-wider">
+                                    {getStatusLabel(app.status)}
+                                  </span>
+                                </div>
+                                <p className="text-xs font-extrabold text-slate-900 leading-tight">
+                                  {app.customer_name || "Cliente Avulso"}
+                                </p>
+                                <div className="flex justify-between items-center text-[10px] text-slate-500/80 font-bold border-t border-slate-200/50 pt-2 mt-1">
+                                  <span className="truncate max-w-[120px]">
+                                    {(app.services || []).map((s) => s.service_name).join(", ")}
+                                  </span>
+                                  <span>
+                                    R$ {(app.services || []).reduce((acc, s) => acc + s.price, 0).toFixed(2)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+              </div>
+            ) : (
+              // Week view timeline
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
+                {Array.from({ length: 7 }).map((_, idx) => {
+                  const dayOfWeek = currentDate.getDay()
+                  const start = new Date(currentDate)
+                  const diff = currentDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // ajusta para segunda
+                  start.setDate(diff + idx)
+
+                  const dayStr = formatDateString(start)
+                  const dayApps = appointments.filter((a) => cleanDate(a.date) === dayStr)
+
+                  const isToday = formatDateString(new Date()) === dayStr
+
+                  return (
+                    <Card key={idx} className={`border-slate-100 flex flex-col min-h-[350px] ${isToday ? "ring-2 ring-primary ring-offset-2" : ""}`}>
+                      <CardHeader className="bg-slate-50 border-b border-slate-100 py-2.5 px-4 text-center">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                          {start.toLocaleDateString("pt-BR", { weekday: "short" })}
+                        </p>
+                        <p className="text-base font-extrabold text-slate-800 leading-none mt-1">
+                          {start.getDate()}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="p-2 flex-1 space-y-2 bg-slate-50/10">
+                        {dayApps.length === 0 ? (
+                          <div className="h-full flex flex-col items-center justify-center text-slate-300 py-16 text-center">
+                            <span className="text-[10px] font-bold">Sem agendamentos</span>
                           </div>
                         ) : (
-                          profApps.map((app) => (
+                          dayApps.map((app) => (
                             <div
                               key={app.id}
                               onClick={() => setSelectedApp(app)}
-                              className={`border rounded-xl p-3.5 shadow-sm hover:shadow transition duration-150 cursor-pointer flex flex-col gap-2 font-sans ${getStatusStyle(
+                              className={`border rounded-lg p-2 shadow-sm hover:shadow transition duration-150 cursor-pointer flex flex-col gap-1 text-[11px] font-sans ${getStatusStyle(
                                 app.status
                               )}`}
                             >
                               <div className="flex justify-between items-center">
-                                <span className="text-xs font-extrabold leading-none">
-                                  {app.start_time.substring(0, 5)} - {app.end_time.substring(0, 5)}
-                                </span>
-                                <span className="text-[10px] font-bold uppercase tracking-wider">
-                                  {getStatusLabel(app.status)}
-                                </span>
+                                <span className="font-bold">{app.start_time.substring(0, 5)}</span>
+                                <span className="text-[8px] font-bold uppercase">{getStatusLabel(app.status)}</span>
                               </div>
-                              <p className="text-xs font-extrabold text-slate-900 leading-tight">
+                              <p className="font-extrabold text-slate-900 truncate leading-none">
                                 {app.customer_name || "Cliente Avulso"}
                               </p>
-                              <div className="flex justify-between items-center text-[10px] text-slate-500/80 font-bold border-t border-slate-200/50 pt-2 mt-1">
-                                <span className="truncate max-w-[120px]">
-                                  {(app.services || []).map((s) => s.service_name).join(", ")}
-                                </span>
-                                <span>
-                                  R$ {(app.services || []).reduce((acc, s) => acc + s.price, 0).toFixed(2)}
-                                </span>
-                              </div>
+                              <p className="text-[9px] text-slate-400 truncate leading-none">
+                                Pro: {app.professional_name.split(" ")[0]}
+                              </p>
+                              <p className="text-[10px] text-slate-500 truncate leading-none">
+                                {(app.services || []).map((s) => s.service_name).join(", ")}
+                              </p>
                             </div>
                           ))
                         )}
@@ -501,69 +752,18 @@ export default function ClienteAgendaPage() {
                     </Card>
                   )
                 })}
-            </div>
-          ) : (
-            // Week view timeline
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
-              {Array.from({ length: 7 }).map((_, idx) => {
-                const dayOfWeek = currentDate.getDay()
-                const start = new Date(currentDate)
-                const diff = currentDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) // ajusta para segunda
-                start.setDate(diff + idx)
-
-                const dayStr = formatDateString(start)
-                const dayApps = appointments.filter((a) => cleanDate(a.date) === dayStr)
-
-                const isToday = formatDateString(new Date()) === dayStr
-
-                return (
-                  <Card key={idx} className={`border-slate-100 flex flex-col min-h-[350px] ${isToday ? "ring-2 ring-primary ring-offset-2" : ""}`}>
-                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-2.5 px-4 text-center">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
-                        {start.toLocaleDateString("pt-BR", { weekday: "short" })}
-                      </p>
-                      <p className="text-base font-extrabold text-slate-800 leading-none mt-1">
-                        {start.getDate()}
-                      </p>
-                    </CardHeader>
-                    <CardContent className="p-2 flex-1 space-y-2 bg-slate-50/10">
-                      {dayApps.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-slate-300 py-16 text-center">
-                          <span className="text-[10px] font-bold">Sem agendamentos</span>
-                        </div>
-                      ) : (
-                        dayApps.map((app) => (
-                          <div
-                            key={app.id}
-                            onClick={() => setSelectedApp(app)}
-                            className={`border rounded-lg p-2 shadow-sm hover:shadow transition duration-150 cursor-pointer flex flex-col gap-1 text-[11px] font-sans ${getStatusStyle(
-                              app.status
-                            )}`}
-                          >
-                            <div className="flex justify-between items-center">
-                              <span className="font-bold">{app.start_time.substring(0, 5)}</span>
-                              <span className="text-[8px] font-bold uppercase">{getStatusLabel(app.status)}</span>
-                            </div>
-                            <p className="font-extrabold text-slate-900 truncate leading-none">
-                              {app.customer_name || "Cliente Avulso"}
-                            </p>
-                            <p className="text-[9px] text-slate-400 truncate leading-none">
-                              Pro: {app.professional_name.split(" ")[0]}
-                            </p>
-                            <p className="text-[10px] text-slate-500 truncate leading-none">
-                              {(app.services || []).map((s) => s.service_name).join(", ")}
-                            </p>
-                          </div>
-                        ))
-                      )}
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       )}
+
+      {/* Floating Action Button (FAB) on Mobile */}
+      <Link href="/cliente/agenda/novo">
+        <button className="fixed bottom-20 right-4 z-40 bg-slate-900 text-white rounded-full h-12 w-12 shadow-xl md:hidden flex items-center justify-center border-none cursor-pointer hover:bg-slate-800 active:scale-95 transition">
+          <i className="ti ti-plus text-lg" />
+        </button>
+      </Link>
 
       <Dialog open={selectedApp !== null} onOpenChange={(open) => !open && setSelectedApp(null)}>
         {selectedApp && (

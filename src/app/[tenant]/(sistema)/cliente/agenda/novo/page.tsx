@@ -229,10 +229,10 @@ export default function NovoAgendamentoPainelPage() {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Formulário (Esquerda) */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-6 pb-24 md:pb-0">
           {/* Seção 1: Cliente */}
           <Card>
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-4 md:p-6 space-y-4">
               <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">1. Cliente</h2>
 
               {!isManualCust ? (
@@ -348,7 +348,7 @@ export default function NovoAgendamentoPainelPage() {
 
           {/* Seção 2: Serviços */}
           <Card>
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-4 md:p-6 space-y-4">
               <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">2. Serviços</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -380,7 +380,7 @@ export default function NovoAgendamentoPainelPage() {
 
           {/* Seção 3: Profissional e Horário */}
           <Card>
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-4 md:p-6 space-y-4">
               <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">3. Profissional e Horário</h2>
 
               <div className="grid grid-cols-2 gap-4">
@@ -456,7 +456,7 @@ export default function NovoAgendamentoPainelPage() {
 
           {/* Seção 4: Observações */}
           <Card>
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-4 md:p-6 space-y-4">
               <h2 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">4. Observações</h2>
               <textarea
                 value={notes}
@@ -469,7 +469,7 @@ export default function NovoAgendamentoPainelPage() {
         </div>
 
         {/* Resumo da Fatura / Sidebar (Direita) */}
-        <div className="lg:col-span-4">
+        <div className="hidden lg:block lg:col-span-4">
           <div className="sticky top-6 space-y-4">
             <Card className="border-slate-200 shadow-lg">
               <CardContent className="p-5 space-y-4 text-sm text-slate-700">
@@ -546,6 +546,29 @@ export default function NovoAgendamentoPainelPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Barra de Rodapé Fixa de Resumo (Somente Mobile) */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 flex items-center justify-between z-40 lg:hidden shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Total Estimado</span>
+            <span className="text-sm font-extrabold text-slate-900 leading-none">R$ {totalPrice.toFixed(2)}</span>
+            <span className="text-[9px] font-semibold text-slate-500 mt-1">{totalDuration} min</span>
+          </div>
+          <Button
+            type="submit"
+            disabled={submitting}
+            className="h-10 text-xs font-bold px-6 shadow-md transition active:scale-[0.98] flex items-center justify-center gap-1.5"
+          >
+            {submitting ? (
+              <>
+                <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Agendando...
+              </>
+            ) : (
+              "Agendar"
+            )}
+          </Button>
         </div>
       </form>
     </div>

@@ -47,19 +47,19 @@ export default function NovoProfissionalPage() {
   }
 
   return (
-    <div className="space-y-6 w-full max-w-2xl mx-auto animate-fade-in">
+    <div className="space-y-6 w-full max-w-2xl mx-auto animate-fade-in px-1 md:px-0">
       <div className="flex items-center gap-2">
         <a href="/cliente/profissionais" className="text-slate-400 hover:text-slate-600 transition">
           <i className="ti ti-arrow-left text-xl" />
         </a>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Novo Profissional</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Cadastrar um novo membro na equipe da barbearia.</p>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-800">Novo Profissional</h1>
+          <p className="text-xs md:text-sm text-slate-500 mt-0.5">Cadastrar um novo membro na equipe da barbearia.</p>
         </div>
       </div>
 
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 px-4 pb-4 md:px-6 md:pb-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase">Nome Completo</label>
@@ -85,8 +85,8 @@ export default function NovoProfissionalPage() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase">Status Inicial</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                <label className="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-700 cursor-pointer">
                   <input
                     type="radio"
                     name="status"
@@ -97,7 +97,7 @@ export default function NovoProfissionalPage() {
                   />
                   Ativo (Disponível na agenda)
                 </label>
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 cursor-pointer">
+                <label className="flex items-center gap-2 text-xs md:text-sm font-semibold text-slate-700 cursor-pointer">
                   <input
                     type="radio"
                     name="status"
@@ -113,13 +113,13 @@ export default function NovoProfissionalPage() {
 
             {saveError && <Alert variant="error" message={saveError} />}
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-              <a href="/cliente/profissionais">
-                <Button type="button" variant="ghost" disabled={saving}>
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 w-full md:flex md:justify-end md:w-auto">
+              <a href="/cliente/profissionais" className="w-full md:w-auto">
+                <Button type="button" variant="ghost" disabled={saving} className="w-full h-9 text-xs">
                   Cancelar
                 </Button>
               </a>
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving} className="w-full h-9 text-xs">
                 {saving ? "Salvando..." : "Salvar e Continuar"}
               </Button>
             </div>
