@@ -3,8 +3,12 @@ import { NextResponse } from "next/server"
 export async function POST(request: Request) {
   const host = request.headers.get("host") || ""
   const hostname = host.split(":")[0]
+  const isIP = /^[0-9.]+$/.test(hostname)
   let cookieDomain = undefined
-  if (hostname.includes(".")) {
+  
+  if (isIP) {
+    cookieDomain = undefined
+  } else if (hostname.includes(".")) {
     if (hostname.endsWith(".localhost")) {
       cookieDomain = undefined
     } else {
@@ -13,8 +17,6 @@ export async function POST(request: Request) {
         cookieDomain = "." + parts.slice(-2).join(".")
       }
     }
-  } else if (hostname === "localhost") {
-    cookieDomain = undefined
   }
 
   const response = NextResponse.json({ data: { ok: true } })
