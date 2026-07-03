@@ -166,17 +166,22 @@ export default function AdminClientesPage() {
     loadData()
   }
 
-  const handleImpersonate = async (clientId: string) => {
-    setLoading(true)
-    const res = await http.post<{ ok: boolean }>(`/admin/impersonate/${clientId}`, {})
-    if (res.error) {
-      setLoading(false)
-      alert(res.error.message)
-      return
+  const handleImpersonate = async (client: ClientSaaS) => {
+    const host = window.location.host
+    const protocol = window.location.protocol
+    
+    if (host.includes("localhost")) {
+      const port = host.split(":")[1] || "3002"
+      window.location.href = `${protocol}//${client.slug}.localhost:${port}/login`
+    } else {
+      const parts = host.split(".")
+      if (parts.length > 2) {
+        parts[0] = client.slug
+        window.location.href = `${protocol}//${parts.join(".")}/login`
+      } else {
+        window.location.href = `${protocol}//${client.slug}.${host}/login`
+      }
     }
-
-    await refreshSession()
-    router.push("/cliente")
   }
 
   const getPlanName = (planId: string) => {
@@ -292,8 +297,8 @@ export default function AdminClientesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleImpersonate(c.id)}
-                          className="text-indigo-600 hover:bg-indigo-50 font-bold"
+                          onClick={() => handleImpersonate(c)}
+                          className="text-indigo-650 hover:bg-indigo-50 font-bold"
                         >
                           Acessar
                         </Button>

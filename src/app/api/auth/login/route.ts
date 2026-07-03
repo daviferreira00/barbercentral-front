@@ -67,12 +67,29 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({ data: user })
 
+    const host = request.headers.get("host") || ""
+    const hostname = host.split(":")[0]
+    let cookieDomain = undefined
+    if (hostname.includes(".")) {
+      if (hostname.endsWith(".localhost")) {
+        cookieDomain = ".localhost"
+      } else {
+        const parts = hostname.split(".")
+        if (parts.length >= 2) {
+          cookieDomain = "." + parts.slice(-2).join(".")
+        }
+      }
+    } else if (hostname === "localhost") {
+      cookieDomain = ".localhost"
+    }
+
     // Sessão em cookie httpOnly
     response.cookies.set("bc_session", token, {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 12, // 12 horas
+      domain: cookieDomain,
     })
 
     return response
