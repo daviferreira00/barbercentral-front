@@ -213,11 +213,25 @@ export default function SistemaLayoutClient({
                   )}
                   <div className="flex flex-col gap-1">
                     <Link
+                      href="/cliente/configuracoes/agenda"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-calendar-event text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Regras da Agenda</span>}
+                    </Link>
+                    <Link
                       href="/cliente/configuracoes/fidelidade"
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-award text-base" />
                       {!sidebarCollapsed && <span className="truncate">Fidelidade</span>}
+                    </Link>
+                    <Link
+                      href="/cliente/configuracoes/identidade-visual"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-palette text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Identidade Visual</span>}
                     </Link>
                     <Link
                       href="/cliente/configuracoes/plano"

@@ -32,7 +32,9 @@ export const clienteNavSections: NavSection[] = [
   {
     title: "Configurações",
     items: [
+      { href: "/cliente/configuracoes/agenda", icon: "ti-calendar-event", label: "Regras da Agenda" },
       { href: "/cliente/configuracoes/fidelidade", icon: "ti-award", label: "Fidelidade" },
+      { href: "/cliente/configuracoes/identidade-visual", icon: "ti-palette", label: "Identidade Visual" },
       { href: "/cliente/configuracoes/plano", icon: "ti-shield-check", label: "Plano & Assinatura" },
     ],
   },
