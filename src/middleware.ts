@@ -25,7 +25,7 @@ export function middleware(req: NextRequest) {
 
   // Domínios principais da sua aplicação (SaaS). 
   // Qualquer coisa antes disso será tratado como subdomínio (tenant).
-  const mainDomains = ['localhost', 'seusaas.com'];
+  const mainDomains = ['localhost', 'seusaas.com', 'barbercentral.com.br'];
   
   let tenant = hostname;
 
