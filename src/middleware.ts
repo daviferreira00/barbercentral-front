@@ -10,7 +10,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt, manifest.webmanifest (metadata files)
      */
-    '/((?!api|_next/static|_next/image|logo|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest).*)',
+    '/((?!api|uploads|_next/static|_next/image|logo|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest).*)',
   ],
 };
 
