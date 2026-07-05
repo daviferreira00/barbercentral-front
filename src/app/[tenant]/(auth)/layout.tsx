@@ -92,8 +92,8 @@ export default async function AuthLayout({
       </div>
 
       {/* Painel do Formulário (Direita) */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 md:p-16">
-        <div className="w-full max-w-md bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-100/50 p-8 sm:p-10 animate-fade-in">
+      <div className="flex-1 flex flex-col justify-center items-center p-0 lg:p-12 bg-slate-50 lg:bg-transparent">
+        <div className="w-full min-h-screen lg:min-h-0 lg:max-w-md bg-transparent lg:bg-white lg:border lg:border-slate-100 lg:rounded-2xl lg:shadow-xl lg:shadow-slate-100/50 p-6 lg:p-10 animate-fade-in flex flex-col justify-center">
           {children}
         </div>
       </div>
