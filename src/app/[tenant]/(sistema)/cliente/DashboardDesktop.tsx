@@ -1,10 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useApp } from "@/shared/context/AppContext"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { useDashboard, type AppointmentStatus } from "@/features/dashboard/hooks/useDashboard"
 import { Loader2 } from "lucide-react"
 
@@ -20,6 +22,9 @@ export default function DashboardDesktop() {
   const tenant = (params?.tenant as string) || "barbearia-modelo"
   const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading } = useDashboard()
 
+  const [sharingMenu, setSharingMenu] = useState<{ title: string; path: string } | null>(null)
+  const [copied, setCopied] = useState(false)
+
   if (!user) return null
 
   if (loading) {
@@ -29,6 +34,49 @@ export default function DashboardDesktop() {
         <span className="text-sm font-semibold">Carregando painel geral...</span>
       </div>
     )
+  }
+
+  const handleShareAction = async (action: "open" | "copy" | "share") => {
+    if (!sharingMenu) return
+    const fullUrl = `${window.location.origin}${sharingMenu.path}`
+
+    const nav = (typeof navigator !== "undefined" ? navigator : null) as any
+    if (!nav) return
+
+    if (action === "open") {
+      window.open(fullUrl, "_blank")
+      setSharingMenu(null)
+    } else if (action === "copy") {
+      if (nav.clipboard) {
+        await nav.clipboard.writeText(fullUrl)
+        setCopied(true)
+        setTimeout(() => {
+          setCopied(false)
+          setSharingMenu(null)
+        }, 1000)
+      }
+    } else if (action === "share") {
+      if (nav.share) {
+        try {
+          await nav.share({
+            title: sharingMenu.title,
+            text: `Acesse o ${sharingMenu.title} da barbearia!`,
+            url: fullUrl
+          })
+        } catch (e) {
+          // Ignora se cancelar
+        }
+      } else {
+        if (nav.clipboard) {
+          await nav.clipboard.writeText(fullUrl)
+          setCopied(true)
+          setTimeout(() => {
+            setCopied(false)
+            setSharingMenu(null)
+          }, 1000)
+        }
+      }
+    }
   }
 
   return (
@@ -44,25 +92,74 @@ export default function DashboardDesktop() {
         {/* Atalhos Rápidos Desktop */}
         <div className="flex gap-2 items-center flex-wrap">
           <Link href="/cliente/agenda/novo">
-            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200">
+            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200 cursor-pointer">
               <i className="ti ti-calendar-plus text-primary text-sm" />
               Novo Agendamento
             </Button>
           </Link>
-          <Link href="/cliente/agenda/kds">
-            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200">
-              <i className="ti ti-device-desktop-analytics text-primary text-sm" />
-              Painel KDS
-            </Button>
-          </Link>
-          <a href={`/agendamento/${tenant}`} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200">
-              <i className="ti ti-world text-primary text-sm" />
-              Link de Agendamento
-            </Button>
-          </a>
+          <Button 
+            variant="outline" 
+            onClick={() => setSharingMenu({ title: "Painel KDS", path: "/cliente/agenda/kds" })}
+            className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200 cursor-pointer"
+          >
+            <i className="ti ti-device-desktop-analytics text-primary text-sm" />
+            Painel KDS
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setSharingMenu({ title: "Link de Agendamento", path: `/agendamento/${tenant}` })}
+            className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200 cursor-pointer"
+          >
+            <i className="ti ti-world text-primary text-sm" />
+            Link de Agendamento
+          </Button>
         </div>
       </div>
+
+      {/* DIALOG DE COMPARTILHAMENTO DE LINKS */}
+      <Dialog open={!!sharingMenu} onOpenChange={(open) => !open && setSharingMenu(null)}>
+        <DialogContent className="bg-white border-slate-200 text-slate-800 max-w-sm rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-base font-black text-slate-900 text-center">
+              Opções do {sharingMenu?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 flex flex-col gap-2.5">
+            <Button
+              onClick={() => handleShareAction("open")}
+              variant="outline"
+              className="w-full flex items-center justify-start gap-3 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold h-11 px-4 cursor-pointer"
+            >
+              <i className="ti ti-external-link text-lg text-indigo-600" />
+              <span>Abrir em Nova Aba</span>
+            </Button>
+            <Button
+              onClick={() => handleShareAction("copy")}
+              variant="outline"
+              className="w-full flex items-center justify-start gap-3 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold h-11 px-4 cursor-pointer"
+            >
+              <i className={`ti ${copied ? "ti-check text-emerald-600 animate-bounce" : "ti-copy text-indigo-600"}`} />
+              <span>{copied ? "Copiado com sucesso!" : "Copiar Link"}</span>
+            </Button>
+            <Button
+              onClick={() => handleShareAction("share")}
+              variant="outline"
+              className="w-full flex items-center justify-start gap-3 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold h-11 px-4 cursor-pointer"
+            >
+              <i className="ti ti-share text-lg text-indigo-600" />
+              <span>{typeof navigator !== "undefined" && "share" in navigator ? "Compartilhar..." : "Compartilhar (Copiar Link)"}</span>
+            </Button>
+          </div>
+          <DialogFooter className="mt-2">
+            <Button
+              onClick={() => setSharingMenu(null)}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-10 cursor-pointer"
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Grid de Cards Estatísticos */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

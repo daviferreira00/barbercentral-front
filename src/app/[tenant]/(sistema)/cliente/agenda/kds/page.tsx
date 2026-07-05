@@ -70,6 +70,7 @@ export default function AgendaKdsPage() {
   const [pinPromptAction, setPinPromptAction] = useState<{ status: string } | null>(null)
   const [enteredPin, setEnteredPin] = useState("")
   const [pinError, setPinError] = useState<string | null>(null)
+  const [isLightMode, setIsLightMode] = useState<boolean>(false)
 
   // Helper para formatar data YYYY-MM-DD
   const formatDateString = (d: Date) => {
@@ -117,6 +118,14 @@ export default function AgendaKdsPage() {
       setLoading(false)
     }
   }
+
+  // Efeito para carregar o tema salvo
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("kds_theme")
+    if (savedTheme === "light") {
+      setIsLightMode(true)
+    }
+  }, [])
 
   // Efeito para relógio e countdown
   useEffect(() => {
@@ -192,19 +201,18 @@ export default function AgendaKdsPage() {
     loadData()
   }
 
-  // Cores institucionais do cliente
-  const colorPrimary = config?.color_primary || "#4f46e5"
-  const colorSecondary = config?.color_secondary || "#db2777"
-  const colorButton = config?.color_button || colorPrimary
-  const fontFam = config?.font_family || "Inter"
+  const toggleTheme = () => {
+    const newTheme = !isLightMode
+    setIsLightMode(newTheme)
+    localStorage.setItem("kds_theme", newTheme ? "light" : "dark")
+  }
 
-  const bgStyle = config?.background_type === "solid_primary" ? { backgroundColor: colorPrimary }
-    : config?.background_type === "solid_light" ? { backgroundColor: "#f8fafc", color: "#1e293b" }
-    : config?.background_type === "solid_dark" ? { backgroundColor: "#0f172a", color: "#f8fafc" }
-    : config?.background_type === "gradient" ? { backgroundImage: `linear-gradient(to top right, ${colorPrimary}, ${colorSecondary})` }
-    : { backgroundColor: "#020617" } // default deep slate-950
+  const isLight = isLightMode
+  const bgStyle = isLight ? { backgroundColor: "#f8fafc", color: "#1e293b" } : { backgroundColor: "#020617", color: "#f8fafc" }
 
-  const isLight = config?.background_type === "solid_light"
+  const colorPrimary = "#4f46e5"
+  const colorSecondary = "#6366f1"
+  const colorButton = "#4f46e5"
 
   // Estilos visuais baseados no status do agendamento
   const getStatusVisuals = (status: string) => {
@@ -334,7 +342,7 @@ export default function AgendaKdsPage() {
   return (
     <div 
       className="flex flex-col h-full w-full overflow-hidden p-6 transition-all duration-300" 
-      style={{ ...bgStyle, fontFamily: fontFam === "Playfair Display" ? "Georgia, serif" : fontFam }}
+      style={bgStyle}
     >
       
       {/* 1. CABEÇALHO DO KDS COM MARCA */}
@@ -410,6 +418,18 @@ export default function AgendaKdsPage() {
           >
             <i className="ti ti-refresh text-sm" />
             Recarregar ({countdown}s)
+          </Button>
+
+          <Button
+            onClick={toggleTheme}
+            variant="outline"
+            size="sm"
+            className={`h-9 font-bold flex items-center gap-1.5 cursor-pointer ${
+              isLight ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50" : "border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <i className={`ti ${isLight ? "ti-moon" : "ti-sun"} text-sm`} />
+            {isLight ? "Modo Escuro" : "Modo Claro"}
           </Button>
 
           <Link href="/cliente/agenda">
