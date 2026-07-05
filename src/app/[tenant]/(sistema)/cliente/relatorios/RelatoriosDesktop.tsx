@@ -260,7 +260,7 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Faturamento por Profissional</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 border-t">
-                    {revenueData.professional_revenue.length === 0 ? (
+                    {(revenueData.professional_revenue || []).length === 0 ? (
                       <div className="p-6 text-center text-xs text-slate-400 font-semibold">Nenhum faturamento registrado no período.</div>
                     ) : (
                       <table className="w-full text-xs text-left text-slate-600">
@@ -272,7 +272,7 @@ export default function RelatoriosDesktop() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                          {revenueData.professional_revenue.map((p, i) => (
+                          {(revenueData.professional_revenue || []).map((p, i) => (
                             <tr key={i} className="hover:bg-slate-50/20">
                               <td className="px-6 py-3.5 font-bold text-slate-700">{p.label}</td>
                               <td className="px-6 py-3.5 text-center font-semibold text-slate-500">{p.count}</td>
@@ -291,10 +291,10 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Métodos de Pagamento</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {revenueData.method_revenue.length === 0 ? (
+                    {(revenueData.method_revenue || []).length === 0 ? (
                       <div className="text-center text-xs text-slate-400 font-semibold py-8">Sem transações no período.</div>
                     ) : (
-                      revenueData.method_revenue.map((m, i) => {
+                      (revenueData.method_revenue || []).map((m, i) => {
                         const total = revenueData.total_revenue || 1
                         const pct = (m.value / total) * 100
                         return (
@@ -320,7 +320,7 @@ export default function RelatoriosDesktop() {
                   <CardTitle className="text-base font-bold">Serviços Mais Vendidos</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 border-t">
-                  {revenueData.service_revenue.length === 0 ? (
+                  {(revenueData.service_revenue || []).length === 0 ? (
                     <div className="p-6 text-center text-xs text-slate-400 font-semibold">Nenhum serviço faturado no período.</div>
                   ) : (
                     <table className="w-full text-xs text-left text-slate-600">
@@ -332,7 +332,7 @@ export default function RelatoriosDesktop() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {revenueData.service_revenue.map((s, i) => (
+                        {(revenueData.service_revenue || []).map((s, i) => (
                           <tr key={i} className="hover:bg-slate-50/20">
                             <td className="px-6 py-3.5 font-bold text-slate-700">{s.label}</td>
                             <td className="px-6 py-3.5 text-center font-semibold text-slate-500">{s.count}</td>
@@ -380,10 +380,10 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Uso da Agenda por Profissional</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {occupancyData.professional_hours.length === 0 ? (
+                    {(occupancyData.professional_hours || []).length === 0 ? (
                       <div className="text-center text-xs text-slate-400 font-semibold py-8">Nenhum profissional agendado no período.</div>
                     ) : (
-                      occupancyData.professional_hours.map((ph, i) => (
+                      (occupancyData.professional_hours || []).map((ph, i) => (
                         <div key={i} className="space-y-1">
                           <div className="flex justify-between text-xs font-semibold">
                             <span className="font-bold text-slate-700">{ph.label}</span>
@@ -428,15 +428,15 @@ export default function RelatoriosDesktop() {
                           { val: 6, label: "Sexta-feira" },
                           { val: 7, label: "Sábado" }
                         ].map((day) => {
-                          const morning = occupancyData.weekday_heatmap
+                          const morning = (occupancyData.weekday_heatmap || [])
                             .filter((h) => h.weekday === day.val && h.hour >= 8 && h.hour < 12)
                             .reduce((acc, curr) => acc + curr.count, 0)
                           
-                          const afternoon = occupancyData.weekday_heatmap
+                          const afternoon = (occupancyData.weekday_heatmap || [])
                             .filter((h) => h.weekday === day.val && h.hour >= 12 && h.hour < 16)
                             .reduce((acc, curr) => acc + curr.count, 0)
 
-                          const evening = occupancyData.weekday_heatmap
+                          const evening = (occupancyData.weekday_heatmap || [])
                             .filter((h) => h.weekday === day.val && h.hour >= 16 && h.hour < 20)
                             .reduce((acc, curr) => acc + curr.count, 0)
 
@@ -507,7 +507,7 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Top 10 Clientes por Valor Gasto</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 border-t">
-                    {customerData.top_customers.length === 0 ? (
+                    {(customerData.top_customers || []).length === 0 ? (
                       <div className="p-6 text-center text-xs text-slate-400 font-semibold">Sem visitas registradas no período.</div>
                     ) : (
                       <table className="w-full text-xs text-left text-slate-600">
@@ -519,7 +519,7 @@ export default function RelatoriosDesktop() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                          {customerData.top_customers.map((c, i) => (
+                          {(customerData.top_customers || []).map((c, i) => (
                             <tr key={i} className="hover:bg-slate-50/20">
                               <td className="px-6 py-3.5 font-bold text-slate-700">{c.label}</td>
                               <td className="px-6 py-3.5 text-center font-semibold text-slate-500">{c.count}</td>
@@ -538,7 +538,7 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Clientes Sumidos (+60 dias de ausência)</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 border-t">
-                    {customerData.churn_customers.length === 0 ? (
+                    {(customerData.churn_customers || []).length === 0 ? (
                       <div className="p-6 text-center text-xs text-slate-400 font-semibold">Nenhum cliente ausente detectado.</div>
                     ) : (
                       <table className="w-full text-xs text-left text-slate-600">
@@ -549,7 +549,7 @@ export default function RelatoriosDesktop() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                          {customerData.churn_customers.map((c, i) => (
+                          {(customerData.churn_customers || []).map((c, i) => (
                             <tr key={i} className="hover:bg-slate-50/20">
                               <td className="px-6 py-3.5 font-bold text-slate-700">{c.label}</td>
                               <td className="px-6 py-3.5 text-center font-semibold text-red-500">
@@ -609,11 +609,11 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Absenteísmo por Profissional</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {cancelData.professional_cancellations.length === 0 ? (
+                    {(cancelData.professional_cancellations || []).length === 0 ? (
                       <div className="text-center text-xs text-slate-400 font-semibold py-8">Nenhum cancelamento no período.</div>
                     ) : (
-                      cancelData.professional_cancellations.map((p, i) => {
-                        const maxCancels = Math.max(...cancelData.professional_cancellations.map((x) => x.count)) || 1
+                      (cancelData.professional_cancellations || []).map((p, i) => {
+                        const maxCancels = Math.max(...(cancelData.professional_cancellations || []).map((x) => x.count)) || 1
                         const pct = (p.count / maxCancels) * 100
                         return (
                           <div key={i} className="space-y-1">
@@ -637,7 +637,7 @@ export default function RelatoriosDesktop() {
                     <CardTitle className="text-base font-bold">Últimos Cancelamentos com Justificativa</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0 border-t">
-                    {cancelData.recent_cancellations.length === 0 ? (
+                    {(cancelData.recent_cancellations || []).length === 0 ? (
                       <div className="p-6 text-center text-xs text-slate-400 font-semibold">Nenhuma justificativa no período.</div>
                     ) : (
                       <table className="w-full text-xs text-left text-slate-600">
@@ -650,10 +650,10 @@ export default function RelatoriosDesktop() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                          {cancelData.recent_cancellations.map((rc, i) => (
+                          {(cancelData.recent_cancellations || []).map((rc, i) => (
                             <tr key={i} className="hover:bg-slate-50/20">
                               <td className="px-6 py-3.5 text-slate-500">
-                                {new Date(rc.date + "T00:00:00").toLocaleDateString("pt-BR")} - {rc.time.substring(0, 5)}
+                                {rc.date ? new Date(rc.date + "T00:00:00").toLocaleDateString("pt-BR") : ""} - {rc.time ? rc.time.substring(0, 5) : ""}
                               </td>
                               <td className="px-6 py-3.5 font-bold text-slate-700">{rc.professional}</td>
                               <td className="px-6 py-3.5 font-semibold text-slate-600">{rc.customer || "Sem cadastro"}</td>

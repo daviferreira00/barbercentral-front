@@ -251,11 +251,11 @@ export default function RelatoriosMobile() {
               {/* Faturamento por Profissional */}
               <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col gap-3">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Por Profissional</h3>
-                {revenueData.professional_revenue.length === 0 ? (
+                {(revenueData.professional_revenue || []).length === 0 ? (
                   <p className="text-center py-4 text-xs text-slate-400 italic">Sem registros.</p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {revenueData.professional_revenue.map((p, i) => (
+                    {(revenueData.professional_revenue || []).map((p, i) => (
                       <ListCard
                         key={i}
                         index={i}
@@ -271,11 +271,11 @@ export default function RelatoriosMobile() {
               {/* Métodos de Pagamento */}
               <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col gap-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Métodos de Pagamento</h3>
-                {revenueData.method_revenue.length === 0 ? (
+                {(revenueData.method_revenue || []).length === 0 ? (
                   <p className="text-center py-4 text-xs text-slate-400 italic">Sem transações.</p>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {revenueData.method_revenue.map((m, i) => {
+                    {(revenueData.method_revenue || []).map((m, i) => {
                       const total = revenueData.total_revenue || 1
                       const pct = (m.value / total) * 100
                       return (
@@ -297,11 +297,11 @@ export default function RelatoriosMobile() {
               {/* Serviços mais vendidos */}
               <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col gap-3">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Serviços Mais Vendidos</h3>
-                {revenueData.service_revenue.length === 0 ? (
+                {(revenueData.service_revenue || []).length === 0 ? (
                   <p className="text-center py-4 text-xs text-slate-400 italic">Sem registros.</p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {revenueData.service_revenue.map((s, i) => (
+                    {(revenueData.service_revenue || []).map((s, i) => (
                       <ListCard
                         key={i}
                         index={i}
@@ -342,11 +342,11 @@ export default function RelatoriosMobile() {
               {/* Ocupação por Profissional */}
               <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col gap-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Por Profissional</h3>
-                {occupancyData.professional_hours.length === 0 ? (
+                {(occupancyData.professional_hours || []).length === 0 ? (
                   <p className="text-center py-4 text-xs text-slate-400 italic">Sem registros.</p>
                 ) : (
                   <div className="flex flex-col gap-3">
-                    {occupancyData.professional_hours.map((ph, i) => (
+                    {(occupancyData.professional_hours || []).map((ph, i) => (
                       <div key={i} className="space-y-1">
                         <div className="flex justify-between text-xs font-bold">
                           <span className="text-slate-700">{ph.label}</span>
@@ -546,11 +546,11 @@ export default function RelatoriosMobile() {
               {/* Últimos Cancelamentos com Justificativa */}
               <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col gap-3">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Últimos Cancelamentos</h3>
-                {cancelData.recent_cancellations.length === 0 ? (
+                {(cancelData.recent_cancellations || []).length === 0 ? (
                   <p className="text-center py-4 text-xs text-slate-400 italic">Sem justificativas registradas.</p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {cancelData.recent_cancellations.map((rc, i) => (
+                    {(cancelData.recent_cancellations || []).map((rc, i) => (
                       <ListCard
                         key={i}
                         index={i}
@@ -562,7 +562,7 @@ export default function RelatoriosMobile() {
                           </span>
                         }
                         pill={{
-                          label: `${new Date(rc.date + "T00:00:00").toLocaleDateString("pt-BR")} às ${rc.time.substring(0, 5)}`,
+                          label: `${rc.date ? new Date(rc.date + "T00:00:00").toLocaleDateString("pt-BR") : ""} às ${rc.time ? rc.time.substring(0, 5) : ""}`,
                           tone: "neutral"
                         }}
                       />
