@@ -20,6 +20,7 @@ export interface DashboardData {
   occupancyRate: string
   upcoming: UpcomingAppointment[]
   loading: boolean
+  clientSlug: string
 }
 
 export function useDashboard(): DashboardData {
@@ -29,6 +30,7 @@ export function useDashboard(): DashboardData {
   const [occupancyRate, setOccupancyRate] = useState("0%")
   const [upcoming, setUpcoming] = useState<UpcomingAppointment[]>([])
   const [loading, setLoading] = useState(true)
+  const [clientSlug, setClientSlug] = useState("")
 
   const getTodayStr = () => {
     return new Date().toISOString().split("T")[0]
@@ -47,7 +49,14 @@ export function useDashboard(): DashboardData {
     // 3. Busca ocupação de hoje (ignora se plano bloquear)
     const occRes = await http.get<any>(`/reports/occupancy?start_date=${today}&end_date=${today}`)
 
+    // 4. Slug da barbearia ativa (para o link do portal público)
+    const brandRes = await http.get<any>(`/config/branding`)
+
     setLoading(false)
+
+    if (brandRes.data?.client_slug) {
+      setClientSlug(brandRes.data.client_slug)
+    }
 
     // Agendamentos
     if (appRes.data) {
@@ -105,5 +114,6 @@ export function useDashboard(): DashboardData {
     occupancyRate,
     upcoming,
     loading,
+    clientSlug,
   }
 }

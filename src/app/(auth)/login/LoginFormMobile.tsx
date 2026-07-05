@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Alert } from "@/components/ui/alert"
 import { authService } from "@/shared/auth/auth-service"
 import { haptic } from "@/shared/lib/haptics"
@@ -22,8 +22,6 @@ type LoginMode = "credentials" | "magic-link"
 
 export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-horizontal-white.svg" }: { logoUrl?: string }) {
   const router = useRouter()
-  const params = useParams()
-  const tenant = (params?.tenant as string) || ""
 
   const [mode, setMode] = useState<LoginMode>("credentials")
   const [email, setEmail] = useState("")
@@ -132,7 +130,7 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
       const { email: savedEmail, password: savedPassword } = JSON.parse(atob(savedData))
 
       setSubmitting(true)
-      const res = await authService.login({ email: savedEmail, password: savedPassword, tenant })
+      const res = await authService.login({ email: savedEmail, password: savedPassword })
       setSubmitting(false)
 
       if (res.error) {
@@ -171,7 +169,7 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
       }
 
       setSubmitting(true)
-      const res = await authService.login({ email, password, tenant })
+      const res = await authService.login({ email, password })
       setSubmitting(false)
 
       if (res.error) {

@@ -3,12 +3,11 @@ import { NextResponse } from "next/server"
 interface LoginBody {
   email?: string
   password?: string
-  tenant?: string
 }
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as LoginBody
-  const { email, password, tenant } = body
+  const { email, password } = body
 
   if (!email || !password) {
     return NextResponse.json(
@@ -58,31 +57,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // Validação do tenant para usuários não-admin
-    if (backendUser.role !== "admin" && tenant && tenant !== "barbercentral") {
-      try {
-        const publicRes = await fetch(`${BACKEND_URL}/public/${tenant}`)
-        if (publicRes.ok) {
-          const publicPayload = await publicRes.json().catch(() => ({}))
-          const tenantClientId = publicPayload.data?.client_id
-          
-          if (tenantClientId && backendUser.client_id !== tenantClientId) {
-            return NextResponse.json(
-              {
-                error: {
-                  code: "ACESSO_NEGADO",
-                  message: "Você não tem permissão para acessar esta barbearia por este subdomínio.",
-                },
-              },
-              { status: 403 }
-            )
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao validar tenant do usuário:", error)
-      }
-    }
-
+    // Sem subdomínio não há mais tenant-da-URL para validar contra o client_id
+    // retornado — a barbearia ativa (se houver só uma) já vem resolvida pelo
+    // backend; com 2+ vínculos, client_id/role vêm vazios e o frontend força
+    // o seletor de barbearia antes de liberar o painel.
     const user = {
       id: backendUser.id,
       client_id: backendUser.client_id,
@@ -97,7 +75,7 @@ export async function POST(request: Request) {
     const hostname = host.split(":")[0]
     const isIP = /^[0-9.]+$/.test(hostname)
     let cookieDomain = undefined
-    
+
     if (isIP) {
       cookieDomain = undefined
     } else if (hostname.includes(".")) {

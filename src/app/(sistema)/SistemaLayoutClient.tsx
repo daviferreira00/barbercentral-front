@@ -7,6 +7,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/shared/hooks/useIsMobile"
 import { MobileShell } from "@/components/mobile/MobileShell"
+import { EstablishmentSelectorModal } from "./EstablishmentSelectorModal"
 
 export default function SistemaLayoutClient({ 
   children,
@@ -15,7 +16,7 @@ export default function SistemaLayoutClient({
   children: React.ReactNode
   tenantData: any
 }) {
-  const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout } = useApp()
+  const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout, setSelectorOpen } = useApp()
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const pathname = usePathname()
   const isMobile = useIsMobile()
@@ -47,9 +48,12 @@ export default function SistemaLayoutClient({
   // Experiência mobile dedicada (painel da barbearia)
   if (isMobile && !isAdmin) {
     return (
-      <MobileShell user={user} tenantData={tenantData} onLogout={logout}>
-        {children}
-      </MobileShell>
+      <>
+        <MobileShell user={user} tenantData={tenantData} onLogout={logout}>
+          {children}
+        </MobileShell>
+        <EstablishmentSelectorModal />
+      </>
     )
   }
 
@@ -247,8 +251,20 @@ export default function SistemaLayoutClient({
           </nav>
         </div>
 
-        {/* Toggle colapso da sidebar */}
-        <div className="p-4 border-t border-slate-800">
+        {/* Powered by + toggle colapso da sidebar */}
+        <div className="p-4 border-t border-slate-800 flex flex-col gap-3">
+          <div className="flex flex-col items-center gap-1">
+            {!sidebarCollapsed && (
+              <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">
+                Powered by
+              </span>
+            )}
+            <img
+              src={sidebarCollapsed ? "/logo/barbercentral-icon-white.svg" : "/logo/barbercentral-logo-horizontal-white.svg"}
+              alt="Barber Central"
+              className={`${sidebarCollapsed ? "h-6" : "h-5"} w-auto object-contain opacity-60`}
+            />
+          </div>
           <Button
             variant="ghost"
             className="w-full text-slate-400 hover:text-white hover:bg-slate-800 justify-start"
@@ -275,14 +291,31 @@ export default function SistemaLayoutClient({
             )}
 
             {isAdmin ? (
-              <div className="flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">
+              <button
+                onClick={() => setSelectorOpen(true)}
+                className="flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                title="Trocar de barbearia (Cmd+K)"
+              >
                 <i className="ti ti-crown text-amber-500" />
                 Painel Geral Admin
-              </div>
+                <i className="ti ti-chevron-down text-slate-400" />
+              </button>
             ) : (
-              <div className="flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">
+              <button
+                onClick={() => setSelectorOpen(true)}
+                className="flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+                title="Trocar de barbearia (Cmd+K)"
+              >
                 <i className="ti ti-building-store text-indigo-500" />
-                Barbearia Modelo
+                <span className="truncate max-w-[160px]">{tenantData?.client_name || "Minha Barbearia"}</span>
+                <i className="ti ti-chevron-down text-slate-400" />
+              </button>
+            )}
+
+            {user.impersonating && (
+              <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-700">
+                <i className="ti ti-spy" />
+                Sessão admin
               </div>
             )}
           </div>
@@ -340,6 +373,8 @@ export default function SistemaLayoutClient({
           {children}
         </main>
       </div>
+
+      <EstablishmentSelectorModal />
     </div>
   )
 }

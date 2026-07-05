@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert } from "@/components/ui/alert"
@@ -11,8 +11,6 @@ type LoginMode = "credentials" | "magic-link"
 
 export default function LoginFormDesktop({ logoUrl = "/logo/barbercentral-logo-horizontal.svg" }: { logoUrl?: string }) {
   const router = useRouter()
-  const params = useParams()
-  const tenant = (params?.tenant as string) || ""
 
   const [mode, setMode] = useState<LoginMode>("credentials")
   const [email, setEmail] = useState("")
@@ -40,7 +38,7 @@ export default function LoginFormDesktop({ logoUrl = "/logo/barbercentral-logo-h
       }
 
       setSubmitting(true)
-      const res = await authService.login({ email, password, tenant })
+      const res = await authService.login({ email, password })
       setSubmitting(false)
 
       if (res.error) {
@@ -149,7 +147,7 @@ export default function LoginFormDesktop({ logoUrl = "/logo/barbercentral-logo-h
         <Button
           type="submit"
           className="w-full h-11 mt-2 text-sm font-semibold hover:opacity-90 animate-press"
-          style={{ backgroundColor: "var(--color-button, var(--color-primary))", color: "#fff" }}
+          style={{ backgroundColor: "var(--color-button, var(--color-primary, #4f46e5))", color: "#fff" }}
           disabled={submitting}
         >
           {submitting ? (

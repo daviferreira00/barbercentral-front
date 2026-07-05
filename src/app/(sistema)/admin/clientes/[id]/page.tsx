@@ -21,8 +21,11 @@ interface ClientSaaS {
   created_at: string
 }
 
+// 1 linha = 1 vínculo (client_user_link); id = link_id. O mesmo e-mail pode
+// estar vinculado a outras barbearias sem aparecer aqui.
 interface ClientUser {
   id: string
+  user_id?: string
   name: string
   email: string
   role: string
@@ -472,6 +475,10 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
                 onChange={(e) => setUserPassword(e.target.value)}
                 required
               />
+              <p className="text-[11px] text-slate-400">
+                Se este e-mail já existir na plataforma, apenas um novo vínculo com esta
+                barbearia será criado — nome e senha atuais do usuário são mantidos.
+              </p>
             </div>
 
             {userError && <Alert variant="error" message={userError} />}
@@ -570,14 +577,15 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Excluir Usuário</DialogTitle>
+            <DialogTitle>Remover Vínculo</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-3">
             <p className="text-sm text-slate-600">
-              Tem certeza que deseja excluir o usuário <strong className="text-slate-800">{deleteUser?.name}</strong>?
+              Tem certeza que deseja remover o vínculo de <strong className="text-slate-800">{deleteUser?.name}</strong> com
+              esta barbearia?
             </p>
             <p className="text-xs text-red-500 font-semibold">
-              Esta ação não pode ser desfeita. O usuário perderá todo o acesso ao sistema.
+              Esta ação não pode ser desfeita. Vínculos com outras barbearias não são afetados.
             </p>
           </div>
           <DialogFooter>
@@ -585,7 +593,7 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
               Cancelar
             </Button>
             <Button variant="destructive" onClick={handleDeleteUser} disabled={deleting}>
-              {deleting ? "Excluindo..." : "Excluir Usuário"}
+              {deleting ? "Removendo..." : "Remover Vínculo"}
             </Button>
           </DialogFooter>
         </DialogContent>

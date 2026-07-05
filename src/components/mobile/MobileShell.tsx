@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { clienteNavSections } from "@/shared/config/nav"
 import { haptic } from "@/shared/lib/haptics"
+import { useApp } from "@/shared/context/AppContext"
 import { MobileDrawer } from "./MobileDrawer"
 import { SplashScreen } from "./SplashScreen"
 
@@ -16,6 +17,10 @@ interface MobileShellProps {
 // Shell da experiência mobile: header fixo + drawer lateral retraído por padrão
 export function MobileShell({ children, user, tenantData, onLogout }: MobileShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { myClients, user: sessionUser, setSelectorOpen } = useApp()
+
+  // Só oferece a troca quando há para onde trocar (2+ vínculos ou admin impersonando)
+  const canSwitchClient = myClients.length > 1 || !!sessionUser?.impersonating
 
   const logoUrl =
     tenantData && (tenantData.logo_url || tenantData.logo_central)
@@ -70,6 +75,7 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
         userRole={user.role === "admin" ? "Administrador" : "Dono da Barbearia"}
         tenantName={tenantData?.client_name || null}
         onLogout={onLogout}
+        onSwitchClient={canSwitchClient ? () => setSelectorOpen(true) : undefined}
       />
 
       <SplashScreen logoUrl={logoUrl} name={tenantData?.client_name} />

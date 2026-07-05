@@ -14,6 +14,7 @@ interface MobileDrawerProps {
   userRole?: string
   tenantName?: string | null
   onLogout: () => void
+  onSwitchClient?: () => void
 }
 
 export function MobileDrawer({
@@ -24,6 +25,7 @@ export function MobileDrawer({
   userRole,
   tenantName,
   onLogout,
+  onSwitchClient,
 }: MobileDrawerProps) {
   const pathname = usePathname()
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
@@ -140,8 +142,21 @@ export function MobileDrawer({
           })}
         </nav>
 
-        {/* Rodapé: sair */}
-        <div className="border-t border-slate-100 p-3 pb-safe">
+        {/* Rodapé: trocar barbearia + sair + powered by */}
+        <div className="border-t border-slate-100 p-3 pb-safe flex flex-col gap-1">
+          {onSwitchClient && (
+            <button
+              onClick={() => {
+                haptic()
+                onClose()
+                onSwitchClient()
+              }}
+              className="mobile-tap flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 active:bg-slate-100 active:scale-[0.98] transition"
+            >
+              <i className="ti ti-switch-horizontal text-lg text-slate-400" />
+              Trocar de barbearia
+            </button>
+          )}
           <button
             onClick={() => {
               haptic()
@@ -153,6 +168,16 @@ export function MobileDrawer({
             <i className="ti ti-logout text-lg" />
             Sair da conta
           </button>
+          <div className="flex flex-col items-center gap-0.5 pt-2 pb-1">
+            <span className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest">
+              Powered by
+            </span>
+            <img
+              src="/logo/barbercentral-logo-horizontal.svg"
+              alt="Barber Central"
+              className="h-4 w-auto object-contain opacity-50"
+            />
+          </div>
         </div>
       </aside>
     </>

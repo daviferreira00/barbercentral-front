@@ -167,29 +167,15 @@ export default function AdminClientesPage() {
   }
 
   const handleImpersonate = async (client: ClientSaaS) => {
-    // 1. Chama a rota de impersonação no Next.js BFF para gerar o token e setar o cookie
+    // O BFF sobrescreve o cookie com o token de impersonação; domínio único,
+    // basta recarregar já no painel da barbearia.
     const res = await http.post<{ ok: boolean }>(`/admin/impersonate/${client.id}`)
     if (res.error) {
       alert(res.error.message || "Erro ao tentar acessar como cliente.")
       return
     }
 
-    // 2. Redireciona para o subdomínio correspondente com o caminho /cliente
-    const host = window.location.host
-    const protocol = window.location.protocol
-
-    if (host.includes("localhost")) {
-      const port = host.split(":")[1] || "3002"
-      window.location.href = `${protocol}//${client.slug}.localhost:${port}/cliente`
-    } else {
-      const parts = host.split(".")
-      if (parts.length > 2) {
-        parts[0] = client.slug
-        window.location.href = `${protocol}//${parts.join(".")}/cliente`
-      } else {
-        window.location.href = `${protocol}//${client.slug}.${host}/cliente`
-      }
-    }
+    window.location.href = "/cliente"
   }
 
   const getPlanName = (planId: string) => {

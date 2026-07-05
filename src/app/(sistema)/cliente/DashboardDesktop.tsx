@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
 import { useApp } from "@/shared/context/AppContext"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -18,9 +17,7 @@ const STATUS_BADGES: Record<AppointmentStatus, string> = {
 
 export default function DashboardDesktop() {
   const { user } = useApp()
-  const params = useParams()
-  const tenant = (params?.tenant as string) || "barbearia-modelo"
-  const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading } = useDashboard()
+  const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading, clientSlug } = useDashboard()
 
   const [sharingMenu, setSharingMenu] = useState<{ title: string; path: string } | null>(null)
   const [copied, setCopied] = useState(false)
@@ -107,7 +104,7 @@ export default function DashboardDesktop() {
           </Button>
           <Button 
             variant="outline" 
-            onClick={() => setSharingMenu({ title: "Link de Agendamento", path: `/agendamento/${tenant}` })}
+            onClick={() => setSharingMenu({ title: "Link de Agendamento", path: `/agendamento/${clientSlug}` })}
             className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200 cursor-pointer"
           >
             <i className="ti ti-world text-primary text-sm" />

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
 import { useApp } from "@/shared/context/AppContext"
 import { KpiCard } from "@/components/mobile/KpiCard"
 import { ListCard } from "@/components/mobile/ListCard"
@@ -22,9 +21,7 @@ const STATUS_TONES: Record<AppointmentStatus, PillTone> = {
 
 export default function DashboardMobile() {
   const { user } = useApp()
-  const params = useParams()
-  const tenant = (params?.tenant as string) || "barbearia-modelo"
-  const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading } =
+  const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading, clientSlug } =
     useDashboard()
 
   const [sharingMenu, setSharingMenu] = useState<{ title: string; path: string } | null>(null)
@@ -51,7 +48,7 @@ export default function DashboardMobile() {
       label: "Link Público", 
       onClick: (e: React.MouseEvent) => {
         e.preventDefault()
-        setSharingMenu({ title: "Link de Agendamento", path: `/agendamento/${tenant}` })
+        setSharingMenu({ title: "Link de Agendamento", path: `/agendamento/${clientSlug}` })
       }
     },
     { href: "/cliente/clientes/novo", icon: "ti-user-plus", label: "Cliente" },

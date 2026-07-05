@@ -49,6 +49,10 @@ interface Professional {
 interface TimeSlot {
   start_time: string
   end_time: string
+  // Preenchidos pelo backend quando o cliente escolheu "Qualquer Profissional":
+  // indicam qual profissional está de fato livre nesse horário.
+  professional_id?: string
+  professional_name?: string
 }
 
 interface AppointmentResponse {
@@ -67,8 +71,8 @@ interface AppointmentResponse {
 }
 
 const STEPS = [
-  { step: 1, label: "Serviço" },
-  { step: 2, label: "Profissional" },
+  { step: 1, label: "Profissional" },
+  { step: 2, label: "Serviços" },
   { step: 3, label: "Data e Hora" },
   { step: 4, label: "Seus dados" },
   { step: 5, label: "Confirmação" },
@@ -84,15 +88,14 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   const [slots, setSlots] = useState<TimeSlot[]>([])
 
   // Selection states
-  const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [selectedProf, setSelectedProf] = useState<Professional | null>(null) // null = Tanto faz
+  const [selectedServices, setSelectedServices] = useState<Service[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
 
   // Form states
   const [customerName, setCustomerName] = useState("")
   const [customerPhone, setCustomerPhone] = useState("")
-  const [customerEmail, setCustomerEmail] = useState("")
   const [notes, setNotes] = useState("")
 
   // Status states
@@ -107,6 +110,17 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
 
   // Generate 14 days starting from seed base (2026-06-29)
   const [availableDays, setAvailableDays] = useState<Date[]>([])
+
+  // Todos os serviços precisam ficar com o mesmo profissional: se o cliente
+  // escolheu "Qualquer Profissional", o profissional real só é conhecido
+  // depois de escolher o horário (o backend resolve quem está livre).
+  const resolvedProfessionalId = selectedProf ? selectedProf.id : selectedSlot?.professional_id || ""
+  const resolvedProfessionalName = selectedProf
+    ? selectedProf.name
+    : selectedSlot?.professional_name || "Qualquer Profissional"
+
+  const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration_minutes, 0)
+  const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0)
 
   useEffect(() => {
     // Inicializa os próximos 14 dias para o swiper
@@ -141,15 +155,15 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
     loadInitialData()
   }, [])
 
-  // Carrega slots disponíveis
+  // Carrega slots disponíveis (soma a duração de todos os serviços escolhidos)
   const loadSlots = async (date: Date) => {
-    if (!selectedService) return
+    if (selectedServices.length === 0) return
     setLoadingSlots(true)
     setErrorMsg(null)
 
     const dateStr = date.toISOString().split("T")[0]
     const profParam = selectedProf ? `&professional_id=${selectedProf.id}` : ""
-    const svcParam = `&service_ids=${selectedService.id}`
+    const svcParam = selectedServices.map((s) => `&service_ids=${s.id}`).join("")
 
     const res = await http.get<TimeSlot[]>(
       `/public/${config.client_slug}/availability?date=${dateStr}${profParam}${svcParam}`
@@ -171,15 +185,21 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
     }
   }, [selectedDate, selectedProf])
 
-  const handleServiceSelect = (svc: Service) => {
-    setSelectedService(svc)
+  const handleProfSelect = (prof: Professional | null) => {
+    setSelectedProf(prof)
     setStep(2)
   }
 
-  const handleProfSelect = (prof: Professional | null) => {
-    setSelectedProf(prof)
+  const toggleService = (svc: Service) => {
+    setSelectedServices((prev) =>
+      prev.some((s) => s.id === svc.id) ? prev.filter((s) => s.id !== svc.id) : [...prev, svc]
+    )
+  }
+
+  const handleServicesContinue = () => {
+    if (selectedServices.length === 0) return
     setStep(3)
-    // Reseta data/hora se mudou o profissional
+    // Reseta data/hora ao mudar a seleção de serviços
     setSelectedDate(null)
     setSelectedSlot(null)
     setSlots([])
@@ -197,7 +217,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!customerName || !customerPhone || !customerEmail) {
+    if (!customerName || !customerPhone) {
       setErrorMsg("Por favor, preencha todos os campos obrigatórios.")
       return
     }
@@ -206,20 +226,19 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   }
 
   const handleConfirmBooking = async () => {
-    if (!selectedService || !selectedDate || !selectedSlot) return
+    if (selectedServices.length === 0 || !selectedDate || !selectedSlot || !resolvedProfessionalId) return
 
     setSubmitting(true)
     setErrorMsg(null)
 
     const dateStr = selectedDate.toISOString().split("T")[0]
     const res = await http.post<AppointmentResponse>(`/public/${config.client_slug}/appointments`, {
-      professional_id: selectedProf ? selectedProf.id : professionals[0]?.id || "", // fallback se "Tanto faz"
-      service_ids: [selectedService.id],
+      professional_id: resolvedProfessionalId,
+      service_ids: selectedServices.map((s) => s.id),
       date: dateStr,
       start_time: selectedSlot.start_time,
       customer_name: customerName,
       customer_phone: customerPhone,
-      customer_email: customerEmail,
       notes: notes ? notes : null,
     })
     setSubmitting(false)
@@ -248,7 +267,8 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
     const endStr = app.end_time.replace(/:/g, "")
 
     const dates = `${dateStr}T${startStr}/${dateStr}T${endStr}`
-    const text = encodeURIComponent(`${selectedService?.name} - ${config.client_name}`)
+    const serviceNames = selectedServices.map((s) => s.name).join(" + ")
+    const text = encodeURIComponent(`${serviceNames} - ${config.client_name}`)
     const details = encodeURIComponent(`Profissional: ${app.professional_name}\nPowered by BarberCentral`)
     const location = encodeURIComponent(config.address || "")
 
@@ -341,93 +361,10 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
         {/* Alerta de erro geral */}
         {errorMsg && <Alert variant="error" message={errorMsg} />}
 
-        {/* STEP 1: Seleção de Serviço */}
+        {/* STEP 1: Seleção de Profissional */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center flex-wrap gap-2">
-              <h2 className="text-lg font-extrabold text-slate-800">Selecione o Serviço</h2>
-              {/* Categorias Filtros */}
-              <div className="flex gap-1.5 flex-wrap">
-                <button
-                  onClick={() => setSelectedCategoryFilter("")}
-                  className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
-                    selectedCategoryFilter === ""
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white text-slate-500 border-slate-200"
-                  }`}
-                >
-                  Todos
-                </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategoryFilter(cat.id)}
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
-                      selectedCategoryFilter === cat.id
-                        ? "bg-slate-900 text-white border-slate-900"
-                        : "bg-white text-slate-500 border-slate-200"
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2].map((i) => (
-                  <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />
-                ))}
-              </div>
-            ) : filteredServices.length === 0 ? (
-              <p className="text-sm font-semibold text-slate-400 text-center py-8">Nenhum serviço disponível.</p>
-            ) : (
-              <div className="space-y-3">
-                {filteredServices.map((svc) => (
-                  <Card
-                    key={svc.id}
-                    onClick={() => handleServiceSelect(svc)}
-                    className="hover:border-slate-300 transition duration-150 cursor-pointer shadow-sm active:scale-[0.99]"
-                  >
-                    <CardContent className="p-4 flex justify-between items-center gap-4">
-                      <div className="min-w-0 pr-2">
-                        <h3 className="font-extrabold text-slate-800 text-sm leading-snug">{svc.name}</h3>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">{svc.description}</p>
-                        <span className="text-[10px] font-bold text-slate-500 mt-2 block bg-slate-100 w-fit px-2 py-0.5 rounded-md">
-                          {svc.duration_minutes} minutos
-                        </span>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <span className="text-sm font-extrabold text-slate-800 block">
-                          R$ {svc.price.toFixed(2)}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="mt-2 text-[10px] h-7 px-3 font-extrabold text-white transition active:scale-[0.97]"
-                          style={{ backgroundColor: "var(--bc-secondary)" }}
-                        >
-                          Escolher
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* STEP 2: Seleção de Profissional */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => setStep(1)} className="h-8 px-2.5 text-xs text-slate-500 border border-slate-200 bg-white">
-                <i className="ti ti-arrow-left text-sm mr-1" /> Voltar
-              </Button>
-              <h2 className="text-lg font-extrabold text-slate-800">Quem vai te atender?</h2>
-            </div>
+            <h2 className="text-lg font-extrabold text-slate-800">Quem vai te atender?</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Opção Qualquer Profissional */}
@@ -470,6 +407,113 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                 </Card>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* STEP 2: Seleção de Serviços (múltiplos) */}
+        {step === 2 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => setStep(1)} className="h-8 px-2.5 text-xs text-slate-500 border border-slate-200 bg-white">
+                <i className="ti ti-arrow-left text-sm mr-1" /> Voltar
+              </Button>
+              <h2 className="text-lg font-extrabold text-slate-800">Selecione os Serviços</h2>
+            </div>
+
+            {/* Categorias Filtros */}
+            <div className="flex gap-1.5 flex-wrap">
+              <button
+                onClick={() => setSelectedCategoryFilter("")}
+                className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
+                  selectedCategoryFilter === ""
+                    ? "bg-slate-900 text-white border-slate-900"
+                    : "bg-white text-slate-500 border-slate-200"
+                }`}
+              >
+                Todos
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategoryFilter(cat.id)}
+                  className={`px-3 py-1 rounded-full text-[10px] font-bold border transition ${
+                    selectedCategoryFilter === cat.id
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white text-slate-500 border-slate-200"
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-20 bg-slate-100 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : filteredServices.length === 0 ? (
+              <p className="text-sm font-semibold text-slate-400 text-center py-8">Nenhum serviço disponível.</p>
+            ) : (
+              <div className="space-y-3">
+                {filteredServices.map((svc) => {
+                  const isSelected = selectedServices.some((s) => s.id === svc.id)
+                  return (
+                    <Card
+                      key={svc.id}
+                      onClick={() => toggleService(svc)}
+                      className={`transition duration-150 cursor-pointer active:scale-[0.99] ${
+                        isSelected ? "border-slate-900 shadow-md" : "hover:border-slate-300 shadow-sm"
+                      }`}
+                    >
+                      <CardContent className="p-4 flex justify-between items-center gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className={`h-5 w-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition ${
+                              isSelected ? "bg-slate-900 border-slate-900" : "border-slate-300 bg-white"
+                            }`}
+                          >
+                            {isSelected && <i className="ti ti-check text-white text-xs" />}
+                          </div>
+                          <div className="min-w-0 pr-2">
+                            <h3 className="font-extrabold text-slate-800 text-sm leading-snug">{svc.name}</h3>
+                            <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">{svc.description}</p>
+                            <span className="text-[10px] font-bold text-slate-500 mt-2 block bg-slate-100 w-fit px-2 py-0.5 rounded-md">
+                              {svc.duration_minutes} minutos
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <span className="text-sm font-extrabold text-slate-800 block">
+                            R$ {svc.price.toFixed(2)}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Barra de resumo + Continuar (fixa ao fim da lista) */}
+            {selectedServices.length > 0 && (
+              <div className="sticky bottom-4 bg-white border border-slate-200 rounded-xl shadow-lg p-4 flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-500">
+                    {selectedServices.length} {selectedServices.length === 1 ? "serviço" : "serviços"} · {totalDuration} min
+                  </p>
+                  <p className="text-base font-extrabold text-slate-800">R$ {totalPrice.toFixed(2)}</p>
+                </div>
+                <Button
+                  onClick={handleServicesContinue}
+                  className="font-bold flex-shrink-0"
+                  style={{ backgroundColor: "var(--bc-secondary)" }}
+                >
+                  Continuar
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -533,9 +577,14 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                         key={idx}
                         variant="ghost"
                         onClick={() => handleSlotSelect(slot)}
-                        className="h-10 text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition active:scale-95"
+                        className="h-10 text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition active:scale-95 flex-col gap-0"
                       >
-                        {slot.start_time}
+                        <span>{slot.start_time}</span>
+                        {!selectedProf && slot.professional_name && (
+                          <span className="text-[9px] font-semibold text-slate-400 leading-none mt-0.5">
+                            {slot.professional_name}
+                          </span>
+                        )}
                       </Button>
                     ))}
                   </div>
@@ -579,17 +628,6 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase">E-mail para Confirmação</label>
-                    <Input
-                      type="email"
-                      placeholder="seuemail@exemplo.com"
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-500 uppercase">Alguma observação? (Opcional)</label>
                     <textarea
                       placeholder="Ex: Cabelo molhado, prefiro corte mais curto na lateral..."
@@ -609,7 +647,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
         )}
 
         {/* STEP 5: Confirmar Reserva */}
-        {step === 5 && selectedService && selectedDate && selectedSlot && (
+        {step === 5 && selectedServices.length > 0 && selectedDate && selectedSlot && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Button variant="ghost" onClick={() => setStep(4)} className="h-8 px-2.5 text-xs text-slate-500 border border-slate-200 bg-white">
@@ -628,7 +666,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase">Profissional</span>
                     <p className="font-extrabold text-slate-800 text-sm leading-tight">
-                      {selectedProf ? selectedProf.name : "Qualquer Profissional"}
+                      {resolvedProfessionalName}
                     </p>
                   </div>
                 </div>
@@ -650,15 +688,24 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
 
                 <div className="border-t border-slate-100 pt-3 space-y-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase">Resumo de Valores</span>
-                  <div className="flex justify-between items-center bg-slate-50 border border-slate-100 p-3 rounded-lg font-semibold">
-                    <span className="text-xs text-slate-600">{selectedService.name} ({selectedService.duration_minutes} min)</span>
-                    <span className="text-sm font-extrabold text-slate-800">R$ {selectedService.price.toFixed(2)}</span>
+                  {selectedServices.map((svc) => (
+                    <div
+                      key={svc.id}
+                      className="flex justify-between items-center bg-slate-50 border border-slate-100 p-3 rounded-lg font-semibold"
+                    >
+                      <span className="text-xs text-slate-600">{svc.name} ({svc.duration_minutes} min)</span>
+                      <span className="text-sm font-extrabold text-slate-800">R$ {svc.price.toFixed(2)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between items-center pt-1">
+                    <span className="text-xs font-bold text-slate-500">Total ({totalDuration} min)</span>
+                    <span className="text-base font-extrabold text-slate-800">R$ {totalPrice.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="border-t border-slate-100 pt-3 space-y-1">
                   <span className="text-[10px] font-bold text-slate-400 uppercase">Seus Dados</span>
-                  <p className="text-xs font-bold text-slate-700">{customerName} ({customerEmail})</p>
+                  <p className="text-xs font-bold text-slate-700">{customerName}</p>
                   <p className="text-[10px] text-slate-400">{customerPhone}</p>
                 </div>
 
@@ -683,7 +730,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
         )}
 
         {/* STEP 6: Agendamento Concluído (Sucesso) */}
-        {step === 6 && successApp && selectedService && selectedDate && (
+        {step === 6 && successApp && selectedServices.length > 0 && selectedDate && (
           <div className="space-y-6 text-center py-6 animate-fade-in">
             {/* Ícone Sucesso */}
             <div className="h-16 w-16 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full flex items-center justify-center text-3xl mx-auto shadow-md">
@@ -693,7 +740,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
             <div>
               <h2 className="text-2xl font-extrabold text-slate-800">Horário Agendado!</h2>
               <p className="text-sm text-slate-500 mt-2">
-                Tudo pronto, {customerName}! Enviamos uma confirmação detalhada para seu e-mail: <strong className="text-slate-700">{customerEmail}</strong>.
+                Tudo pronto, {customerName}! Seu horário na barbearia {config.client_name} está garantido.
               </p>
             </div>
 
@@ -719,11 +766,13 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                 </div>
 
                 <div className="border-t border-slate-100 pt-3 space-y-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Serviço</span>
-                  <div className="flex justify-between items-center font-bold text-slate-800">
-                    <span>{selectedService.name}</span>
-                    <span>R$ {selectedService.price.toFixed(2)}</span>
-                  </div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Serviços</span>
+                  {selectedServices.map((svc) => (
+                    <div key={svc.id} className="flex justify-between items-center font-bold text-slate-800">
+                      <span>{svc.name}</span>
+                      <span>R$ {svc.price.toFixed(2)}</span>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="border-t border-slate-100 pt-3 flex flex-col gap-2">

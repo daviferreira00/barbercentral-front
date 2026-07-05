@@ -17,8 +17,11 @@ interface ClientSaaS {
   status: string
 }
 
+// Para type "client", cada linha é 1 VÍNCULO usuário↔barbearia (id = link_id);
+// o mesmo e-mail pode aparecer em várias linhas, uma por barbearia.
 interface AdminUser {
   id: string
+  user_id?: string
   type: "admin" | "client"
   name: string
   email: string
@@ -508,12 +511,18 @@ export default function AdminUsuariosPage() {
               <>
                 {/* Seleção de Barbearia (Vínculo) */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Vincular à Barbearia / Cliente
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                    <span>Vincular à Barbearia / Cliente</span>
+                    {isEditMode && (
+                      <span className="text-[10px] text-slate-400 lowercase font-medium">
+                        (crie um novo vínculo para outra barbearia)
+                      </span>
+                    )}
                   </label>
                   <Select
                     value={formClientId}
                     onValueChange={setFormClientId}
+                    disabled={isEditMode}
                   >
                     <SelectTrigger className="border-slate-200">
                       <SelectValue placeholder="Selecione a barbearia" />
@@ -526,6 +535,12 @@ export default function AdminUsuariosPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {!isEditMode && (
+                    <p className="text-[11px] text-slate-400 pt-0.5">
+                      Se o e-mail já existir na plataforma, apenas um novo vínculo com esta
+                      barbearia será criado (nome e senha atuais são mantidos).
+                    </p>
+                  )}
                 </div>
 
                 {/* Função (Role) */}
@@ -599,7 +614,20 @@ export default function AdminUsuariosPage() {
               Confirmar Exclusão
             </DialogTitle>
             <DialogDescription className="text-slate-500 text-sm mt-1">
-              Tem certeza que deseja excluir o usuário <span className="font-semibold text-slate-700">{deleteTarget?.name}</span>? Esta ação não pode ser desfeita.
+              {deleteTarget?.type === "client" ? (
+                <>
+                  Tem certeza que deseja remover o vínculo de{" "}
+                  <span className="font-semibold text-slate-700">{deleteTarget?.name}</span> com a
+                  barbearia <span className="font-semibold text-slate-700">{deleteTarget?.client_name}</span>?
+                  Vínculos com outras barbearias não são afetados.
+                </>
+              ) : (
+                <>
+                  Tem certeza que deseja excluir o usuário{" "}
+                  <span className="font-semibold text-slate-700">{deleteTarget?.name}</span>? Esta
+                  ação não pode ser desfeita.
+                </>
+              )}
             </DialogDescription>
           </DialogHeader>
 
