@@ -12,6 +12,7 @@ export interface AuthUser {
 export interface LoginCredentials {
   email: string
   password?: string
+  tenant?: string
 }
 
 export const authService = {

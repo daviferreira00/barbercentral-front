@@ -13,7 +13,9 @@ export async function POST(request: Request) {
       cookieDomain = undefined
     } else {
       const parts = hostname.split(".")
-      if (parts.length >= 2) {
+      if (parts.length >= 3 && hostname.endsWith(".com.br")) {
+        cookieDomain = "." + parts.slice(-3).join(".")
+      } else if (parts.length >= 2) {
         cookieDomain = "." + parts.slice(-2).join(".")
       }
     }

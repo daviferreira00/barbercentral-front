@@ -3,11 +3,12 @@ import { NextResponse } from "next/server"
 interface LoginBody {
   email?: string
   password?: string
+  tenant?: string
 }
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as LoginBody
-  const { email, password } = body
+  const { email, password, tenant } = body
 
   if (!email || !password) {
     return NextResponse.json(
@@ -57,6 +58,31 @@ export async function POST(request: Request) {
       )
     }
 
+    // Validação do tenant para usuários não-admin
+    if (backendUser.role !== "admin" && tenant && tenant !== "barbercentral") {
+      try {
+        const publicRes = await fetch(`${BACKEND_URL}/public/${tenant}`)
+        if (publicRes.ok) {
+          const publicPayload = await publicRes.json().catch(() => ({}))
+          const tenantClientId = publicPayload.data?.client_id
+          
+          if (tenantClientId && backendUser.client_id !== tenantClientId) {
+            return NextResponse.json(
+              {
+                error: {
+                  code: "ACESSO_NEGADO",
+                  message: "Você não tem permissão para acessar esta barbearia por este subdomínio.",
+                },
+              },
+              { status: 403 }
+            )
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao validar tenant do usuário:", error)
+      }
+    }
+
     const user = {
       id: backendUser.id,
       client_id: backendUser.client_id,
@@ -79,7 +105,9 @@ export async function POST(request: Request) {
         cookieDomain = undefined
       } else {
         const parts = hostname.split(".")
-        if (parts.length >= 2) {
+        if (parts.length >= 3 && hostname.endsWith(".com.br")) {
+          cookieDomain = "." + parts.slice(-3).join(".")
+        } else if (parts.length >= 2) {
           cookieDomain = "." + parts.slice(-2).join(".")
         }
       }

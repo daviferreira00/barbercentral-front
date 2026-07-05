@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert } from "@/components/ui/alert"
@@ -11,6 +11,8 @@ type LoginMode = "credentials" | "magic-link"
 
 export function LoginForm({ logoUrl = "/logo/barbercentral-logo-horizontal.svg" }: { logoUrl?: string }) {
   const router = useRouter()
+  const params = useParams()
+  const tenant = (params?.tenant as string) || ""
 
   const [mode, setMode] = useState<LoginMode>("credentials")
   const [email, setEmail] = useState("")
@@ -38,7 +40,7 @@ export function LoginForm({ logoUrl = "/logo/barbercentral-logo-horizontal.svg" 
       }
 
       setSubmitting(true)
-      const res = await authService.login({ email, password })
+      const res = await authService.login({ email, password, tenant })
       setSubmitting(false)
 
       if (res.error) {
