@@ -112,21 +112,26 @@ export function useConfigIdentidadeVisual() {
     setErrorMsg(null)
     setSuccessMsg(null)
 
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      const base64String = reader.result as string
+    const formData = new FormData()
+    formData.append("logo", file)
+
+    const endpoint = type === "header" ? "/config/logo" : "/config/logo-central"
+    const res = await http.post<{ logo_url: string }>(endpoint, formData)
+    setUploading(false)
+
+    if (res.error) {
+      setErrorMsg(res.error.message)
+      return
+    }
+
+    if (res.data) {
       if (type === "header") {
-        setLogoUrl(base64String)
+        setLogoUrl(res.data.logo_url)
       } else {
-        setLogoCentral(base64String)
+        setLogoCentral(res.data.logo_url)
       }
-      setUploading(false)
+      setSuccessMsg("Imagem enviada e salva com sucesso!")
     }
-    reader.onerror = () => {
-      setErrorMsg("Erro ao ler o arquivo de imagem")
-      setUploading(false)
-    }
-    reader.readAsDataURL(file)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
