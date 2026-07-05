@@ -24,6 +24,16 @@ import {
   Calendar
 } from "lucide-react"
 
+const formatReportDate = (dateStr?: string) => {
+  if (!dateStr) return ""
+  const cleanDate = dateStr.split("T")[0]
+  const parts = cleanDate.split("-")
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`
+  }
+  return dateStr
+}
+
 export default function RelatoriosMobile() {
   const {
     startDate,
@@ -475,7 +485,7 @@ export default function RelatoriosMobile() {
                         title={c.label}
                         subtitle={
                           c.date 
-                            ? `Último atendimento em: ${new Date(c.date + "T00:00:00").toLocaleDateString("pt-BR")}` 
+                            ? `Último atendimento em: ${formatReportDate(c.date)}` 
                             : "Nenhum atendimento"
                         }
                         pill={{ label: "Ausente", tone: "danger" }}
@@ -562,7 +572,7 @@ export default function RelatoriosMobile() {
                           </span>
                         }
                         pill={{
-                          label: `${rc.date ? new Date(rc.date + "T00:00:00").toLocaleDateString("pt-BR") : ""} às ${rc.time ? rc.time.substring(0, 5) : ""}`,
+                          label: `${rc.date ? formatReportDate(rc.date) : ""} às ${rc.time ? rc.time.substring(0, 5) : ""}`,
                           tone: "neutral"
                         }}
                       />

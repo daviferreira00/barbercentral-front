@@ -16,11 +16,21 @@ import {
   Percent, 
   Clock, 
   Activity, 
-  UserCheck, 
   Loader2,
   ChevronRight,
-  Calendar
+  Calendar,
+  UserCheck
 } from "lucide-react"
+
+const formatReportDate = (dateStr?: string) => {
+  if (!dateStr) return ""
+  const cleanDate = dateStr.split("T")[0]
+  const parts = cleanDate.split("-")
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`
+  }
+  return dateStr
+}
 
 export default function RelatoriosDesktop() {
   const {
@@ -553,7 +563,7 @@ export default function RelatoriosDesktop() {
                             <tr key={i} className="hover:bg-slate-50/20">
                               <td className="px-6 py-3.5 font-bold text-slate-700">{c.label}</td>
                               <td className="px-6 py-3.5 text-center font-semibold text-red-500">
-                                {c.date ? new Date(c.date + "T00:00:00").toLocaleDateString("pt-BR") : "Nenhum"}
+                                {c.date ? formatReportDate(c.date) : "Nenhum"}
                               </td>
                             </tr>
                           ))}
@@ -653,7 +663,7 @@ export default function RelatoriosDesktop() {
                           {(cancelData.recent_cancellations || []).map((rc, i) => (
                             <tr key={i} className="hover:bg-slate-50/20">
                               <td className="px-6 py-3.5 text-slate-500">
-                                {rc.date ? new Date(rc.date + "T00:00:00").toLocaleDateString("pt-BR") : ""} - {rc.time ? rc.time.substring(0, 5) : ""}
+                                {rc.date ? formatReportDate(rc.date) : ""} - {rc.time ? rc.time.substring(0, 5) : ""}
                               </td>
                               <td className="px-6 py-3.5 font-bold text-slate-700">{rc.professional}</td>
                               <td className="px-6 py-3.5 font-semibold text-slate-600">{rc.customer || "Sem cadastro"}</td>
