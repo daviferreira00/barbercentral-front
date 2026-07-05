@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/shared/hooks/useIsMobile"
+import { MobileShell } from "@/components/mobile/MobileShell"
 
 export default function SistemaLayoutClient({ 
   children,
@@ -15,10 +17,10 @@ export default function SistemaLayoutClient({
 }) {
   const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout } = useApp()
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
-  const [mobileMoreOpen, setMobileMoreOpen] = useState(false)
   const pathname = usePathname()
+  const isMobile = useIsMobile()
 
-  if (loading) {
+  if (loading || isMobile === null) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-3">
@@ -39,6 +41,15 @@ export default function SistemaLayoutClient({
       <div className="h-screen w-screen bg-slate-950 text-slate-100 overflow-hidden font-sans">
         {children}
       </div>
+    )
+  }
+
+  // Experiência mobile dedicada (painel da barbearia)
+  if (isMobile && !isAdmin) {
+    return (
+      <MobileShell user={user} tenantData={tenantData} onLogout={logout}>
+        {children}
+      </MobileShell>
     )
   }
 
@@ -311,115 +322,10 @@ export default function SistemaLayoutClient({
         </header>
 
         {/* Content Area (Sem max-width!) */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-20 md:pb-8 scrollbar-none w-full h-full">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-none w-full h-full">
           {children}
         </main>
       </div>
-
-      {/* 3. BOTTOM NAVIGATION (Mobile only - non-admin) */}
-      {!isAdmin && (
-        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 z-40 flex items-center justify-around md:hidden px-2 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-          <Link
-            href="/cliente/agenda"
-            className="flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 transition gap-1"
-          >
-            <i className="ti ti-calendar text-xl" />
-            <span className="text-[10px] font-bold">Agenda</span>
-          </Link>
-          <Link
-            href="/cliente/profissionais"
-            className="flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 transition gap-1"
-          >
-            <i className="ti ti-users text-xl" />
-            <span className="text-[10px] font-bold">Barbeiros</span>
-          </Link>
-          <Link
-            href="/cliente/servicos"
-            className="flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 transition gap-1"
-          >
-            <i className="ti ti-cut text-xl" />
-            <span className="text-[10px] font-bold">Serviços</span>
-          </Link>
-          <Link
-            href="/cliente/caixa"
-            className="flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 transition gap-1"
-          >
-            <i className="ti ti-cash text-xl" />
-            <span className="text-[10px] font-bold">Caixa</span>
-          </Link>
-          <button
-            onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
-            className="flex flex-col items-center justify-center text-slate-500 hover:text-indigo-600 transition gap-1 focus:outline-none bg-transparent border-none cursor-pointer"
-          >
-            <i className="ti ti-menu-2 text-xl" />
-            <span className="text-[10px] font-bold">Mais</span>
-          </button>
-        </nav>
-      )}
-
-      {/* Mobile More Sheet */}
-      {mobileMoreOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end justify-center md:hidden animate-fade-in" onClick={() => setMobileMoreOpen(false)}>
-          <div className="bg-white rounded-t-3xl w-full max-w-md p-6 space-y-6 shadow-2xl animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Outros Módulos</h3>
-              <button onClick={() => setMobileMoreOpen(false)} className="text-slate-400 hover:text-slate-600 text-sm font-bold bg-transparent border-none cursor-pointer">Fechar</button>
-            </div>
-            <div className="grid grid-cols-3 gap-4 pb-4">
-              <Link
-                href="/cliente/clientes"
-                onClick={() => setMobileMoreOpen(false)}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition text-center gap-2"
-              >
-                <i className="ti ti-users-group text-xl text-indigo-500" />
-                <span className="text-[10px] font-bold text-slate-700">Clientes CRM</span>
-              </Link>
-              <Link
-                href="/cliente/estoque"
-                onClick={() => setMobileMoreOpen(false)}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition text-center gap-2"
-              >
-                <i className="ti ti-box text-xl text-amber-500" />
-                <span className="text-[10px] font-bold text-slate-700">Estoque</span>
-              </Link>
-              <Link
-                href="/cliente/relatorios"
-                onClick={() => setMobileMoreOpen(false)}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition text-center gap-2"
-              >
-                <i className="ti ti-chart-bar text-xl text-emerald-500" />
-                <span className="text-[10px] font-bold text-slate-700">Relatórios</span>
-              </Link>
-              <Link
-                href="/cliente/configuracoes/fidelidade"
-                onClick={() => setMobileMoreOpen(false)}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition text-center gap-2"
-              >
-                <i className="ti ti-award text-xl text-rose-500" />
-                <span className="text-[10px] font-bold text-slate-700">Fidelidade</span>
-              </Link>
-              <Link
-                href="/cliente/configuracoes/plano"
-                onClick={() => setMobileMoreOpen(false)}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/70 transition text-center gap-2"
-              >
-                <i className="ti ti-shield-check text-xl text-teal-500" />
-                <span className="text-[10px] font-bold text-slate-700">Plano</span>
-              </Link>
-              <button
-                onClick={() => {
-                  setMobileMoreOpen(false)
-                  logout()
-                }}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-red-50 border border-red-100 hover:bg-red-100/50 transition text-center gap-2 text-red-600 bg-transparent cursor-pointer"
-              >
-                <i className="ti ti-logout text-xl" />
-                <span className="text-[10px] font-bold">Sair</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
