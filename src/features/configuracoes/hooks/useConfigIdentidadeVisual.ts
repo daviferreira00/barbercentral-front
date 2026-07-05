@@ -6,8 +6,11 @@ import { http } from "@/shared/lib/http"
 export interface ClientConfig {
   client_id: string
   logo_url?: string
+  logo_central?: string
   color_primary: string
   color_secondary: string
+  color_button?: string
+  background_type?: string
   font_family: string
   address?: string
   neighborhood?: string
@@ -40,8 +43,11 @@ export function useConfigIdentidadeVisual() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
   const [logoUrl, setLogoUrl] = useState("")
+  const [logoCentral, setLogoCentral] = useState("")
   const [colorPrimary, setColorPrimary] = useState("#1a1a1a")
   const [colorSecondary, setColorSecondary] = useState("#c9a84c")
+  const [colorButton, setColorButton] = useState("#1a1a1a")
+  const [backgroundType, setBackgroundType] = useState("gradient")
   const [fontFamily, setFontFamily] = useState("Inter")
 
   const [address, setAddress] = useState("")
@@ -72,9 +78,12 @@ export function useConfigIdentidadeVisual() {
       const c = res.data
       setConfig(c)
       setLogoUrl(c.logo_url || "")
-      setColorPrimary(c.color_primary)
-      setColorSecondary(c.color_secondary)
-      setFontFamily(c.font_family)
+      setLogoCentral(c.logo_central || "")
+      setColorPrimary(c.color_primary || "#1a1a1a")
+      setColorSecondary(c.color_secondary || "#c9a84c")
+      setColorButton(c.color_button || c.color_primary || "#1a1a1a")
+      setBackgroundType(c.background_type || "gradient")
+      setFontFamily(c.font_family || "Inter")
       setAddress(c.address || "")
       setNeighborhood(c.neighborhood || "")
       setCity(c.city || "")
@@ -95,7 +104,7 @@ export function useConfigIdentidadeVisual() {
     loadConfig()
   }, [])
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "header" | "central") => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -103,21 +112,21 @@ export function useConfigIdentidadeVisual() {
     setErrorMsg(null)
     setSuccessMsg(null)
 
-    const formData = new FormData()
-    formData.append("logo", file)
-
-    const res = await http.post<{ logo_url: string }>("/config/logo", formData)
-    setUploading(false)
-
-    if (res.error) {
-      setErrorMsg(res.error.message)
-      return
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const base64String = reader.result as string
+      if (type === "header") {
+        setLogoUrl(base64String)
+      } else {
+        setLogoCentral(base64String)
+      }
+      setUploading(false)
     }
-
-    if (res.data) {
-      setLogoUrl(res.data.logo_url)
-      setSuccessMsg("Logo enviada e salva com sucesso!")
+    reader.onerror = () => {
+      setErrorMsg("Erro ao ler o arquivo de imagem")
+      setUploading(false)
     }
+    reader.readAsDataURL(file)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,7 +138,11 @@ export function useConfigIdentidadeVisual() {
     const res = await http.put<ClientConfig>("/config", {
       color_primary: colorPrimary,
       color_secondary: colorSecondary,
+      color_button: colorButton,
+      background_type: backgroundType,
       font_family: fontFamily,
+      logo_url: logoUrl || null,
+      logo_central: logoCentral || null,
       address: address ? address : null,
       neighborhood: neighborhood ? neighborhood : null,
       city: city ? city : null,
@@ -163,10 +176,15 @@ export function useConfigIdentidadeVisual() {
     errorMsg,
     successMsg,
     logoUrl,
+    logoCentral,
     colorPrimary,
     setColorPrimary,
     colorSecondary,
     setColorSecondary,
+    colorButton,
+    setColorButton,
+    backgroundType,
+    setBackgroundType,
     fontFamily,
     setFontFamily,
     address,

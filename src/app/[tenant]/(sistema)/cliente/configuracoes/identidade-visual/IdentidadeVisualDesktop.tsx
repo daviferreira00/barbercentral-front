@@ -17,10 +17,15 @@ export default function IdentidadeVisualDesktop() {
     errorMsg,
     successMsg,
     logoUrl,
+    logoCentral,
     colorPrimary,
     setColorPrimary,
     colorSecondary,
     setColorSecondary,
+    colorButton,
+    setColorButton,
+    backgroundType,
+    setBackgroundType,
     fontFamily,
     setFontFamily,
     address,
@@ -60,6 +65,14 @@ export default function IdentidadeVisualDesktop() {
     )
   }
 
+  // Estilo do background do simulador do portal
+  const previewBgStyle = backgroundType === "solid_primary" ? { backgroundColor: colorPrimary }
+    : backgroundType === "solid_light" ? { backgroundColor: "#f8fafc", color: "#1e293b" }
+    : backgroundType === "solid_dark" ? { backgroundColor: "#0f172a", color: "#f8fafc" }
+    : { backgroundImage: `linear-gradient(to top right, ${colorPrimary}, ${colorSecondary})` }
+
+  const isDarkBg = backgroundType === "solid_dark" || backgroundType === "solid_primary" || backgroundType === "gradient"
+
   return (
     <div className="space-y-6 w-full animate-fade-in px-1 md:px-0">
       <div>
@@ -81,49 +94,86 @@ export default function IdentidadeVisualDesktop() {
                 <CardDescription>Personalize o visual com sua logo e cores institucionais.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Logo Upload */}
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm">
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Logo Barbearia" className="h-full w-full object-contain p-1" />
-                    ) : (
-                      <i className="ti ti-camera text-2xl" />
-                    )}
-                    {uploading && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Logo do Cabeçalho */}
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold text-slate-500 uppercase">Logo do Cabeçalho (Header)</label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-14 w-14 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0">
+                        {logoUrl ? (
+                          <img src={logoUrl} alt="Logo Cabeçalho" className="h-full w-full object-contain p-1" />
+                        ) : (
+                          <i className="ti ti-camera text-xl" />
+                        )}
+                        {uploading && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <div>
+                        <label className="cursor-pointer">
+                          <span className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
+                            Upload
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleLogoUpload(e, "header")}
+                            disabled={uploading}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="cursor-pointer">
-                      <span className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
-                        Enviar Logo
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        disabled={uploading}
-                        className="hidden"
-                      />
-                    </label>
-                    <p className="text-[10px] text-slate-400 mt-1">PNG ou JPG recomendado (fundo transparente).</p>
+
+                  {/* Logo Central */}
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold text-slate-500 uppercase">Logo Central (Principal)</label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-14 w-14 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0">
+                        {logoCentral ? (
+                          <img src={logoCentral} alt="Logo Central" className="h-full w-full object-contain p-1" />
+                        ) : (
+                          <i className="ti ti-camera text-xl" />
+                        )}
+                        {uploading && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <label className="cursor-pointer">
+                          <span className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
+                            Upload
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleLogoUpload(e, "central")}
+                            disabled={uploading}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 <hr className="border-slate-100" />
 
                 {/* Cores */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Cor Primária (Header/Buttons)</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase">Cor Primária</label>
                     <div className="flex gap-2 items-center">
                       <input
                         type="color"
                         value={colorPrimary}
                         onChange={(e) => setColorPrimary(e.target.value)}
-                        className="h-9 w-9 rounded-lg border border-slate-200 cursor-pointer"
+                        className="h-9 w-9 rounded-lg border border-slate-200 cursor-pointer shrink-0"
                       />
                       <Input
                         value={colorPrimary}
@@ -134,17 +184,34 @@ export default function IdentidadeVisualDesktop() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Cor Secundária (Destaques)</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase">Cor Secundária</label>
                     <div className="flex gap-2 items-center">
                       <input
                         type="color"
                         value={colorSecondary}
                         onChange={(e) => setColorSecondary(e.target.value)}
-                        className="h-9 w-9 rounded-lg border border-slate-200 cursor-pointer"
+                        className="h-9 w-9 rounded-lg border border-slate-200 cursor-pointer shrink-0"
                       />
                       <Input
                         value={colorSecondary}
                         onChange={(e) => setColorSecondary(e.target.value)}
+                        className="font-mono text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-500 uppercase">Cor dos Botões</label>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="color"
+                        value={colorButton}
+                        onChange={(e) => setColorButton(e.target.value)}
+                        className="h-9 w-9 rounded-lg border border-slate-200 cursor-pointer shrink-0"
+                      />
+                      <Input
+                        value={colorButton}
+                        onChange={(e) => setColorButton(e.target.value)}
                         className="font-mono text-xs"
                       />
                     </div>
@@ -164,6 +231,30 @@ export default function IdentidadeVisualDesktop() {
                           {f.label}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Fundo do Portal */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Plano de Fundo</CardTitle>
+                <CardDescription>Configure o estilo do plano de fundo da sua página de agendamentos.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase">Tipo de Fundo</label>
+                  <Select value={backgroundType} onValueChange={setBackgroundType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione o tipo de fundo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gradient">Gradiente (Cor Primária & Secundária)</SelectItem>
+                      <SelectItem value="solid_primary">Sólido (Cor Primária)</SelectItem>
+                      <SelectItem value="solid_dark">Sólido Escuro (Padrão)</SelectItem>
+                      <SelectItem value="solid_light">Sólido Claro</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -286,15 +377,15 @@ export default function IdentidadeVisualDesktop() {
 
               {/* Portal Content Scrollable */}
               <div
-                className="flex-1 overflow-y-auto pt-6 pb-4"
+                className="flex-grow overflow-y-auto pt-6 pb-4"
                 style={{
                   fontFamily: fontFamily === "Playfair Display" ? "Georgia, serif" : fontFamily,
+                  ...previewBgStyle
                 }}
               >
-                {/* Header do Portal */}
+                {/* Header do Portal com fundo escurecido translúcido sobre o background geral */}
                 <div
-                  className="p-6 text-center text-white transition-colors duration-200"
-                  style={{ backgroundColor: colorPrimary }}
+                  className="p-6 text-center text-white border-b border-white/10 bg-black/20 backdrop-blur-sm"
                 >
                   <div className="h-12 w-12 rounded-full bg-white/20 mx-auto flex items-center justify-center overflow-hidden mb-3 border border-white/10">
                     {logoUrl ? (
@@ -308,14 +399,14 @@ export default function IdentidadeVisualDesktop() {
                 </div>
 
                 {/* Info Card */}
-                <div className="p-4 bg-white border-b border-slate-100 text-center">
+                <div className={`p-4 text-center border-b ${isDarkBg ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-slate-100 text-slate-800'}`}>
                   <p className="text-[10px] font-bold text-slate-400 uppercase">Contato</p>
-                  <p className="text-xs font-bold text-slate-700 mt-0.5">{phone || "(11) 99999-9999"}</p>
+                  <p className="text-xs font-bold mt-0.5">{phone || "(11) 99999-9999"}</p>
                   <div className="flex gap-2 justify-center mt-3">
-                    <span className="h-7 w-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs border border-emerald-100">
+                    <span className={`h-7 w-7 rounded-full flex items-center justify-center text-xs border ${isDarkBg ? 'bg-white/10 border-white/10 text-white' : 'bg-emerald-50 border-emerald-100 text-emerald-600'}`}>
                       <i className="ti ti-brand-whatsapp text-sm" />
                     </span>
-                    <span className="h-7 w-7 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs border border-indigo-100">
+                    <span className={`h-7 w-7 rounded-full flex items-center justify-center text-xs border ${isDarkBg ? 'bg-white/10 border-white/10 text-white' : 'bg-indigo-50 border-indigo-100 text-indigo-600'}`}>
                       <i className="ti ti-brand-instagram text-sm" />
                     </span>
                   </div>
@@ -329,18 +420,18 @@ export default function IdentidadeVisualDesktop() {
                     { name: "Corte Degradê", desc: "Degradê moderno com acabamento na navalha.", time: 30, price: 45.0 },
                     { name: "Barba Completa", desc: "Toalha quente, barboterapia e alinhamento.", time: 20, price: 30.0 },
                   ].map((s, idx) => (
-                    <div key={idx} className="p-3 bg-white border border-slate-100 rounded-xl flex justify-between items-center shadow-sm">
+                    <div key={idx} className={`p-3 rounded-xl flex justify-between items-center shadow-sm border ${isDarkBg ? 'bg-white/5 border-white/5 text-white' : 'bg-white border-slate-100 text-slate-800'}`}>
                       <div className="min-w-0 pr-2">
-                        <p className="font-extrabold text-xs text-slate-800 leading-tight">{s.name}</p>
+                        <p className="font-extrabold text-xs leading-tight">{s.name}</p>
                         <p className="text-[9px] text-slate-400 line-clamp-1 leading-normal mt-0.5">{s.desc}</p>
                         <span className="text-[9px] font-bold text-slate-500 mt-1 block">{s.time} min</span>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <span className="text-xs font-extrabold text-slate-800">R$ {s.price.toFixed(2)}</span>
+                        <span className="text-xs font-extrabold">R$ {s.price.toFixed(2)}</span>
                         <button
                           type="button"
                           className="mt-1.5 h-6 px-2 text-[9px] font-bold rounded-lg text-white block transition-colors"
-                          style={{ backgroundColor: colorSecondary }}
+                          style={{ backgroundColor: colorButton }}
                         >
                           Escolher
                         </button>
@@ -354,7 +445,7 @@ export default function IdentidadeVisualDesktop() {
                   <button
                     type="button"
                     className="w-full h-10 text-xs font-bold rounded-xl text-white transition-colors flex items-center justify-center gap-1.5"
-                    style={{ backgroundColor: colorPrimary }}
+                    style={{ backgroundColor: colorButton }}
                   >
                     Agendar Agora
                     <i className="ti ti-chevron-right text-xs" />
