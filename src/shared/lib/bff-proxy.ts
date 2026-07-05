@@ -46,8 +46,10 @@ export async function bffProxy(
       headers["Authorization"] = `Bearer ${session.value}`
     }
 
+    const isFormData = body instanceof FormData || (body !== null && typeof body === "object" && (body.constructor.name === "FormData" || "append" in (body as any)))
+
     if (body !== null && body !== undefined) {
-      if (!(body instanceof FormData)) {
+      if (!isFormData) {
         headers["Content-Type"] = "application/json"
       }
     }
@@ -55,7 +57,7 @@ export async function bffProxy(
     const res = await fetch(`${BACKEND_URL}${path}`, {
       method,
       headers,
-      body: body ? (body instanceof FormData ? (body as any) : JSON.stringify(body)) : undefined,
+      body: body ? (isFormData ? (body as any) : JSON.stringify(body)) : undefined,
     })
 
     if (res.status === 204) {

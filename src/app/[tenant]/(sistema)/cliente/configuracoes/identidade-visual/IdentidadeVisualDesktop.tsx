@@ -53,6 +53,8 @@ export default function IdentidadeVisualDesktop() {
     setMaxAdvance,
     interval,
     setInterval,
+    kdsPin,
+    setKdsPin,
     handleLogoUpload,
     handleSubmit,
   } = useConfigIdentidadeVisual()
@@ -350,6 +352,31 @@ export default function IdentidadeVisualDesktop() {
                   <label htmlFor="req-login" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
                     Exigir login no portal público para agendar
                   </label>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Seção Segurança & KDS */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Painel KDS & Segurança</CardTitle>
+                <CardDescription>Defina regras de autenticação e proteção para as telas de monitoramento.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase">PIN de Segurança do KDS (4 a 6 dígitos)</label>
+                  <Input
+                    type="password"
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="Sem PIN (desprotegido)"
+                    value={kdsPin}
+                    onChange={(e) => setKdsPin(e.target.value.replace(/\D/g, ""))}
+                  />
+                  <span className="text-[10px] text-slate-400 font-medium leading-normal block">
+                    Se definido, o painel KDS exigirá que o colaborador digite este PIN numérico para poder iniciar, concluir, confirmar ou cancelar atendimentos nos cartões.
+                  </span>
                 </div>
               </CardContent>
             </Card>

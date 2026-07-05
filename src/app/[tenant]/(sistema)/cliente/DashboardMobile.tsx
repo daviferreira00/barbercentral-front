@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useParams } from "next/navigation"
 import { useApp } from "@/shared/context/AppContext"
 import { KpiCard } from "@/components/mobile/KpiCard"
 import { ListCard } from "@/components/mobile/ListCard"
@@ -16,21 +17,25 @@ const STATUS_TONES: Record<AppointmentStatus, PillTone> = {
   Pendente: "info",
 }
 
-const SHORTCUTS = [
-  { href: "/cliente/agenda/novo", icon: "ti-calendar-plus", label: "Agendar" },
-  { href: "/cliente/clientes/novo", icon: "ti-user-plus", label: "Cliente" },
-  { href: "/cliente/caixa", icon: "ti-cash", label: "Caixa" },
-  { href: "/cliente/relatorios", icon: "ti-chart-bar", label: "Relatórios" },
-]
-
 export default function DashboardMobile() {
   const { user } = useApp()
+  const params = useParams()
+  const tenant = (params?.tenant as string) || "barbearia-modelo"
   const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading } =
     useDashboard()
 
   if (!user) return null
 
   const firstName = user.name ? user.name.split(" ")[0] : ""
+
+  const shortcuts = [
+    { href: "/cliente/agenda/novo", icon: "ti-calendar-plus", label: "Agendar" },
+    { href: "/cliente/agenda/kds", icon: "ti-device-desktop-analytics", label: "KDS" },
+    { href: `/agendamento/${tenant}`, icon: "ti-world", label: "Link Público", target: "_blank" },
+    { href: "/cliente/clientes/novo", icon: "ti-user-plus", label: "Cliente" },
+    { href: "/cliente/caixa", icon: "ti-cash", label: "Caixa" },
+    { href: "/cliente/relatorios", icon: "ti-chart-bar", label: "Relatórios" },
+  ]
 
   return (
     <div className="flex flex-col gap-5 animate-fade-in">
@@ -43,27 +48,33 @@ export default function DashboardMobile() {
       </div>
 
       {/* Atalhos rápidos (estilo app de banco) */}
-      <div className="grid grid-cols-4 gap-2">
-        {SHORTCUTS.map((s, i) => (
-          <Link
-            key={s.href}
-            href={s.href}
-            onClick={() => haptic()}
-            className="animate-card-enter mobile-tap flex flex-col items-center gap-1.5 rounded-2xl border border-slate-100 bg-white py-3 shadow-sm transition active:scale-95"
-            style={{ animationDelay: `${i * 40}ms` }}
-          >
-            <span
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-lg text-white shadow-md"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 60%, black))",
-              }}
+      <div className="grid grid-cols-3 gap-2.5">
+        {shortcuts.map((s, i) => {
+          const isExternal = s.target === "_blank"
+          const Component = isExternal ? "a" : Link
+          return (
+            <Component
+              key={s.href}
+              href={s.href}
+              target={s.target}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              onClick={() => haptic()}
+              className="animate-card-enter mobile-tap flex flex-col items-center gap-1.5 rounded-2xl border border-slate-100 bg-white py-3 shadow-sm transition active:scale-95 text-center"
+              style={{ animationDelay: `${i * 40}ms` }}
             >
-              <i className={`ti ${s.icon}`} />
-            </span>
-            <span className="text-[10px] font-extrabold text-slate-600">{s.label}</span>
-          </Link>
-        ))}
+              <span
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-lg text-white shadow-md"
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 60%, black))",
+                }}
+              >
+                <i className={`ti ${s.icon}`} />
+              </span>
+              <span className="text-[10px] font-extrabold text-slate-600 truncate w-full px-1">{s.label}</span>
+            </Component>
+          )
+        })}
       </div>
 
       {/* Indicadores do dia */}

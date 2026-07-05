@@ -72,19 +72,22 @@ export default function LayoutConfigPage() {
   }
 
   const handleUpload = async (file: File, type: "header" | "central") => {
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      const base64String = reader.result as string
+    const formData = new FormData()
+    formData.append("file", file)
+
+    const res = await http.post<{ url: string }>("/admin/upload", formData)
+    if (res.error) {
+      alert(res.error.message)
+      return
+    }
+
+    if (res.data) {
       if (type === "header") {
-        setLogoHeader(base64String)
+        setLogoHeader(res.data.url)
       } else {
-        setLogoCentral(base64String)
+        setLogoCentral(res.data.url)
       }
     }
-    reader.onerror = () => {
-      alert("Erro ao ler o arquivo de imagem")
-    }
-    reader.readAsDataURL(file)
   }
 
   const handleSave = async (e: React.FormEvent) => {

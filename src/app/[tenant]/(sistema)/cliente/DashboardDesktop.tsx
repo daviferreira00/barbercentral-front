@@ -1,7 +1,10 @@
 "use client"
 
+import Link from "next/link"
+import { useParams } from "next/navigation"
 import { useApp } from "@/shared/context/AppContext"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { useDashboard, type AppointmentStatus } from "@/features/dashboard/hooks/useDashboard"
 import { Loader2 } from "lucide-react"
 
@@ -13,6 +16,8 @@ const STATUS_BADGES: Record<AppointmentStatus, string> = {
 
 export default function DashboardDesktop() {
   const { user } = useApp()
+  const params = useParams()
+  const tenant = (params?.tenant as string) || "barbearia-modelo"
   const { appointmentsToday, appointmentsDone, cashToday, occupancyRate, upcoming, loading } = useDashboard()
 
   if (!user) return null
@@ -28,11 +33,35 @@ export default function DashboardDesktop() {
 
   return (
     <div className="space-y-6 w-full animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Painel Geral</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Bem-vindo, {user.name}. Confira a movimentação da sua barbearia hoje.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Painel Geral</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Bem-vindo, {user.name}. Confira a movimentação da sua barbearia hoje.
+          </p>
+        </div>
+
+        {/* Atalhos Rápidos Desktop */}
+        <div className="flex gap-2 items-center flex-wrap">
+          <Link href="/cliente/agenda/novo">
+            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200">
+              <i className="ti ti-calendar-plus text-primary text-sm" />
+              Novo Agendamento
+            </Button>
+          </Link>
+          <Link href="/cliente/agenda/kds">
+            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200">
+              <i className="ti ti-device-desktop-analytics text-primary text-sm" />
+              Painel KDS
+            </Button>
+          </Link>
+          <a href={`/agendamento/${tenant}`} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" className="flex items-center gap-2 text-xs font-bold text-slate-700 border-slate-200">
+              <i className="ti ti-world text-primary text-sm" />
+              Link de Agendamento
+            </Button>
+          </a>
+        </div>
       </div>
 
       {/* Grid de Cards Estatísticos */}

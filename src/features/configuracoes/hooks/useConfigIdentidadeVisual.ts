@@ -25,6 +25,7 @@ export interface ClientConfig {
   min_advance_hours: number
   max_advance_days: number
   interval_between_minutes: number
+  kds_pin?: string
 }
 
 export const FONTS = [
@@ -63,6 +64,7 @@ export function useConfigIdentidadeVisual() {
   const [minAdvance, setMinAdvance] = useState("1")
   const [maxAdvance, setMaxAdvance] = useState("30")
   const [interval, setInterval] = useState("15")
+  const [kdsPin, setKdsPin] = useState("")
 
   const loadConfig = async () => {
     setLoading(true)
@@ -97,6 +99,7 @@ export function useConfigIdentidadeVisual() {
       setMinAdvance(c.min_advance_hours.toString())
       setMaxAdvance(c.max_advance_days.toString())
       setInterval(c.interval_between_minutes.toString())
+      setKdsPin(c.kds_pin || "")
     }
   }
 
@@ -161,6 +164,7 @@ export function useConfigIdentidadeVisual() {
       min_advance_hours: parseInt(minAdvance) || 1,
       max_advance_days: parseInt(maxAdvance) || 30,
       interval_between_minutes: parseInt(interval) || 0,
+      kds_pin: kdsPin || null,
     })
     setSaving(false)
 
@@ -217,6 +221,8 @@ export function useConfigIdentidadeVisual() {
     setMaxAdvance,
     interval,
     setInterval,
+    kdsPin,
+    setKdsPin,
     handleLogoUpload,
     handleSubmit,
   }

@@ -57,6 +57,8 @@ export default function IdentidadeVisualMobile() {
     setMaxAdvance,
     interval,
     setInterval,
+    kdsPin,
+    setKdsPin,
     handleLogoUpload,
     handleSubmit,
   } = useConfigIdentidadeVisual()
@@ -376,6 +378,30 @@ export default function IdentidadeVisualMobile() {
               <label htmlFor="req-login" className="text-sm font-extrabold text-slate-700 cursor-pointer select-none">
                 Exigir login no portal para agendar
               </label>
+            </div>
+          </div>
+
+          {/* Seção Segurança & KDS */}
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col gap-4">
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b pb-2">Segurança & KDS</h2>
+            
+            <div className="space-y-1.5">
+              <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                PIN de Segurança KDS
+              </label>
+              <Input
+                type="password"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="Sem PIN (Desprotegido)"
+                value={kdsPin}
+                onChange={(e) => setKdsPin(e.target.value.replace(/\D/g, ""))}
+                className="h-11 rounded-xl text-base"
+              />
+              <span className="text-[10px] text-slate-400 font-semibold leading-normal block">
+                O PIN será exigido na tela do KDS para poder realizar ações rápidas.
+              </span>
             </div>
           </div>
 
