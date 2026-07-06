@@ -15,7 +15,7 @@ import { useClientesList } from "@/features/clientes/hooks/useClientesList"
 import { MONTHS, type CustomerStats } from "@/features/clientes/types"
 
 const formatDate = (iso?: string) =>
-  iso ? new Date(iso + "T00:00:00").toLocaleDateString("pt-BR") : "Nunca"
+  iso ? new Date(iso.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR") : "Nunca"
 
 const whatsappUrl = (phone: string) => {
   const digits = phone.replace(/\D/g, "")

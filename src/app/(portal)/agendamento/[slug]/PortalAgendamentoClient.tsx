@@ -78,6 +78,14 @@ const STEPS = [
   { step: 5, label: "Confirmação" },
 ]
 
+// Helper para formatar data YYYY-MM-DD local sem shift de timezone
+const getLocalDateString = (d: Date) => {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
 export default function PortalAgendamentoClient({ config }: { config: PublicClientData }) {
   const [step, setStep] = useState(1)
 
@@ -123,8 +131,9 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0)
 
   useEffect(() => {
-    // Inicializa os próximos 14 dias para o swiper
-    const start = new Date("2026-06-29") // fixo no dia do seed
+    // Inicializa os próximos 14 dias para o swiper (local date sem timezone shift)
+    const [year, month, day] = "2026-06-29".split("-").map(Number)
+    const start = new Date(year, month - 1, day)
     const days: Date[] = []
     for (let i = 0; i < 14; i++) {
       const d = new Date(start)
@@ -161,7 +170,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
     setLoadingSlots(true)
     setErrorMsg(null)
 
-    const dateStr = date.toISOString().split("T")[0]
+    const dateStr = getLocalDateString(date)
     const profParam = selectedProf ? `&professional_id=${selectedProf.id}` : ""
     const svcParam = selectedServices.map((s) => `&service_ids=${s.id}`).join("")
 
@@ -231,7 +240,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
     setSubmitting(true)
     setErrorMsg(null)
 
-    const dateStr = selectedDate.toISOString().split("T")[0]
+    const dateStr = getLocalDateString(selectedDate)
     const res = await http.post<AppointmentResponse>(`/public/${config.client_slug}/appointments`, {
       professional_id: resolvedProfessionalId,
       service_ids: selectedServices.map((s) => s.id),

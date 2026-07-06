@@ -108,7 +108,7 @@ export default function CancelamentoPage({ params }: { params: { token: string }
                   <div className="space-y-0.5">
                     <span className="text-[10px] font-bold text-slate-400 uppercase">Data e Hora</span>
                     <p className="font-extrabold text-slate-800">
-                      {new Date(appointment.date + "T00:00:00").toLocaleDateString("pt-BR")} às {appointment.start_time.substring(0, 5)}
+                      {new Date(appointment.date.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR")} às {appointment.start_time.substring(0, 5)}
                     </p>
                   </div>
                   <div className="space-y-0.5">

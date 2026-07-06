@@ -320,7 +320,7 @@ export default function DetalheClientePage({ params }: { params: { id: string } 
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Última Visita</span>
                 <span className="text-base font-black text-slate-800 mt-2 block">
-                  {customer.last_visit ? new Date(customer.last_visit + "T00:00:00").toLocaleDateString("pt-BR") : "Nenhuma registrada"}
+                  {customer.last_visit ? new Date(customer.last_visit.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR") : "Nenhuma registrada"}
                 </span>
               </div>
               <div className="h-10 w-10 rounded-full bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-lg">
@@ -447,7 +447,7 @@ export default function DetalheClientePage({ params }: { params: { id: string } 
                       {history.map((h) => (
                         <tr key={h.id} className="hover:bg-slate-50/50 transition">
                           <td className="px-6 py-4 font-bold text-slate-700">
-                            {new Date(h.date + "T00:00:00").toLocaleDateString("pt-BR")}
+                            {new Date(h.date.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR")}
                           </td>
                           <td className="px-6 py-4 font-semibold text-slate-500">{h.start_time.substring(0, 5)}</td>
                           <td className="px-6 py-4 font-semibold text-slate-700">{h.services_list}</td>

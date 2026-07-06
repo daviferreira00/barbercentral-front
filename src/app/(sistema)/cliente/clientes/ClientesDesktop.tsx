@@ -125,7 +125,7 @@ export default function ClientesDesktop() {
                         R$ {c.total_spent.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 text-slate-500 font-medium">
-                        {c.last_visit ? new Date(c.last_visit + "T00:00:00").toLocaleDateString("pt-BR") : "Nunca"}
+                        {c.last_visit ? new Date(c.last_visit.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR") : "Nunca"}
                       </td>
                       <td className="px-6 py-4 text-center">
                         <Link href={`/cliente/clientes/${c.id}`}>

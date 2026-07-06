@@ -82,7 +82,7 @@ export default function BloqueiosMobile() {
                 footerLeft={
                   <span>
                     <i className="ti ti-calendar mr-1 text-slate-400" />
-                    {new Date(b.date + "T00:00:00").toLocaleDateString("pt-BR")}
+                    {new Date(b.date.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR")}
                     <span className="ml-2 font-mono">
                       {b.start_time.substring(0, 5)} - {b.end_time.substring(0, 5)}
                     </span>

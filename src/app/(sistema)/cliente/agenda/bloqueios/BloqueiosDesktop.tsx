@@ -158,7 +158,7 @@ export default function BloqueiosDesktop() {
                           <td className="p-4 pl-6 font-bold text-slate-800">
                             {b.professional_id ? (prof ? prof.name : "Carregando...") : "Toda a Barbearia"}
                           </td>
-                          <td className="p-4">{new Date(b.date + "T00:00:00").toLocaleDateString("pt-BR")}</td>
+                          <td className="p-4">{new Date(b.date.split("T")[0] + "T00:00:00").toLocaleDateString("pt-BR")}</td>
                           <td className="p-4 font-mono text-xs">
                             {b.start_time.substring(0, 5)} - {b.end_time.substring(0, 5)}
                           </td>
