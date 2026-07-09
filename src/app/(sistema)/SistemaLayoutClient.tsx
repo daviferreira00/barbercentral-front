@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/shared/hooks/useIsMobile"
 import { MobileShell } from "@/components/mobile/MobileShell"
 import { EstablishmentSelectorModal } from "./EstablishmentSelectorModal"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { http } from "@/shared/lib/http"
 
 export default function SistemaLayoutClient({ 
   children,
@@ -19,7 +22,10 @@ export default function SistemaLayoutClient({
   const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout, setSelectorOpen } = useApp()
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const isMobile = useIsMobile()
+
+
 
   if (loading || isMobile === null) {
     return (
@@ -326,8 +332,16 @@ export default function SistemaLayoutClient({
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               className="flex items-center gap-2.5 p-1 rounded-full hover:bg-slate-50 text-left focus:outline-none"
             >
-              <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-amber-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
-                {user.name ? user.name[0].toUpperCase() : "U"}
+              <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-amber-500 flex items-center justify-center text-white text-sm font-bold shadow-sm overflow-hidden border border-slate-200">
+                {user.photo_url ? (
+                  <img
+                    src={user.photo_url.startsWith("/uploads") ? `http://localhost:8080${user.photo_url}` : user.photo_url}
+                    alt={user.name}
+                    className="w-full h-full object-cover select-none"
+                  />
+                ) : (
+                  user.name ? user.name[0].toUpperCase() : "U"
+                )}
               </div>
               <div className="hidden md:flex flex-col">
                 <span className="text-xs font-bold text-slate-800 truncate leading-none">
@@ -355,9 +369,20 @@ export default function SistemaLayoutClient({
                   <button
                     onClick={() => {
                       setProfileDropdownOpen(false)
+                      router.push("/cliente/perfil")
+                    }}
+                    className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-slate-750 hover:bg-slate-50 transition text-left"
+                  >
+                    <i className="ti ti-user text-base text-slate-400" />
+                    Meu Perfil
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setProfileDropdownOpen(false)
                       logout()
                     }}
-                    className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition text-left"
+                    className="flex w-full items-center gap-2.5 px-4 py-2 text-sm text-red-650 hover:bg-red-50 transition text-left"
                   >
                     <i className="ti ti-logout text-base" />
                     Sair da conta

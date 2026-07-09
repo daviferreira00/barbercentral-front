@@ -9,6 +9,7 @@ export interface AuthUser {
   role: string // admin, owner, manager, professional, receptionist, ou "" (aguardando seleção)
   impersonating?: boolean
   needs_client_selection?: boolean
+  photo_url?: string
 }
 
 export interface ClientMembership {
