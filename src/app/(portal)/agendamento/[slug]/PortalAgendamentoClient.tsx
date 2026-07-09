@@ -116,8 +116,25 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   // Filter state for services
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("")
 
-  // Generate 14 days starting from seed base (2026-06-29)
-  const [availableDays, setAvailableDays] = useState<Date[]>([])
+  const [calendarYear, setCalendarYear] = useState<number>(() => new Date().getFullYear())
+  const [calendarMonth, setCalendarMonth] = useState<number>(() => new Date().getMonth())
+
+  const getDaysForCalendar = (year: number, month: number) => {
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+    const firstDayIndex = new Date(year, month, 1).getDay()
+    
+    const calendarDays: (Date | null)[] = []
+    
+    for (let i = 0; i < firstDayIndex; i++) {
+      calendarDays.push(null)
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      calendarDays.push(new Date(year, month, day))
+    }
+    
+    return calendarDays
+  }
 
   // Todos os serviços precisam ficar com o mesmo profissional: se o cliente
   // escolheu "Qualquer Profissional", o profissional real só é conhecido
@@ -129,19 +146,6 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
 
   const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration_minutes, 0)
   const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0)
-
-  useEffect(() => {
-    // Inicializa os próximos 14 dias para o swiper (local date sem timezone shift)
-    const [year, month, day] = "2026-06-29".split("-").map(Number)
-    const start = new Date(year, month - 1, day)
-    const days: Date[] = []
-    for (let i = 0; i < 14; i++) {
-      const d = new Date(start)
-      d.setDate(start.getDate() + i)
-      days.push(d)
-    }
-    setAvailableDays(days)
-  }, [])
 
   // Carrega serviços e profissionais
   const loadInitialData = async () => {
@@ -536,29 +540,126 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
               <h2 className="text-lg font-extrabold text-slate-800">Escolha a data e hora</h2>
             </div>
 
-            {/* Horizontal Date Swiper */}
+            {/* Calendário Mensal Responsivo */}
             <div className="space-y-2">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Selecione o Dia</span>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap">
-                {availableDays.map((d, i) => {
-                  const isSelected = selectedDate && selectedDate.toDateString() === d.toDateString()
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => handleDateSelect(d)}
-                      className={`h-16 w-14 rounded-xl flex flex-col items-center justify-center border transition flex-shrink-0 active:scale-95 ${
-                        isSelected
-                          ? "bg-slate-900 text-white border-slate-900 shadow-md"
-                          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                      }`}
+              
+              <div className="space-y-4 bg-slate-50/50 border border-slate-200/80 p-4 rounded-2xl shadow-sm max-w-md mx-auto sm:mx-0">
+                {/* Mês/Ano e Navegação */}
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
+                  <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wide">
+                    {(() => {
+                      const label = new Date(calendarYear, calendarMonth).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+                      return label.charAt(0).toUpperCase() + label.slice(1)
+                    })()}
+                  </h3>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={calendarYear === new Date().getFullYear() && calendarMonth === new Date().getMonth()}
+                      onClick={() => {
+                        if (calendarMonth === 0) {
+                          setCalendarMonth(11)
+                          setCalendarYear(calendarYear - 1)
+                        } else {
+                          setCalendarMonth(calendarMonth - 1)
+                        }
+                      }}
+                      className="h-8 w-8 p-0 text-slate-600 hover:bg-slate-200/50 rounded-lg cursor-pointer flex items-center justify-center border border-slate-200 bg-white"
                     >
-                      <span className="text-[9px] font-bold uppercase tracking-wider">
-                        {d.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "")}
-                      </span>
-                      <span className="text-base font-extrabold mt-0.5">{d.getDate()}</span>
-                    </button>
-                  )
-                })}
+                      <i className="ti ti-chevron-left text-sm" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={(() => {
+                        const todayDate = new Date()
+                        todayDate.setHours(0, 0, 0, 0)
+                        const limitFuture = new Date(todayDate)
+                        
+                        if (config.max_advance_days > 0) {
+                          limitFuture.setDate(todayDate.getDate() + config.max_advance_days)
+                        } else {
+                          // Limite padrão de 6 meses
+                          limitFuture.setMonth(todayDate.getMonth() + 6)
+                        }
+                        
+                        const nextMonthFirstDay = new Date(calendarYear, calendarMonth + 1, 1)
+                        return nextMonthFirstDay > limitFuture
+                      })()}
+                      onClick={() => {
+                        if (calendarMonth === 11) {
+                          setCalendarMonth(0)
+                          setCalendarYear(calendarYear + 1)
+                        } else {
+                          setCalendarMonth(calendarMonth + 1)
+                        }
+                      }}
+                      className="h-8 w-8 p-0 text-slate-600 hover:bg-slate-200/50 rounded-lg cursor-pointer flex items-center justify-center border border-slate-200 bg-white"
+                    >
+                      <i className="ti ti-chevron-right text-sm" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Dias da semana */}
+                <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <span>Dom</span>
+                  <span>Seg</span>
+                  <span>Ter</span>
+                  <span>Qua</span>
+                  <span>Qui</span>
+                  <span>Sex</span>
+                  <span>Sáb</span>
+                </div>
+
+                {/* Dias do mês */}
+                <div className="grid grid-cols-7 gap-1.5 text-center mt-1">
+                  {getDaysForCalendar(calendarYear, calendarMonth).map((day, idx) => {
+                    if (day === null) {
+                      return <div key={`empty-${idx}`} className="h-8 w-8 sm:h-9 sm:w-9" />
+                    }
+
+                    const isSelected = selectedDate && selectedDate.toDateString() === day.toDateString()
+                    
+                    const todayDate = new Date()
+                    todayDate.setHours(0, 0, 0, 0)
+                    const isToday = day.toDateString() === todayDate.toDateString()
+                    
+                    const isPast = day < todayDate
+                    
+                    let isTooFar = false
+                    if (config.max_advance_days > 0) {
+                      const maxDate = new Date(todayDate)
+                      maxDate.setDate(todayDate.getDate() + config.max_advance_days)
+                      isTooFar = day > maxDate
+                    }
+                    
+                    const isDisabled = isPast || isTooFar
+
+                    return (
+                      <button
+                        key={`day-${day.getDate()}`}
+                        type="button"
+                        disabled={isDisabled}
+                        onClick={() => handleDateSelect(day)}
+                        style={isSelected ? { backgroundColor: "var(--bc-primary)", color: "#fff" } : isToday ? { borderColor: "var(--bc-primary)", color: "var(--bc-primary)" } : undefined}
+                        className={`h-8 w-8 sm:h-9 sm:w-9 text-xs font-bold rounded-lg flex items-center justify-center transition active:scale-90 select-none ${
+                          isSelected
+                            ? "shadow-md font-extrabold"
+                            : isToday
+                            ? "border font-extrabold hover:bg-slate-100/50"
+                            : isDisabled
+                            ? "text-slate-300 cursor-not-allowed bg-slate-50/10 opacity-40"
+                            : "text-slate-700 hover:bg-slate-150/60 border border-slate-200/50"
+                        }`}
+                      >
+                        {day.getDate()}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             </div>
 
