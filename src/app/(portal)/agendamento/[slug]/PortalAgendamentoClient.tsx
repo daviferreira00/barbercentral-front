@@ -574,17 +574,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                       variant="ghost"
                       size="sm"
                       disabled={(() => {
-                        const todayDate = new Date()
-                        todayDate.setHours(0, 0, 0, 0)
-                        const limitFuture = new Date(todayDate)
-                        
-                        if (config.max_advance_days > 0) {
-                          limitFuture.setDate(todayDate.getDate() + config.max_advance_days)
-                        } else {
-                          // Limite padrão de 6 meses
-                          limitFuture.setMonth(todayDate.getMonth() + 6)
-                        }
-                        
+                        const limitFuture = new Date(2028, 11, 31)
                         const nextMonthFirstDay = new Date(calendarYear, calendarMonth + 1, 1)
                         return nextMonthFirstDay > limitFuture
                       })()}
@@ -629,12 +619,8 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                     
                     const isPast = day < todayDate
                     
-                    let isTooFar = false
-                    if (config.max_advance_days > 0) {
-                      const maxDate = new Date(todayDate)
-                      maxDate.setDate(todayDate.getDate() + config.max_advance_days)
-                      isTooFar = day > maxDate
-                    }
+                    const limitFuture = new Date(2028, 11, 31)
+                    const isTooFar = day > limitFuture
                     
                     const isDisabled = isPast || isTooFar
 
