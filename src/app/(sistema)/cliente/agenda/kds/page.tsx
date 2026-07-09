@@ -272,40 +272,40 @@ export default function AgendaKdsPage() {
       <div
         key={app.id}
         onClick={() => setSelectedApp(app)}
-        className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98] flex flex-col gap-2.5 ${visuals.border}`}
+        className={`p-3 md:p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98] flex flex-col gap-2 ${visuals.border}`}
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-0.5">
-            <span className={`text-xs font-bold ${isLight ? "text-slate-500" : "text-slate-400"}`}>{app.start_time} - {app.end_time}</span>
-            <h4 className={`text-base font-extrabold tracking-wide truncate max-w-[170px] md:max-w-[220px] ${isLight ? "text-slate-800" : "text-white"}`}>
+            <span className={`text-[10px] md:text-xs font-bold ${isLight ? "text-slate-500" : "text-slate-400"}`}>{app.start_time} - {app.end_time}</span>
+            <h4 className={`text-sm md:text-base font-extrabold tracking-wide truncate max-w-[140px] md:max-w-[220px] ${isLight ? "text-slate-800" : "text-white"}`}>
               {app.customer_name || "Cliente sem Nome"}
             </h4>
           </div>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${visuals.badge}`}>
+          <span className={`px-1.5 md:px-2 py-0.5 rounded-full text-[9px] md:text-[10px] font-bold border ${visuals.badge}`}>
             {visuals.label}
           </span>
         </div>
 
         <div className={`flex flex-col gap-1.5 border-t pt-2 ${isLight ? "border-slate-100" : "border-slate-800/60"}`}>
-          <div className={`flex items-center gap-1.5 text-xs ${isLight ? "text-slate-600" : "text-slate-300"}`}>
-            <i className="ti ti-cut text-sm" style={{ color: colorSecondary }} />
+          <div className={`flex items-center gap-1.5 text-[11px] md:text-xs ${isLight ? "text-slate-600" : "text-slate-300"}`}>
+            <i className="ti ti-cut text-xs md:text-sm" style={{ color: colorSecondary }} />
             <span className="font-semibold line-clamp-1">{servicesText}</span>
           </div>
           
-          <div className="flex items-center justify-between text-[11px] mt-0.5 font-medium">
+          <div className="flex items-center justify-between text-[10px] md:text-[11px] mt-0.5 font-medium">
             {app.status === "in_progress" ? (
-              <span className="flex items-center gap-1 text-amber-500 font-extrabold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                <i className="ti ti-clock" />
+              <span className="flex items-center gap-1 text-amber-500 font-extrabold bg-amber-500/10 px-1.5 md:px-2 py-0.5 rounded-md border border-amber-500/20">
+                <i className="ti ti-clock text-[10px] md:text-xs" />
                 {getElapsedTime(app.started_at)} min
               </span>
             ) : (
               <span className={isLight ? "text-slate-500" : "text-slate-400"}>
-                <i className="ti ti-clock mr-1 text-slate-400" />
+                <i className="ti ti-clock mr-1 text-slate-400 text-[10px] md:text-xs" />
                 {totalDuration} min
               </span>
             )}
-            <span className={`flex items-center gap-1 font-semibold ${isLight ? "text-slate-655" : "text-slate-300"}`}>
-              <i className="ti ti-user text-slate-400" />
+            <span className={`flex items-center gap-1 font-semibold ${isLight ? "text-slate-600" : "text-slate-300"}`}>
+              <i className="ti ti-user text-slate-400 text-[10px] md:text-xs" />
               {app.professional_name}
             </span>
           </div>
@@ -341,134 +341,147 @@ export default function AgendaKdsPage() {
 
   return (
     <div 
-      className="flex flex-col h-full w-full overflow-hidden p-6 transition-all duration-300" 
+      className="flex flex-col h-full w-full overflow-hidden p-3 md:p-6 transition-all duration-300" 
       style={bgStyle}
     >
       
       {/* 1. CABEÇALHO DO KDS COM MARCA */}
-      <header className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-5 ${isLight ? "border-slate-200" : "border-slate-900"}`}>
-        <div className="flex items-center gap-3">
-          {config?.logo_central || config?.logo_url ? (
-            <img 
-              src={config?.logo_central || config?.logo_url} 
-              alt="Logo" 
-              className="h-10 max-w-[140px] object-contain rounded-lg shadow-sm" 
-            />
-          ) : (
-            <div 
-              className="h-10 w-10 rounded-xl flex items-center justify-center shadow-lg text-white"
-              style={{ backgroundColor: colorPrimary }}
-            >
-              <i className="ti ti-device-tv text-xl" />
+      <header className={`flex flex-col lg:flex-row lg:items-center justify-between gap-3 md:gap-4 border-b pb-3 md:pb-5 ${isLight ? "border-slate-200" : "border-slate-900"}`}>
+        <div className="flex items-center justify-between w-full lg:w-auto gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
+            {config?.logo_central || config?.logo_url ? (
+              <img 
+                src={config?.logo_central || config?.logo_url} 
+                alt="Logo" 
+                className="h-8 md:h-10 max-w-[100px] md:max-w-[140px] object-contain rounded-lg shadow-sm" 
+              />
+            ) : (
+              <div 
+                className="h-8 w-8 md:h-10 md:w-10 rounded-xl flex items-center justify-center shadow-lg text-white text-sm md:text-xl"
+                style={{ backgroundColor: colorPrimary }}
+              >
+                <i className="ti ti-device-tv" />
+              </div>
+            )}
+            <div>
+              <div className="flex items-center gap-1.5 md:gap-2">
+                <h1 className={`text-base md:text-xl font-black tracking-wider uppercase ${isLight ? "text-slate-800" : "text-white"}`}>Painel KDS</h1>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-emerald-500"></span>
+                </span>
+              </div>
+              <p className={`text-[9px] md:text-xs font-bold uppercase tracking-wider mt-0.5 ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+                Monitoramento de Atendimentos
+              </p>
             </div>
-          )}
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className={`text-xl font-black tracking-wider uppercase ${isLight ? "text-slate-800" : "text-white"}`}>Painel KDS</h1>
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-            </div>
-            <p className={`text-xs font-bold uppercase tracking-wider mt-0.5 ${isLight ? "text-slate-500" : "text-slate-450"}`}>
-              Monitoramento de Atendimentos
-            </p>
+          </div>
+
+          {/* Relógio Digital Mobile (HH:MM) */}
+          <div className={`flex lg:hidden items-center justify-center border rounded-xl px-3 py-1.5 shadow-inner ${isLight ? "bg-white border-slate-200" : "bg-slate-900/65 border-slate-800/80"}`}>
+            <span className={`text-base font-black font-mono tracking-wider ${isLight ? "text-slate-800" : "text-slate-200"}`}>
+              {currentTime ? currentTime.substring(0, 5) : "00:00"}
+            </span>
           </div>
         </div>
 
-        {/* Relógio Digital Centralizado/Destacado */}
-        <div className={`flex items-center justify-center border rounded-2xl px-6 py-2 shadow-inner ${isLight ? "bg-white border-slate-200" : "bg-slate-900/65 border-slate-800/80"}`}>
+        {/* Relógio Digital Desktop (Centralizado/Destacado) */}
+        <div className={`hidden lg:flex items-center justify-center border rounded-2xl px-6 py-2 shadow-inner ${isLight ? "bg-white border-slate-200" : "bg-slate-900/65 border-slate-800/80"}`}>
           <span className={`text-2xl font-black font-mono tracking-widest ${isLight ? "text-slate-800" : "text-slate-200"}`}>
             {currentTime || "00:00:00"}
           </span>
         </div>
 
         {/* Controles de Configuração e Refresh */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2 w-full lg:w-auto">
           <div className={`flex border rounded-lg p-0.5 ${isLight ? "border-slate-200 bg-white" : "border-slate-800 bg-slate-900/40"}`}>
             <button
               onClick={() => setViewMode("columns")}
               style={viewMode === "columns" ? { backgroundColor: colorButton, color: "#fff" } : undefined}
-              className={`px-3 py-1.5 text-xs font-extrabold rounded-md transition ${
+              className={`px-2.5 md:px-3 py-1.5 text-[10px] md:text-xs font-extrabold rounded-md transition ${
                 viewMode === "columns" ? "shadow-md" : isLight ? "text-slate-500 hover:text-slate-800" : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              <i className="ti ti-columns mr-1.5 text-sm" />
-              Por Barbeiro
+              <i className="ti ti-columns mr-1 md:mr-1.5 text-xs md:text-sm" />
+              <span className="hidden sm:inline">Por Barbeiro</span>
+              <span className="inline sm:hidden">Barbeiro</span>
             </button>
             <button
               onClick={() => setViewMode("timeline")}
               style={viewMode === "timeline" ? { backgroundColor: colorButton, color: "#fff" } : undefined}
-              className={`px-3 py-1.5 text-xs font-extrabold rounded-md transition ${
+              className={`px-2.5 md:px-3 py-1.5 text-[10px] md:text-xs font-extrabold rounded-md transition ${
                 viewMode === "timeline" ? "shadow-md" : isLight ? "text-slate-500 hover:text-slate-800" : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              <i className="ti ti-timeline mr-1.5 text-sm" />
-              Fila Cronológica
+              <i className="ti ti-timeline mr-1 md:mr-1.5 text-xs md:text-sm" />
+              <span className="hidden sm:inline">Fila Cronológica</span>
+              <span className="inline sm:hidden">Fila</span>
             </button>
           </div>
 
-          <Button
-            onClick={loadData}
-            variant="outline"
-            size="sm"
-            className={`h-9 font-bold flex items-center gap-1.5 cursor-pointer ${
-              isLight ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50" : "border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <i className="ti ti-refresh text-sm" />
-            Recarregar ({countdown}s)
-          </Button>
-
-          <Button
-            onClick={toggleTheme}
-            variant="outline"
-            size="sm"
-            className={`h-9 font-bold flex items-center gap-1.5 cursor-pointer ${
-              isLight ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50" : "border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white"
-            }`}
-          >
-            <i className={`ti ${isLight ? "ti-moon" : "ti-sun"} text-sm`} />
-            {isLight ? "Modo Escuro" : "Modo Claro"}
-          </Button>
-
-          <Link href="/cliente/agenda">
+          <div className="flex items-center gap-1.5 md:gap-2">
             <Button
-              variant="ghost"
+              onClick={loadData}
+              variant="outline"
               size="sm"
-              className={`h-9 font-bold flex items-center gap-1 ${
-                isLight ? "text-slate-500 hover:text-slate-850 hover:bg-slate-100" : "text-slate-400 hover:text-white hover:bg-slate-900"
+              className={`h-8 md:h-9 text-[11px] md:text-xs font-bold flex items-center gap-1 cursor-pointer ${
+                isLight ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50" : "border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white"
               }`}
             >
-              <i className="ti ti-arrow-left text-sm" />
-              Voltar
+              <i className="ti ti-refresh text-xs md:text-sm" />
+              <span className="hidden sm:inline">Recarregar</span> ({countdown}s)
             </Button>
-          </Link>
+
+            <Button
+              onClick={toggleTheme}
+              variant="outline"
+              size="sm"
+              className={`h-8 md:h-9 text-[11px] md:text-xs font-bold flex items-center gap-1 cursor-pointer ${
+                isLight ? "border-slate-200 bg-white text-slate-700 hover:bg-slate-50" : "border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <i className={`ti ${isLight ? "ti-moon" : "ti-sun"} text-xs md:text-sm`} />
+              <span className="hidden sm:inline">{isLight ? "Escuro" : "Claro"}</span>
+            </Button>
+
+            <Link href="/cliente/agenda">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`h-8 md:h-9 text-[11px] md:text-xs font-bold flex items-center gap-1 ${
+                  isLight ? "text-slate-500 hover:text-slate-800 hover:bg-slate-100" : "text-slate-400 hover:text-white hover:bg-slate-900"
+                }`}
+              >
+                <i className="ti ti-arrow-left text-xs md:text-sm" />
+                <span className="hidden sm:inline">Voltar</span>
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* 2. BARRA DE CARDS E KPIs */}
-      <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-b ${isLight ? "border-slate-200/60" : "border-slate-900/50"}`}>
-        <div className={`border rounded-xl p-3 flex flex-col ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Hoje</span>
-          <span className={`text-xl font-extrabold mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{totalToday}</span>
+      <div className={`grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 py-2 md:py-4 border-b ${isLight ? "border-slate-200/60" : "border-slate-900/50"}`}>
+        <div className={`border rounded-xl p-2.5 md:p-3 flex flex-col ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
+          <span className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Hoje</span>
+          <span className={`text-base md:text-xl font-extrabold mt-0.5 md:mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{totalToday}</span>
         </div>
-        <div className={`border rounded-xl p-3 flex flex-col border-l-4 border-l-blue-500 ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-blue-500">Próximos</span>
-          <span className={`text-xl font-extrabold mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{pendingCount}</span>
+        <div className={`border rounded-xl p-2.5 md:p-3 flex flex-col border-l-4 border-l-blue-500 ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
+          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-blue-500">Próximos</span>
+          <span className={`text-base md:text-xl font-extrabold mt-0.5 md:mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{pendingCount}</span>
         </div>
-        <div className={`border rounded-xl p-3 flex flex-col border-l-4 border-l-amber-500 ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500">Atendendo</span>
-          <span className={`text-xl font-extrabold mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{activeCount}</span>
+        <div className={`border rounded-xl p-2.5 md:p-3 flex flex-col border-l-4 border-l-amber-500 ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
+          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-amber-500">Atendendo</span>
+          <span className={`text-base md:text-xl font-extrabold mt-0.5 md:mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{activeCount}</span>
         </div>
-        <div className={`border rounded-xl p-3 flex flex-col border-l-4 border-l-emerald-500 ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Finalizados</span>
-          <span className={`text-xl font-extrabold mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{completedCount}</span>
+        <div className={`border rounded-xl p-2.5 md:p-3 flex flex-col border-l-4 border-l-emerald-500 ${isLight ? "bg-white border-slate-200" : "bg-slate-900/30 border-slate-900"}`}>
+          <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-emerald-500">Finalizados</span>
+          <span className={`text-base md:text-xl font-extrabold mt-0.5 md:mt-1 ${isLight ? "text-slate-800" : "text-white"}`}>{completedCount}</span>
         </div>
       </div>
 
       {/* 3. CONTEÚDO PRINCIPAL */}
-      <main className="flex-1 overflow-hidden py-5">
+      <main className="flex-1 overflow-hidden py-3 md:py-5">
         {loading && appointments.length === 0 ? (
           <div className="h-full w-full flex flex-col items-center justify-center gap-3">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
@@ -490,12 +503,12 @@ export default function AgendaKdsPage() {
           </div>
         ) : viewMode === "columns" ? (
           /* MODO COLUNAS (KANBAN POR BARBEIRO) */
-          <div className="flex gap-5 h-full overflow-x-auto pb-4 scrollbar-thin select-none">
+          <div className="flex gap-3 md:gap-5 h-full overflow-x-auto pb-4 scrollbar-thin select-none">
             {/* Coluna para agendamentos sem profissional */}
             {getUnassignedAppointments().length > 0 && (
-              <div className={`flex-shrink-0 w-80 flex flex-col border rounded-2xl p-4 overflow-hidden h-full ${isLight ? "bg-white border-slate-200" : "bg-slate-900/25 border-slate-900"}`}>
-                <div className={`flex items-center justify-between mb-4 pb-2 border-b ${isLight ? "border-slate-100" : "border-slate-900"}`}>
-                  <h3 className={`text-sm font-black uppercase tracking-wider ${isLight ? "text-slate-655" : "text-slate-300"}`}>Sem Profissional</h3>
+              <div className={`flex-shrink-0 w-72 md:w-80 flex flex-col border rounded-2xl p-3 md:p-4 overflow-hidden h-full ${isLight ? "bg-white border-slate-200" : "bg-slate-900/25 border-slate-900"}`}>
+                <div className={`flex items-center justify-between mb-3 pb-2 border-b ${isLight ? "border-slate-100" : "border-slate-900"}`}>
+                  <h3 className={`text-xs md:text-sm font-black uppercase tracking-wider ${isLight ? "text-slate-600" : "text-slate-300"}`}>Sem Profissional</h3>
                   <span className="bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-xs font-bold">
                     {getUnassignedAppointments().length}
                   </span>
@@ -512,28 +525,28 @@ export default function AgendaKdsPage() {
               const profAppsActive = profApps.filter((a) => a.status === "in_progress").length
               
               return (
-                <div key={prof.id} className={`flex-shrink-0 w-80 flex flex-col border rounded-2xl p-4 overflow-hidden h-full ${isLight ? "bg-white border-slate-200" : "bg-slate-900/20 border-slate-900/60"}`}>
-                  <div className={`flex items-center justify-between mb-3.5 pb-2.5 border-b ${isLight ? "border-slate-150" : "border-slate-900/80"}`}>
+                <div key={prof.id} className={`flex-shrink-0 w-72 md:w-80 flex flex-col border rounded-2xl p-3 md:p-4 overflow-hidden h-full ${isLight ? "bg-white border-slate-200" : "bg-slate-900/20 border-slate-900/60"}`}>
+                  <div className={`flex items-center justify-between mb-3 pb-2 border-b ${isLight ? "border-slate-150" : "border-slate-900/80"}`}>
                     <div className="flex flex-col gap-0.5">
-                      <h3 className={`text-sm font-black uppercase tracking-wider truncate max-w-[200px] ${isLight ? "text-slate-800" : "text-white"}`}>
+                      <h3 className={`text-xs md:text-sm font-black uppercase tracking-wider truncate max-w-[150px] md:max-w-[200px] ${isLight ? "text-slate-800" : "text-white"}`}>
                         {prof.name}
                       </h3>
                       {profAppsActive > 0 && (
-                        <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 bg-amber-500 rounded-full"></span>
+                        <span className="text-[8px] md:text-[9px] font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1">
+                          <span className="h-1 w-1 bg-amber-500 rounded-full"></span>
                           Em Atendimento
                         </span>
                       )}
                     </div>
-                    <span className={`border px-2.5 py-0.5 rounded-full text-xs font-extrabold ${isLight ? "bg-slate-50 border-slate-200 text-slate-600" : "bg-slate-900 border-slate-800 text-slate-300"}`}>
+                    <span className={`border px-2 py-0.5 rounded-full text-xs font-extrabold ${isLight ? "bg-slate-50 border-slate-200 text-slate-600" : "bg-slate-900 border-slate-800 text-slate-300"}`}>
                       {profApps.length}
                     </span>
                   </div>
-                  <div className="flex-1 overflow-y-auto flex flex-col gap-3 scrollbar-none pr-1">
+                  <div className="flex-1 overflow-y-auto flex flex-col gap-2.5 md:gap-3 scrollbar-none pr-1">
                     {profApps.length === 0 ? (
                       <div className={`flex-1 flex flex-col items-center justify-center text-slate-400 text-center gap-1 p-4 border border-dashed rounded-xl ${isLight ? "border-slate-200" : "border-slate-900"}`}>
-                        <i className="ti ti-user-x text-2xl" />
-                        <span className="text-xs font-bold uppercase">Sem agenda</span>
+                        <i className="ti ti-user-x text-xl md:text-2xl" />
+                        <span className="text-[10px] md:text-xs font-bold uppercase">Sem agenda</span>
                       </div>
                     ) : (
                       profApps.map(renderAppointmentCard)
@@ -545,14 +558,14 @@ export default function AgendaKdsPage() {
           </div>
         ) : (
           /* MODO TIMELINE (FILA CRONOLÓGICA) */
-          <div className={`h-full overflow-y-auto max-w-3xl mx-auto border p-6 rounded-2xl shadow-inner scrollbar-thin ${isLight ? "bg-white border-slate-200" : "bg-slate-900/10 border-slate-900"}`}>
-            <div className="flex flex-col gap-4">
+          <div className={`h-full overflow-y-auto max-w-3xl mx-auto border p-4 md:p-6 rounded-2xl shadow-inner scrollbar-thin ${isLight ? "bg-white border-slate-200" : "bg-slate-900/10 border-slate-900"}`}>
+            <div className="flex flex-col gap-3 md:gap-4">
               {getTimelineAppointments().map((app) => (
-                <div key={app.id} className="flex gap-4 items-stretch">
+                <div key={app.id} className="flex gap-2 md:gap-4 items-stretch">
                   {/* Hora na lateral esquerda */}
-                  <div className={`flex flex-col items-center justify-center border px-4 py-2 rounded-xl min-w-[90px] ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-850"}`}>
-                    <span className={`text-sm font-black ${isLight ? "text-slate-800" : "text-white"}`}>{app.start_time}</span>
-                    <span className="text-[9px] font-bold text-slate-500 uppercase mt-0.5">Início</span>
+                  <div className={`flex flex-col items-center justify-center border px-2 md:px-4 py-1.5 md:py-2 rounded-xl min-w-[70px] md:min-w-[90px] ${isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900 border-slate-850"}`}>
+                    <span className={`text-xs md:text-sm font-black ${isLight ? "text-slate-800" : "text-white"}`}>{app.start_time}</span>
+                    <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase mt-0.5">Início</span>
                   </div>
                   
                   {/* Card Completo */}
@@ -568,40 +581,40 @@ export default function AgendaKdsPage() {
 
       {/* 4. DIALOG DE AÇÕES RÁPIDAS */}
       <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-md w-full rounded-2xl shadow-2xl p-6">
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-md w-[92vw] sm:w-full rounded-2xl shadow-2xl p-4 md:p-6">
           <DialogHeader className="border-b border-slate-800 pb-3">
-            <DialogTitle className="text-lg font-black text-white tracking-wide flex items-center gap-2">
-              <i className="ti ti-info-circle text-indigo-500 text-xl" />
+            <DialogTitle className="text-base md:text-lg font-black text-white tracking-wide flex items-center gap-2">
+              <i className="ti ti-info-circle text-indigo-500 text-lg md:text-xl" />
               Detalhes do Agendamento
             </DialogTitle>
           </DialogHeader>
 
           {selectedApp && (
-            <div className="py-4 space-y-4 text-sm">
+            <div className="py-4 space-y-4 text-xs md:text-sm">
               <div className="grid grid-cols-2 gap-4 bg-slate-950/40 p-3 rounded-xl border border-slate-850">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Cliente</span>
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500">Cliente</span>
                   <p className="font-extrabold text-white mt-0.5">{selectedApp.customer_name || "N/A"}</p>
                   {selectedApp.customer_phone && (
-                    <p className="text-xs text-slate-400 mt-0.5">{selectedApp.customer_phone}</p>
+                    <p className="text-[10px] md:text-xs text-slate-400 mt-0.5">{selectedApp.customer_phone}</p>
                   )}
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Profissional (Barbeiro)</span>
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500">Profissional (Barbeiro)</span>
                   <p className="font-extrabold text-white mt-0.5">{selectedApp.professional_name}</p>
                 </div>
               </div>
 
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Serviços Contratados</span>
+                <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">Serviços Contratados</span>
                 <div className="bg-slate-950/20 rounded-xl border border-slate-850 p-3 flex flex-col gap-2">
                   {selectedApp.services?.map((svc, i) => (
-                    <div key={i} className="flex justify-between items-center text-xs font-semibold">
+                    <div key={i} className="flex justify-between items-center text-[11px] md:text-xs font-semibold">
                       <span className="text-slate-300">{svc.service_name}</span>
                       <span className="text-slate-400">R$ {svc.price.toFixed(2)} ({svc.duration_minutes} min)</span>
                     </div>
                   ))}
-                  <div className="border-t border-slate-800/80 pt-2 mt-1 flex justify-between items-center text-xs font-bold text-white">
+                  <div className="border-t border-slate-800/80 pt-2 mt-1 flex justify-between items-center text-[11px] md:text-xs font-bold text-white">
                     <span>Total</span>
                     <span>
                       R$ {selectedApp.services?.reduce((acc, curr) => acc + curr.price, 0).toFixed(2)}
@@ -612,11 +625,11 @@ export default function AgendaKdsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Horário Previsto</span>
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500">Horário Previsto</span>
                   <p className="font-extrabold text-white mt-0.5">{selectedApp.start_time} até {selectedApp.end_time}</p>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Status Atual</span>
+                  <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500">Status Atual</span>
                   <p className="font-extrabold text-white mt-0.5 capitalize flex items-center gap-1.5">
                     <span className={`h-2 w-2 rounded-full ${
                       selectedApp.status === "in_progress" ? "bg-amber-500" :
@@ -631,7 +644,7 @@ export default function AgendaKdsPage() {
 
               {/* Botões de Ações Rápidas */}
               <div className="pt-4 border-t border-slate-800 space-y-2.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
                   Controle de Atendimento KDS
                 </span>
                 
@@ -639,19 +652,19 @@ export default function AgendaKdsPage() {
                   <Button
                     onClick={() => handleQuickStatusChange("in_progress")}
                     disabled={updatingStatus || selectedApp.status === "in_progress"}
-                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black h-11 flex items-center justify-center gap-1.5 border-none cursor-pointer"
+                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black h-10 md:h-11 flex items-center justify-center gap-1.5 border-none cursor-pointer text-xs md:text-sm"
                   >
-                    <i className="ti ti-play text-base" />
-                    Iniciar Atendimento
+                    <i className="ti ti-play text-xs md:text-base" />
+                    Iniciar
                   </Button>
 
                   <Button
                     onClick={() => handleQuickStatusChange("completed")}
                     disabled={updatingStatus || selectedApp.status === "completed"}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-black h-11 flex items-center justify-center gap-1.5 border-none cursor-pointer"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-black h-10 md:h-11 flex items-center justify-center gap-1.5 border-none cursor-pointer text-xs md:text-sm"
                   >
-                    <i className="ti ti-checkbox text-base" />
-                    Concluir Atendimento
+                    <i className="ti ti-checkbox text-xs md:text-base" />
+                    Concluir
                   </Button>
                 </div>
 
@@ -660,7 +673,7 @@ export default function AgendaKdsPage() {
                     onClick={() => handleQuickStatusChange("confirmed")}
                     disabled={updatingStatus || selectedApp.status === "confirmed"}
                     variant="outline"
-                    className="border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-xs font-bold h-9 cursor-pointer"
+                    className="border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-[10px] md:text-xs font-bold h-9 cursor-pointer"
                   >
                     Confirmar
                   </Button>
@@ -668,15 +681,15 @@ export default function AgendaKdsPage() {
                     onClick={() => handleQuickStatusChange("no_show")}
                     disabled={updatingStatus || selectedApp.status === "no_show"}
                     variant="outline"
-                    className="border-rose-950/60 bg-rose-950/10 hover:bg-rose-950/20 text-rose-300 text-xs font-bold h-9 cursor-pointer"
+                    className="border-rose-950/60 bg-rose-950/10 hover:bg-rose-950/20 text-rose-300 text-[10px] md:text-xs font-bold h-9 cursor-pointer"
                   >
-                    Falta (No-Show)
+                    Falta
                   </Button>
                   <Button
                     onClick={() => handleQuickStatusChange("cancelled")}
                     disabled={updatingStatus || selectedApp.status === "cancelled"}
                     variant="outline"
-                    className="border-red-950/60 bg-red-950/10 hover:bg-red-950/20 text-red-400 text-xs font-bold h-9 cursor-pointer"
+                    className="border-red-950/60 bg-red-950/10 hover:bg-red-950/20 text-red-400 text-[10px] md:text-xs font-bold h-9 cursor-pointer"
                   >
                     Cancelar
                   </Button>
@@ -689,7 +702,7 @@ export default function AgendaKdsPage() {
             <Button
               onClick={() => setSelectedApp(null)}
               variant="outline"
-              className="w-full border-slate-800 bg-slate-900 text-slate-450 hover:bg-slate-850 hover:text-white font-bold h-10 cursor-pointer"
+              className="w-full border-slate-800 bg-slate-900 text-slate-400 hover:bg-slate-850 hover:text-white font-bold h-10 cursor-pointer text-xs md:text-sm"
             >
               Fechar
             </Button>
@@ -699,14 +712,14 @@ export default function AgendaKdsPage() {
 
       {/* DIALOG DE PIN DE SEGURANÇA */}
       <Dialog open={!!pinPromptAction} onOpenChange={(open) => !open && setPinPromptAction(null)}>
-        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-sm rounded-2xl p-6">
+        <DialogContent className="bg-slate-900 border-slate-800 text-slate-100 max-w-sm w-[92vw] sm:w-full rounded-2xl p-5 md:p-6">
           <DialogHeader>
-            <DialogTitle className="text-base font-black text-white text-center">
+            <DialogTitle className="text-sm md:text-base font-black text-white text-center">
               Confirmação de Segurança
             </DialogTitle>
           </DialogHeader>
           <div className="py-4 flex flex-col items-center gap-4">
-            <p className="text-xs text-slate-400 text-center font-medium">
+            <p className="text-[11px] md:text-xs text-slate-400 text-center font-medium">
               Digite o PIN do KDS para autorizar esta alteração de status.
             </p>
             <input
@@ -720,7 +733,7 @@ export default function AgendaKdsPage() {
                 setEnteredPin(e.target.value.replace(/\D/g, ""))
               }}
               placeholder="••••"
-              className="w-40 text-center h-12 rounded-xl bg-slate-950 border border-slate-800 text-white font-black tracking-[0.5em] text-2xl focus:border-indigo-500 outline-none"
+              className="w-36 md:w-40 text-center h-10 md:h-12 rounded-xl bg-slate-950 border border-slate-800 text-white font-black tracking-[0.5em] text-xl md:text-2xl focus:border-indigo-500 outline-none"
             />
             {pinError && (
               <span className="text-xs text-red-500 font-bold">{pinError}</span>
@@ -734,13 +747,13 @@ export default function AgendaKdsPage() {
                 setEnteredPin("")
                 setPinError(null)
               }}
-              className="border-slate-800 bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-white font-bold h-10"
+              className="border-slate-800 bg-slate-950 text-slate-400 hover:bg-slate-900 hover:text-white font-bold h-10 text-xs md:text-sm"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleVerifyPinAndExecute}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-10 text-xs md:text-sm"
             >
               Confirmar
             </Button>
