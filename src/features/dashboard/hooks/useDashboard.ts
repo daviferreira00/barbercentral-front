@@ -11,6 +11,7 @@ export interface UpcomingAppointment {
   professional: string
   services: string
   status: AppointmentStatus
+  date: string
 }
 
 export interface DashboardData {
@@ -33,7 +34,11 @@ export function useDashboard(): DashboardData {
   const [clientSlug, setClientSlug] = useState("")
 
   const getTodayStr = () => {
-    return new Date().toISOString().split("T")[0]
+    const d = new Date()
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
   }
 
   const loadDashboardData = async () => {
@@ -74,12 +79,21 @@ export function useDashboard(): DashboardData {
         const tStart = a.start_time ? a.start_time.substring(0, 5) : ""
         const tEnd = a.end_time ? a.end_time.substring(0, 5) : ""
 
+        let formattedDate = ""
+        if (a.date) {
+          const parts = a.date.split("T")[0].split("-")
+          if (parts.length === 3) {
+            formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`
+          }
+        }
+
         return {
           customer: a.customer_name || "Sem cadastro",
           time: tStart && tEnd ? `${tStart} - ${tEnd}` : "",
           professional: a.professional_name || "Geral",
-          services: (a.services || []).map((s: any) => s.name).join(" + "),
-          status: displayStatus
+          services: (a.services || []).map((s: any) => s.service_name || s.name).join(" + "),
+          status: displayStatus,
+          date: formattedDate
         }
       })
       

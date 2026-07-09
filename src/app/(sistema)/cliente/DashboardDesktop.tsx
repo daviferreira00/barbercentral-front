@@ -220,6 +220,7 @@ export default function DashboardDesktop() {
                 <thead className="bg-slate-50 border-y border-slate-100 text-xs font-bold text-slate-500 uppercase">
                   <tr>
                     <th className="p-4 pl-6">Cliente</th>
+                    <th className="p-4">Data</th>
                     <th className="p-4">Horário</th>
                     <th className="p-4">Profissional</th>
                     <th className="p-4">Serviços</th>
@@ -230,6 +231,7 @@ export default function DashboardDesktop() {
                   {upcoming.map((a) => (
                     <tr key={`${a.customer}-${a.time}`}>
                       <td className="p-4 pl-6 font-bold text-slate-800">{a.customer}</td>
+                      <td className="p-4 text-slate-500">{a.date}</td>
                       <td className="p-4">{a.time}</td>
                       <td className="p-4">{a.professional}</td>
                       <td className="p-4">{a.services}</td>

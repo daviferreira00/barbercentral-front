@@ -267,9 +267,16 @@ export default function DashboardMobile() {
                 </span>
               }
               footerRight={
-                <span className="text-slate-700">
-                  <i className="ti ti-clock mr-1 text-slate-400" />
-                  {a.time}
+                <span className="text-slate-700 flex flex-col items-end gap-0.5">
+                  <span className="flex items-center">
+                    <i className="ti ti-clock mr-1 text-slate-400" />
+                    {a.time}
+                  </span>
+                  {a.date && (
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {a.date}
+                    </span>
+                  )}
                 </span>
               }
             />
