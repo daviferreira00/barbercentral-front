@@ -55,6 +55,12 @@ export default function IdentidadeVisualDesktop() {
     setInterval,
     kdsPin,
     setKdsPin,
+    blockLunchEnabled,
+    setBlockLunchEnabled,
+    blockLunchStart,
+    setBlockLunchStart,
+    blockLunchEnd,
+    setBlockLunchEnd,
     handleLogoUpload,
     handleSubmit,
   } = useConfigIdentidadeVisual()
@@ -341,7 +347,7 @@ export default function IdentidadeVisualDesktop() {
                   </div>
                 </div>
 
-                <hr className="border-slate-100" />
+                 <hr className="border-slate-100" />
 
                 <div className="flex items-center gap-3">
                   <Checkbox
@@ -352,6 +358,44 @@ export default function IdentidadeVisualDesktop() {
                   <label htmlFor="req-login" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
                     Exigir login no portal público para agendar
                   </label>
+                </div>
+
+                <hr className="border-slate-100" />
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      id="block-lunch"
+                      checked={blockLunchEnabled}
+                      onCheckedChange={(c) => setBlockLunchEnabled(!!c)}
+                    />
+                    <label htmlFor="block-lunch" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
+                      Bloquear horário de almoço diariamente (Bloqueio Global)
+                    </label>
+                  </div>
+
+                  {blockLunchEnabled && (
+                    <div className="grid grid-cols-2 gap-4 pl-7 animate-fade-in">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase">Hora Início do Almoço</label>
+                        <Input
+                          type="time"
+                          value={blockLunchStart}
+                          onChange={(e) => setBlockLunchStart(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 uppercase">Hora Fim do Almoço</label>
+                        <Input
+                          type="time"
+                          value={blockLunchEnd}
+                          onChange={(e) => setBlockLunchEnd(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -26,6 +26,9 @@ export interface ClientConfig {
   max_advance_days: number
   interval_between_minutes: number
   kds_pin?: string
+  block_lunch_enabled?: number
+  block_lunch_start?: string
+  block_lunch_end?: string
 }
 
 export const FONTS = [
@@ -65,6 +68,9 @@ export function useConfigIdentidadeVisual() {
   const [maxAdvance, setMaxAdvance] = useState("30")
   const [interval, setInterval] = useState("15")
   const [kdsPin, setKdsPin] = useState("")
+  const [blockLunchEnabled, setBlockLunchEnabled] = useState(false)
+  const [blockLunchStart, setBlockLunchStart] = useState("12:00")
+  const [blockLunchEnd, setBlockLunchEnd] = useState("13:00")
 
   const loadConfig = async () => {
     setLoading(true)
@@ -100,6 +106,9 @@ export function useConfigIdentidadeVisual() {
       setMaxAdvance(c.max_advance_days.toString())
       setInterval(c.interval_between_minutes.toString())
       setKdsPin(c.kds_pin || "")
+      setBlockLunchEnabled(c.block_lunch_enabled === 1)
+      setBlockLunchStart(c.block_lunch_start ? c.block_lunch_start.substring(0, 5) : "12:00")
+      setBlockLunchEnd(c.block_lunch_end ? c.block_lunch_end.substring(0, 5) : "13:00")
     }
   }
 
@@ -165,6 +174,9 @@ export function useConfigIdentidadeVisual() {
       max_advance_days: parseInt(maxAdvance) || 30,
       interval_between_minutes: parseInt(interval) || 0,
       kds_pin: kdsPin || null,
+      block_lunch_enabled: blockLunchEnabled ? 1 : 0,
+      block_lunch_start: blockLunchStart ? `${blockLunchStart}:00` : "12:00:00",
+      block_lunch_end: blockLunchEnd ? `${blockLunchEnd}:00` : "13:00:00",
     })
     setSaving(false)
 
@@ -223,6 +235,12 @@ export function useConfigIdentidadeVisual() {
     setInterval,
     kdsPin,
     setKdsPin,
+    blockLunchEnabled,
+    setBlockLunchEnabled,
+    blockLunchStart,
+    setBlockLunchStart,
+    blockLunchEnd,
+    setBlockLunchEnd,
     handleLogoUpload,
     handleSubmit,
   }

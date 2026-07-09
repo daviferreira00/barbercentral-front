@@ -59,6 +59,12 @@ export default function IdentidadeVisualMobile() {
     setInterval,
     kdsPin,
     setKdsPin,
+    blockLunchEnabled,
+    setBlockLunchEnabled,
+    blockLunchStart,
+    setBlockLunchStart,
+    blockLunchEnd,
+    setBlockLunchEnd,
     handleLogoUpload,
     handleSubmit,
   } = useConfigIdentidadeVisual()
@@ -378,6 +384,51 @@ export default function IdentidadeVisualMobile() {
               <label htmlFor="req-login" className="text-sm font-extrabold text-slate-700 cursor-pointer select-none">
                 Exigir login no portal para agendar
               </label>
+            </div>
+
+            <hr className="border-slate-100" />
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-3.5 py-1">
+                <Checkbox
+                  id="block-lunch"
+                  checked={blockLunchEnabled}
+                  onCheckedChange={(c) => { haptic(); setBlockLunchEnabled(!!c) }}
+                  className="h-5 w-5 rounded-lg"
+                />
+                <label htmlFor="block-lunch" className="text-sm font-extrabold text-slate-700 cursor-pointer select-none">
+                  Bloquear horário de almoço diariamente
+                </label>
+              </div>
+
+              {blockLunchEnabled && (
+                <div className="grid grid-cols-2 gap-3 pl-8 animate-fade-in">
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                      Início Almoço
+                    </label>
+                    <Input
+                      type="time"
+                      value={blockLunchStart}
+                      onChange={(e) => setBlockLunchStart(e.target.value)}
+                      required
+                      className="h-11 rounded-xl text-base"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                      Fim Almoço
+                    </label>
+                    <Input
+                      type="time"
+                      value={blockLunchEnd}
+                      onChange={(e) => setBlockLunchEnd(e.target.value)}
+                      required
+                      className="h-11 rounded-xl text-base"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
