@@ -56,7 +56,7 @@ export function useConfigPlano() {
   const getUpgradeWhatsAppLink = () => {
     if (!usage) return ""
     const text = encodeURIComponent(`Olá! Gostaria de falar sobre o upgrade do meu plano no BarberCentral. Minha barbearia: ${usage.plan.name}`)
-    return `https://wa.me/5511999999999?text=${text}`
+    return `https://wa.me/5583987972804?text=${text}`
   }
 
   return {
