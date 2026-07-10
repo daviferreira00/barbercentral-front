@@ -21,6 +21,12 @@ interface ClientSaaS {
   created_at: string
 }
 
+interface Plan {
+  id: string
+  name: string
+  price: number
+}
+
 // 1 linha = 1 vínculo (client_user_link); id = link_id. O mesmo e-mail pode
 // estar vinculado a outras barbearias sem aparecer aqui.
 interface ClientUser {
@@ -61,6 +67,7 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
   const [client, setClient] = useState<ClientSaaS | null>(null)
   const [users, setUsers] = useState<ClientUser[]>([])
   const [config, setConfig] = useState<ClientConfig | null>(null)
+  const [plans, setPlans] = useState<Plan[]>([])
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
@@ -98,10 +105,11 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
 
   const loadData = async () => {
     setLoading(true)
-    const [resClient, resUsers, resConfig] = await Promise.all([
+    const [resClient, resUsers, resConfig, resPlans] = await Promise.all([
       http.get<ClientSaaS>(`/admin/clients/${clientId}`),
       http.get<ClientUser[]>(`/admin/clients/${clientId}/users`),
-      http.get<ClientConfig>(`/admin/clients/${clientId}/config`)
+      http.get<ClientConfig>(`/admin/clients/${clientId}/config`),
+      http.get<Plan[]>("/admin/plans")
     ])
     setLoading(false)
 
@@ -118,6 +126,7 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
       setEditClientPlan(resClient.data.plan_id)
     }
     if (resUsers.data) setUsers(resUsers.data)
+    if (resPlans.data) setPlans(resPlans.data)
     if (resConfig.data) {
       setConfig(resConfig.data)
     }
@@ -340,9 +349,9 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
                     <SelectValue placeholder="Selecione um plano" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="plan-basico">Básico</SelectItem>
-                    <SelectItem value="plan-profissional">Profissional</SelectItem>
-                    <SelectItem value="plan-premium">Premium</SelectItem>
+                    {plans.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name} (R$ {p.price})</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
