@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { haptic } from "@/shared/lib/haptics"
 import type { NavSection } from "@/shared/config/nav"
+import { useApp } from "@/shared/context/AppContext"
 
 interface MobileDrawerProps {
   open: boolean
@@ -29,6 +30,7 @@ export function MobileDrawer({
 }: MobileDrawerProps) {
   const pathname = usePathname()
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
+  const { user: sessionUser } = useApp()
 
   // Trava o scroll da página enquanto o drawer está aberto
   useEffect(() => {
@@ -74,8 +76,16 @@ export function MobileDrawer({
           }}
         >
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-lg font-extrabold">
-              {userName ? userName[0].toUpperCase() : "U"}
+            <div className="h-12 w-12 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-lg font-extrabold overflow-hidden">
+              {sessionUser?.photo_url ? (
+                <img
+                  src={sessionUser.photo_url.startsWith("/uploads") ? `http://localhost:8080${sessionUser.photo_url}` : sessionUser.photo_url}
+                  alt={userName}
+                  className="w-full h-full object-cover select-none"
+                />
+              ) : (
+                userName ? userName[0].toUpperCase() : "U"
+              )}
             </div>
             <div className="min-w-0">
               <p className="text-sm font-extrabold truncate">{userName || "Usuário"}</p>
@@ -157,6 +167,17 @@ export function MobileDrawer({
               Trocar de barbearia
             </button>
           )}
+          <Link
+            href="/cliente/perfil"
+            onClick={() => {
+              haptic()
+              onClose()
+            }}
+            className="mobile-tap flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 active:bg-slate-100 active:scale-[0.98] transition"
+          >
+            <i className="ti ti-user text-lg text-slate-400" />
+            Meu Perfil
+          </Link>
           <button
             onClick={() => {
               haptic()

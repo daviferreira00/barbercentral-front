@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { clienteNavSections } from "@/shared/config/nav"
 import { haptic } from "@/shared/lib/haptics"
 import { useApp } from "@/shared/context/AppContext"
@@ -54,8 +55,16 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
 
           <img src={logoUrl} alt="Logo" className="h-8 w-auto max-w-[55%] object-contain" />
 
-          <div className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/20 border border-white/30 text-sm font-extrabold">
-            {user.name ? user.name[0].toUpperCase() : "U"}
+          <div className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/20 border border-white/30 text-sm font-extrabold overflow-hidden">
+            {sessionUser?.photo_url ? (
+              <img
+                src={sessionUser.photo_url.startsWith("/uploads") ? `http://localhost:8080${sessionUser.photo_url}` : sessionUser.photo_url}
+                alt={user.name}
+                className="w-full h-full object-cover select-none"
+              />
+            ) : (
+              user.name ? user.name[0].toUpperCase() : "U"
+            )}
           </div>
         </div>
       </header>
