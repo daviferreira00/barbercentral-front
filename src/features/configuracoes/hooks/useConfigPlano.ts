@@ -19,6 +19,7 @@ export interface Plan {
 
 export interface UsageResponse {
   plan: Plan
+  client_name: string
   professionals: number
   customers: number
   users: number
@@ -55,12 +56,14 @@ export function useConfigPlano() {
 
   const getUpgradeWhatsAppLink = () => {
     if (!usage) return ""
-    const text = encodeURIComponent(`Olá! Gostaria de falar sobre o upgrade do meu plano no BarberCentral. Minha barbearia: ${usage.plan.name}`)
+    const barbeariaName = usage.client_name || "Minha Barbearia"
+    const text = encodeURIComponent(`Olá! Gostaria de falar sobre o upgrade do meu plano no BarberCentral. Minha Barbearia: "${barbeariaName}" e o plano atual é: ${usage.plan.name}`)
     return `https://wa.me/5583987972804?text=${text}`
   }
 
   return {
     usage,
+    plan: usage?.plan || null,
     loading,
     errorMsg,
     getProgressValue,
