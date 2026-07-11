@@ -225,6 +225,30 @@ export default function SistemaLayoutClient({
                 <div className="flex flex-col gap-1.5">
                   {!sidebarCollapsed && (
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-2">
+                      Comunicação & Alertas
+                    </span>
+                  )}
+                  <div className="flex flex-col gap-1">
+                    <Link
+                      href="/cliente/whatsapp"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-brand-whatsapp text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Canais WhatsApp</span>}
+                    </Link>
+                    <Link
+                      href="/cliente/notificacoes"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
+                    >
+                      <i className="ti ti-bell text-base" />
+                      {!sidebarCollapsed && <span className="truncate">Regras de Disparo</span>}
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  {!sidebarCollapsed && (
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-2">
                       Configurações
                     </span>
                   )}

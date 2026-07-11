@@ -19,6 +19,7 @@ interface ClientSaaS {
   name: string
   slug: string
   status: string
+  phone?: string | null
   created_at: string
 }
 
@@ -41,6 +42,7 @@ export default function AdminClientesPage() {
   const [newName, setNewName] = useState("")
   const [newSlug, setNewSlug] = useState("")
   const [newCustomDomain, setNewCustomDomain] = useState("")
+  const [newPhone, setNewPhone] = useState("")
   const [newPlan, setNewPlan] = useState("")
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -99,6 +101,7 @@ export default function AdminClientesPage() {
       name: newName,
       slug: newSlug,
       custom_domain: newCustomDomain || null,
+      phone: newPhone || null,
       plan_id: newPlan,
     })
     setSaving(false)
@@ -112,6 +115,7 @@ export default function AdminClientesPage() {
     setNewName("")
     setNewSlug("")
     setNewCustomDomain("")
+    setNewPhone("")
     loadData()
   }
 
@@ -348,6 +352,15 @@ export default function AdminClientesPage() {
                 placeholder="ex: agendamento.barbeariadopovo.com"
                 value={newCustomDomain}
                 onChange={(e) => setNewCustomDomain(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase">Telefone Administrativo (Opcional)</label>
+              <Input
+                placeholder="Ex: 11999999999"
+                value={newPhone}
+                onChange={(e) => setNewPhone(e.target.value)}
               />
             </div>
 

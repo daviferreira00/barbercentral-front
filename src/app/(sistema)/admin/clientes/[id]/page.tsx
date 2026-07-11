@@ -18,6 +18,7 @@ interface ClientSaaS {
   slug: string
   custom_domain?: string | null
   status: string
+  phone?: string | null
   created_at: string
 }
 
@@ -75,6 +76,7 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
   const [editClientName, setEditClientName] = useState("")
   const [editClientSlug, setEditClientSlug] = useState("")
   const [editClientDomain, setEditClientDomain] = useState("")
+  const [editClientPhone, setEditClientPhone] = useState("")
   const [editClientPlan, setEditClientPlan] = useState("")
   const [clientSaving, setClientSaving] = useState(false)
 
@@ -123,6 +125,7 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
       setEditClientName(resClient.data.name)
       setEditClientSlug(resClient.data.slug)
       setEditClientDomain(resClient.data.custom_domain || "")
+      setEditClientPhone(resClient.data.phone || "")
       setEditClientPlan(resClient.data.plan_id)
     }
     if (resUsers.data) setUsers(resUsers.data)
@@ -236,6 +239,7 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
       slug: editClientSlug,
       custom_domain: editClientDomain || null,
       plan_id: editClientPlan,
+      phone: editClientPhone || null,
     })
     setClientSaving(false)
 
@@ -327,6 +331,10 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
               <div className="space-y-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Domínio Customizado</span>
                 <Input placeholder="ex: agendamento.barbeariadopovo.com" value={editClientDomain} onChange={e => setEditClientDomain(e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Telefone Administrativo</span>
+                <Input placeholder="ex: 11999999999" value={editClientPhone} onChange={e => setEditClientPhone(e.target.value)} />
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Status</span>
