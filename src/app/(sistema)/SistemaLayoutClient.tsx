@@ -3,7 +3,7 @@
 import { useApp } from "@/shared/context/AppContext"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/shared/hooks/useIsMobile"
 import { MobileShell } from "@/components/mobile/MobileShell"
@@ -24,6 +24,23 @@ export default function SistemaLayoutClient({
   const pathname = usePathname()
   const router = useRouter()
   const isMobile = useIsMobile()
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    if (!user || user.role === "admin") return
+
+    const fetchUnreadCount = async () => {
+      const res = await http.get<any[]>("/cliente/chats")
+      if (res.data && Array.isArray(res.data)) {
+        const sum = res.data.reduce((acc, curr) => acc + (curr.unread_count || 0), 0)
+        setUnreadCount(sum)
+      }
+    }
+
+    fetchUnreadCount()
+    const interval = setInterval(fetchUnreadCount, 8000)
+    return () => clearInterval(interval)
+  }, [user])
 
 
 
@@ -229,6 +246,20 @@ export default function SistemaLayoutClient({
                     </span>
                   )}
                   <div className="flex flex-col gap-1">
+                    <Link
+                      href="/cliente/chat"
+                      className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
+                    >
+                      <div className="flex items-center gap-3">
+                        <i className="ti ti-message text-base" />
+                        {!sidebarCollapsed && <span className="truncate">Chat WhatsApp</span>}
+                      </div>
+                      {!sidebarCollapsed && unreadCount > 0 && (
+                        <span className="h-5 min-w-[20px] px-1 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </Link>
                     <Link
                       href="/cliente/whatsapp"
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
