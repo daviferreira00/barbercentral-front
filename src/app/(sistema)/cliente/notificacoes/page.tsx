@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { http } from "@/shared/lib/http"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2, Plus, Edit2, Trash2, HelpCircle } from "lucide-react"
+import { Loader2, Plus, Edit2, Trash2, HelpCircle, Search, ChevronDown, Check } from "lucide-react"
 
 interface NotificationRule {
   id: string
@@ -189,7 +189,7 @@ export default function ClientNotificationsPage() {
         </div>
         <Button
           onClick={handleOpenCreateModal}
-          className="bg-indigo-650 hover:bg-indigo-700 text-white font-bold h-9 text-xs flex items-center gap-2 shadow-sm transition-all"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-9 text-xs flex items-center gap-2 shadow-sm transition-all"
         >
           <Plus className="h-4 w-4" />
           Nova Regra
@@ -215,7 +215,7 @@ export default function ClientNotificationsPage() {
           </p>
           <Button
             onClick={handleOpenCreateModal}
-            className="mt-6 bg-indigo-650 hover:bg-indigo-700 text-white font-bold text-xs"
+            className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs"
           >
             Criar Minha Primeira Regra
           </Button>
@@ -253,7 +253,7 @@ export default function ClientNotificationsPage() {
                   <div className="flex gap-4 text-[10px] text-slate-400 font-semibold pt-1">
                     <span>
                       Dispositivo de Envio:{" "}
-                      <strong className="text-slate-650">
+                      <strong className="text-slate-600">
                         {rule.channel_name ? rule.channel_name : "Geral (Qualquer Canal)"}
                       </strong>
                     </span>
@@ -293,7 +293,7 @@ export default function ClientNotificationsPage() {
 
       {/* MODAL FORMULÁRIO DE REGRA */}
       <Dialog open={isRuleModalOpen} onOpenChange={setIsRuleModalOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
               {editingRule ? "Editar Regra de Notificação" : "Nova Regra de Notificação"}
@@ -318,18 +318,20 @@ export default function ClientNotificationsPage() {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Dispositivo de Envio (WhatsApp)
                 </label>
-                <select
+                <SearchableSelect
                   value={selectedChannelId}
-                  onChange={(e) => setSelectedChannelId(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
-                >
-                  <option value="">Geral (Enviar por qualquer canal ativo)</option>
-                  {channels.map((ch) => (
-                    <option key={ch.id} value={ch.id}>
-                      {ch.professional_name ? `${ch.professional_name} - (${ch.instance_name})` : `Geral - (${ch.instance_name})`}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedChannelId}
+                  placeholder="Geral (Enviar por qualquer canal ativo)"
+                  options={[
+                    { value: "", label: "Geral (Enviar por qualquer canal ativo)" },
+                    ...channels.map((ch) => ({
+                      value: ch.id,
+                      label: ch.professional_name
+                        ? `${ch.professional_name} - (${ch.instance_name})`
+                        : `Geral - (${ch.instance_name})`,
+                    })),
+                  ]}
+                />
               </div>
             </div>
 
@@ -338,15 +340,16 @@ export default function ClientNotificationsPage() {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Gatilho de Disparo
                 </label>
-                <select
+                <SearchableSelect
                   value={triggerType}
-                  onChange={(e: any) => setTriggerType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
-                >
-                  <option value="booking_confirmation">Confirmação Imediata</option>
-                  <option value="booking_reminder">Lembrete antes do horário</option>
-                  <option value="customer_retention">Retenção de clientes</option>
-                </select>
+                  onChange={(val: any) => setTriggerType(val)}
+                  placeholder="Selecione o gatilho"
+                  options={[
+                    { value: "booking_confirmation", label: "Confirmação Imediata" },
+                    { value: "booking_reminder", label: "Lembrete antes do horário" },
+                    { value: "customer_retention", label: "Retenção de clientes" },
+                  ]}
+                />
               </div>
 
               {triggerType !== "booking_confirmation" && (
@@ -369,14 +372,15 @@ export default function ClientNotificationsPage() {
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                       Unidade de tempo
                     </label>
-                    <select
+                    <SearchableSelect
                       value={triggerUnit}
-                      onChange={(e: any) => setTriggerUnit(e.target.value)}
-                      className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
-                    >
-                      <option value="hours">Hora(s)</option>
-                      <option value="days">Dia(s)</option>
-                    </select>
+                      onChange={(val: any) => setTriggerUnit(val)}
+                      placeholder="Selecione a unidade"
+                      options={[
+                        { value: "hours", label: "Hora(s)" },
+                        { value: "days", label: "Dia(s)" },
+                      ]}
+                    />
                   </div>
                 </>
               )}
@@ -464,7 +468,7 @@ export default function ClientNotificationsPage() {
               </Button>
               <Button
                 type="submit"
-                className="bg-indigo-650 hover:bg-indigo-700 text-white font-bold flex items-center gap-1.5"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center gap-1.5"
                 disabled={saveLoading}
               >
                 {saveLoading && (
@@ -476,6 +480,111 @@ export default function ClientNotificationsPage() {
           </form>
         </DialogContent>
       </Dialog>
+    </div>
+  )
+}
+
+interface Option {
+  value: string
+  label: string
+}
+
+interface SearchableSelectProps {
+  value: string
+  onChange: (value: string) => void
+  options: Option[]
+  placeholder: string
+  emptyMessage?: string
+}
+
+function SearchableSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  emptyMessage = "Nenhum resultado encontrado."
+}: SearchableSelectProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState("")
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const selectedOption = options.find(o => o.value === value)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const filteredOptions = options.filter(o =>
+    o.label.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      {/* Trigger */}
+      <div
+        onClick={() => {
+          setIsOpen(!isOpen)
+          setSearch("")
+        }}
+        className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm cursor-pointer hover:bg-slate-50 transition"
+      >
+        <span className={selectedOption ? "text-slate-800 font-medium" : "text-slate-400"}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <ChevronDown className="h-4 w-4 text-slate-400" />
+      </div>
+
+      {/* Dropdown menu */}
+      {isOpen && (
+        <div className="absolute left-0 right-0 z-50 mt-1.5 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-fade-in max-h-60 overflow-y-auto">
+          {/* Search Input */}
+          <div className="relative mb-2 flex items-center">
+            <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Pesquisar..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 w-full rounded-lg border border-slate-100 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
+              autoFocus
+            />
+          </div>
+
+          {/* Options list */}
+          <div className="space-y-0.5 max-h-40 overflow-y-auto">
+            {filteredOptions.length === 0 ? (
+              <div className="py-2 text-center text-xs text-slate-400 font-medium">{emptyMessage}</div>
+            ) : (
+              filteredOptions.map((opt) => {
+                const isSelected = opt.value === value
+                return (
+                  <div
+                    key={opt.value}
+                    onClick={() => {
+                      onChange(opt.value)
+                      setIsOpen(false)
+                    }}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold cursor-pointer transition ${
+                      isSelected
+                        ? "bg-slate-50 text-slate-900"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {isSelected && <Check className="h-3.5 w-3.5 text-slate-850 stroke-[3px]" />}
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

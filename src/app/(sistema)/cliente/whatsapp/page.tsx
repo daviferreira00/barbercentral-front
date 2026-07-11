@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { Loader2, Search, ChevronDown, Check } from "lucide-react"
 
 interface WhatsAppInstance {
   id: string
@@ -290,9 +290,9 @@ export default function ClientWhatsAppPage() {
                       <span className="text-slate-500">Tipo de Uso:</span>
                       <span className="font-bold text-slate-800">
                         {inst.professional_name ? (
-                          <span className="text-indigo-650">Uso do Barbeiro</span>
+                          <span className="text-indigo-600">Uso do Barbeiro</span>
                         ) : (
-                          <span className="text-slate-650">Geral da Barbearia</span>
+                          <span className="text-slate-600">Geral da Barbearia</span>
                         )}
                       </span>
                     </div>
@@ -336,7 +336,7 @@ export default function ClientWhatsAppPage() {
       {/* MODAL: PAREAMENTO NOVA CONEXÃO */}
       {createModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-scale-up">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-scale-up">
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
                 <i className="ti ti-brand-whatsapp text-emerald-500 text-xl" />
@@ -365,18 +365,18 @@ export default function ClientWhatsAppPage() {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   A quem pertence este aparelho?
                 </label>
-                <select
+                <SearchableSelect
                   value={selectedProfId}
-                  onChange={(e) => setSelectedProfId(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
-                >
-                  <option value="">Geral da Barbearia (Padrão para todos)</option>
-                  {professionals.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      Exclusivo do Barbeiro: {p.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedProfId}
+                  placeholder="Geral da Barbearia (Padrão para todos)"
+                  options={[
+                    { value: "", label: "Geral da Barbearia (Padrão para todos)" },
+                    ...professionals.map((p) => ({
+                      value: p.id,
+                      label: `Exclusivo do Barbeiro: ${p.name}`,
+                    })),
+                  ]}
+                />
                 <span className="text-[10px] text-slate-400 block mt-1">
                   Selecione um barbeiro se desejar que as notificações dos clientes dele saiam exclusivamente por esse celular.
                 </span>
@@ -451,6 +451,111 @@ export default function ClientWhatsAppPage() {
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+interface Option {
+  value: string
+  label: string
+}
+
+interface SearchableSelectProps {
+  value: string
+  onChange: (value: string) => void
+  options: Option[]
+  placeholder: string
+  emptyMessage?: string
+}
+
+function SearchableSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  emptyMessage = "Nenhum resultado encontrado."
+}: SearchableSelectProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState("")
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const selectedOption = options.find(o => o.value === value)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const filteredOptions = options.filter(o =>
+    o.label.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div ref={containerRef} className="relative w-full">
+      {/* Trigger */}
+      <div
+        onClick={() => {
+          setIsOpen(!isOpen)
+          setSearch("")
+        }}
+        className="flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm cursor-pointer hover:bg-slate-50 transition"
+      >
+        <span className={selectedOption ? "text-slate-800 font-medium" : "text-slate-400"}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <ChevronDown className="h-4 w-4 text-slate-400" />
+      </div>
+
+      {/* Dropdown menu */}
+      {isOpen && (
+        <div className="absolute left-0 right-0 z-50 mt-1.5 rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-fade-in max-h-60 overflow-y-auto">
+          {/* Search Input */}
+          <div className="relative mb-2 flex items-center">
+            <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Pesquisar..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 w-full rounded-lg border border-slate-100 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
+              autoFocus
+            />
+          </div>
+
+          {/* Options list */}
+          <div className="space-y-0.5 max-h-40 overflow-y-auto">
+            {filteredOptions.length === 0 ? (
+              <div className="py-2 text-center text-xs text-slate-400 font-medium">{emptyMessage}</div>
+            ) : (
+              filteredOptions.map((opt) => {
+                const isSelected = opt.value === value
+                return (
+                  <div
+                    key={opt.value}
+                    onClick={() => {
+                      onChange(opt.value)
+                      setIsOpen(false)
+                    }}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold cursor-pointer transition ${
+                      isSelected
+                        ? "bg-slate-50 text-slate-900"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {isSelected && <Check className="h-3.5 w-3.5 text-slate-850 stroke-[3px]" />}
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
       )}
