@@ -336,7 +336,7 @@ export default function ClientWhatsAppPage() {
       {/* MODAL: PAREAMENTO NOVA CONEXÃO */}
       {createModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-scale-up">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-2xl animate-scale-up">
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
                 <i className="ti ti-brand-whatsapp text-emerald-500 text-xl" />
