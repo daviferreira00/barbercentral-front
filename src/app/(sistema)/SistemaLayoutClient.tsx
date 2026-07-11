@@ -141,6 +141,13 @@ export default function SistemaLayoutClient({
                     <i className="ti ti-credit-card text-base" />
                     {!sidebarCollapsed && <span className="truncate">Planos SaaS</span>}
                   </Link>
+                  <Link
+                    href="/admin/whatsapp"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
+                  >
+                    <i className="ti ti-brand-whatsapp text-base" />
+                    {!sidebarCollapsed && <span className="truncate">Conexões WhatsApp</span>}
+                  </Link>
                 </div>
               </div>
             ) : (
