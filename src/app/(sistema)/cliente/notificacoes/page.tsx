@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2, Plus, Edit2, Trash2, HelpCircle, Search, ChevronDown, Check } from "lucide-react"
+import { useIsMobile } from "@/shared/hooks/useIsMobile"
+import { BottomSheet } from "@/components/mobile/BottomSheet"
 
 interface NotificationRule {
   id: string
@@ -34,6 +36,7 @@ export default function ClientNotificationsPage() {
   const [channels, setChannels] = useState<WhatsAppChannel[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const isMobile = useIsMobile()
 
   // Modais de Criação e Edição
   const [isRuleModalOpen, setIsRuleModalOpen] = useState(false)
@@ -292,14 +295,34 @@ export default function ClientNotificationsPage() {
       )}
 
       {/* MODAL FORMULÁRIO DE REGRA */}
-      <Dialog open={isRuleModalOpen} onOpenChange={setIsRuleModalOpen}>
-        <DialogContent className="w-[95vw] sm:max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle>
-              {editingRule ? "Editar Regra de Notificação" : "Nova Regra de Notificação"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSaveRule} className="space-y-4 py-2">
+      {isMobile ? (
+        <BottomSheet
+          open={isRuleModalOpen}
+          onClose={() => setIsRuleModalOpen(false)}
+          title={editingRule ? "Editar Regra de Notificação" : "Nova Regra de Notificação"}
+          footer={
+            <div className="grid grid-cols-2 gap-2 w-full">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsRuleModalOpen(false)}
+                className="rounded-xl py-3 h-11 text-xs font-extrabold text-slate-600 border-slate-200"
+                disabled={saveLoading}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="submit"
+                form="rule-form"
+                disabled={saveLoading} 
+                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3 h-11 text-xs font-extrabold shadow-md flex items-center justify-center gap-1.5"
+              >
+                {saveLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar Regra"}
+              </Button>
+            </div>
+          }
+        >
+          <form id="rule-form" onSubmit={handleSaveRule} className="space-y-4 py-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 col-span-1">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -455,31 +478,198 @@ export default function ClientNotificationsPage() {
                 </Button>
               </div>
             </div>
-
-            <DialogFooter className="pt-4 border-t">
-              <Button
-                type="button"
-                onClick={() => setIsRuleModalOpen(false)}
-                variant="outline"
-                className="border-slate-200 text-slate-700 font-semibold"
-                disabled={saveLoading}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center gap-1.5"
-                disabled={saveLoading}
-              >
-                {saveLoading && (
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                )}
-                Salvar Regra
-              </Button>
-            </DialogFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </BottomSheet>
+      ) : (
+        <Dialog open={isRuleModalOpen} onOpenChange={setIsRuleModalOpen}>
+          <DialogContent className="w-[95vw] sm:max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
+            <DialogHeader>
+              <DialogTitle>
+                {editingRule ? "Editar Regra de Notificação" : "Nova Regra de Notificação"}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSaveRule} className="space-y-4 py-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5 col-span-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Nome da Regra
+                  </label>
+                  <Input
+                    value={ruleName}
+                    onChange={(e) => setRuleName(e.target.value)}
+                    placeholder="Ex: Lembrete 24h antes"
+                    className="rounded-xl border-slate-200 text-[16px] sm:text-sm"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5 col-span-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Dispositivo de Envio (WhatsApp)
+                  </label>
+                  <SearchableSelect
+                    value={selectedChannelId}
+                    onChange={setSelectedChannelId}
+                    placeholder="Geral (Enviar por qualquer canal ativo)"
+                    options={[
+                      { value: "", label: "Geral (Enviar por qualquer canal ativo)" },
+                      ...channels.map((ch) => ({
+                        value: ch.id,
+                        label: ch.professional_name
+                          ? `${ch.professional_name} - (${ch.instance_name})`
+                          : `Geral - (${ch.instance_name})`,
+                      })),
+                    ]}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
+                <div className="space-y-1.5 sm:col-span-1">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Gatilho de Disparo
+                  </label>
+                  <SearchableSelect
+                    value={triggerType}
+                    onChange={(val: any) => setTriggerType(val)}
+                    placeholder="Selecione o gatilho"
+                    options={[
+                      { value: "booking_confirmation", label: "Confirmação Imediata" },
+                      { value: "booking_reminder", label: "Lembrete antes do horário" },
+                      { value: "customer_retention", label: "Retenção de clientes" },
+                    ]}
+                  />
+                </div>
+
+                {triggerType !== "booking_confirmation" && (
+                  <>
+                    <div className="space-y-1.5 sm:col-span-1 animate-fade-in">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        Quanto tempo?
+                      </label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={triggerValue}
+                        onChange={(e) => setTriggerValue(e.target.value)}
+                        className="rounded-xl border-slate-200 text-[16px] sm:text-sm"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5 sm:col-span-1 animate-fade-in">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        Unidade de tempo
+                      </label>
+                      <SearchableSelect
+                        value={triggerUnit}
+                        onChange={(val: any) => setTriggerUnit(val)}
+                        placeholder="Selecione a unidade"
+                        options={[
+                          { value: "hours", label: "Hora(s)" },
+                          { value: "days", label: "Dia(s)" },
+                        ]}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div className="space-y-1.5 border-t pt-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                    Template da Mensagem
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-0.5">
+                    <HelpCircle className="h-3.5 w-3.5 text-slate-400" />
+                    Clique nos botões abaixo para inserir tags automáticas.
+                  </span>
+                </div>
+
+                <textarea
+                  value={messageTemplate}
+                  onChange={(e) => setMessageTemplate(e.target.value)}
+                  placeholder="Escreva sua mensagem..."
+                  rows={5}
+                  required
+                  className="flex min-h-[120px] w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-[16px] sm:text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400"
+                />
+
+                {/* Botões de Tags rápidas */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertPlaceholder("{nome_cliente}")}
+                    className="h-7 text-[10px] font-bold border-indigo-100 hover:bg-indigo-50 text-indigo-700"
+                  >
+                    + Nome Cliente
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertPlaceholder("{data_hora}")}
+                    className="h-7 text-[10px] font-bold border-indigo-100 hover:bg-indigo-50 text-indigo-700"
+                  >
+                    + Data/Hora
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertPlaceholder("{nome_profissional}")}
+                    className="h-7 text-[10px] font-bold border-indigo-100 hover:bg-indigo-50 text-indigo-700"
+                  >
+                    + Nome Barbeiro
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertPlaceholder("{nome_servico}")}
+                    className="h-7 text-[10px] font-bold border-indigo-100 hover:bg-indigo-50 text-indigo-700"
+                  >
+                    + Serviço(s)
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => insertPlaceholder("{link_cancelamento}")}
+                    className="h-7 text-[10px] font-bold border-indigo-100 hover:bg-indigo-50 text-indigo-700"
+                  >
+                    + Link Cancelar
+                  </Button>
+                </div>
+              </div>
+
+              <DialogFooter className="pt-4 border-t">
+                <Button
+                  type="button"
+                  onClick={() => setIsRuleModalOpen(false)}
+                  variant="outline"
+                  className="border-slate-200 text-slate-700 font-semibold"
+                  disabled={saveLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold flex items-center gap-1.5"
+                  disabled={saveLoading}
+                >
+                  {saveLoading && (
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  )}
+                  Salvar Regra
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }
