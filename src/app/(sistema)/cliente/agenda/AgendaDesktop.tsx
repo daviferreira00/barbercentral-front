@@ -96,7 +96,7 @@ export default function AgendaDesktop() {
     sendingConfirmationRef.current = true
     setSendingConfirmation(true)
     try {
-      const res = await http.post(`/cliente/appointments/${app.id}/confirm-buttons`, {})
+      const res = await http.post(`/appointments/${app.id}/confirm-buttons`, {})
       if (res.error) {
         alert("Erro ao disparar botões de confirmação: " + res.error.message)
       } else {
