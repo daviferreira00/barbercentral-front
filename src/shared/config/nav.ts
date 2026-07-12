@@ -30,6 +30,14 @@ export const clienteNavSections: NavSection[] = [
     ],
   },
   {
+    title: "Comunicação & Alertas",
+    items: [
+      { href: "/cliente/chat", icon: "ti-message", label: "Chat WhatsApp" },
+      { href: "/cliente/whatsapp", icon: "ti-brand-whatsapp", label: "Canais WhatsApp" },
+      { href: "/cliente/notificacoes", icon: "ti-bell", label: "Regras de Disparo" },
+    ],
+  },
+  {
     title: "Configurações",
     items: [
       { href: "/cliente/configuracoes/agenda", icon: "ti-calendar-event", label: "Regras da Agenda" },
