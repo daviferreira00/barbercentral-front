@@ -61,6 +61,8 @@ export default function IdentidadeVisualDesktop() {
     setBlockLunchStart,
     blockLunchEnd,
     setBlockLunchEnd,
+    whatsappVerificationEnabled,
+    setWhatsappVerificationEnabled,
     handleLogoUpload,
     handleSubmit,
   } = useConfigIdentidadeVisual()
@@ -357,6 +359,19 @@ export default function IdentidadeVisualDesktop() {
                   />
                   <label htmlFor="req-login" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
                     Exigir login no portal público para agendar
+                  </label>
+                </div>
+
+                <hr className="border-slate-100" />
+
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    id="whatsapp-verification"
+                    checked={whatsappVerificationEnabled}
+                    onCheckedChange={(c) => setWhatsappVerificationEnabled(!!c)}
+                  />
+                  <label htmlFor="whatsapp-verification" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
+                    Exigir confirmação por código enviado no WhatsApp para agendar
                   </label>
                 </div>
 

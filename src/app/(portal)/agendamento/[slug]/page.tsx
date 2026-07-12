@@ -24,6 +24,7 @@ interface PublicClientData {
   min_advance_hours: number
   max_advance_days: number
   interval_between_minutes: number
+  whatsapp_verification_enabled?: number
 }
 
 export default async function PortalAgendamentoPage({ params }: { params: { slug: string } }) {

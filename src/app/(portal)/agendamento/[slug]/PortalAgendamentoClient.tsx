@@ -28,6 +28,7 @@ interface PublicClientData {
   min_advance_hours: number
   max_advance_days: number
   interval_between_minutes: number
+  whatsapp_verification_enabled?: number
 }
 
 interface Service {
@@ -112,6 +113,12 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successApp, setSuccessApp] = useState<AppointmentResponse | null>(null)
+
+  // Verification states
+  const [showVerificationStep, setShowVerificationStep] = useState(false)
+  const [verificationCodeInput, setVerificationCodeInput] = useState("")
+  const [verificationError, setVerificationError] = useState<string | null>(null)
+  const [verifying, setVerifying] = useState(false)
 
   // Filter state for services
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("")
@@ -228,14 +235,69 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
     setStep(4)
   }
 
-  const handleDetailsSubmit = (e: React.FormEvent) => {
+  const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!customerName || !customerPhone) {
       setErrorMsg("Por favor, preencha todos os campos obrigatórios.")
       return
     }
     setErrorMsg(null)
-    setStep(5)
+    setVerificationError(null)
+
+    if (config.whatsapp_verification_enabled === 1) {
+      setVerifying(true)
+      const res = await http.post<{ ok: boolean }>(`/public/${config.client_slug}/verification-code`, {
+        phone: customerPhone,
+      })
+      setVerifying(false)
+      if (res.error) {
+        setErrorMsg("Erro ao enviar código de verificação por WhatsApp: " + res.error.message)
+        return
+      }
+      setShowVerificationStep(true)
+    } else {
+      setStep(5)
+    }
+  }
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!verificationCodeInput) {
+      setVerificationError("Por favor, digite o código de 6 dígitos.")
+      return
+    }
+    setVerificationError(null)
+    setVerifying(true)
+
+    const res = await http.post<{ verified: boolean }>(`/public/${config.client_slug}/verify-code`, {
+      phone: customerPhone,
+      code: verificationCodeInput,
+    })
+    setVerifying(false)
+
+    if (res.error) {
+      setVerificationError(res.error.message || "Código incorreto ou expirado. Tente novamente.")
+      return
+    }
+
+    if (res.data?.verified) {
+      setShowVerificationStep(false)
+      setStep(5)
+    }
+  }
+
+  const handleResendCode = async () => {
+    setVerificationError(null)
+    setVerifying(true)
+    const res = await http.post<{ ok: boolean }>(`/public/${config.client_slug}/verification-code`, {
+      phone: customerPhone,
+    })
+    setVerifying(false)
+    if (res.error) {
+      setVerificationError("Erro ao reenviar código: " + res.error.message)
+      return
+    }
+    setVerificationCodeInput("")
   }
 
   const handleConfirmBooking = async () => {
@@ -694,49 +756,99 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
         {step === 4 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => setStep(3)} className="h-8 px-2.5 text-xs text-slate-500 border border-slate-200 bg-white">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (showVerificationStep) {
+                    setShowVerificationStep(false)
+                  } else {
+                    setStep(3)
+                  }
+                }}
+                className="h-8 px-2.5 text-xs text-slate-500 border border-slate-200 bg-white"
+              >
                 <i className="ti ti-arrow-left text-sm mr-1" /> Voltar
               </Button>
-              <h2 className="text-lg font-extrabold text-slate-800">Preencha seus dados</h2>
+              <h2 className="text-lg font-extrabold text-slate-800">
+                {showVerificationStep ? "Confirmação do WhatsApp" : "Preencha seus dados"}
+              </h2>
             </div>
 
             <Card>
               <CardContent className="pt-6">
-                <form onSubmit={handleDetailsSubmit} className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Nome Completo</label>
-                    <Input
-                      placeholder="Ex: Pedro de Souza"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      required
-                    />
-                  </div>
+                {showVerificationStep ? (
+                  <form onSubmit={handleVerifyCode} className="space-y-5">
+                    <p className="text-xs font-semibold text-slate-500 leading-relaxed">
+                      Enviamos um código de verificação de 6 dígitos via WhatsApp para o número <strong className="text-slate-700">{customerPhone}</strong>. Insira o código abaixo para confirmar o número e prosseguir.
+                    </p>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Telefone celular</label>
-                    <Input
-                      placeholder="Ex: 11999999999"
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      required
-                    />
-                  </div>
+                    {verificationError && <Alert variant="error" message={verificationError} />}
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-500 uppercase">Alguma observação? (Opcional)</label>
-                    <textarea
-                      placeholder="Ex: Cabelo molhado, prefiro corte mais curto na lateral..."
-                      className="flex min-h-[80px] w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 transition-shadow duration-100"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                    />
-                  </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Código de 6 dígitos</label>
+                      <Input
+                        type="text"
+                        placeholder="000000"
+                        maxLength={6}
+                        className="text-center text-xl font-bold tracking-[8px] h-12"
+                        value={verificationCodeInput}
+                        onChange={(e) => setVerificationCodeInput(e.target.value.replace(/\D/g, ""))}
+                        required
+                      />
+                    </div>
 
-                  <Button type="submit" className="w-full font-bold">
-                    Continuar
-                  </Button>
-                </form>
+                    <Button type="submit" disabled={verifying} className="w-full font-bold h-11">
+                      {verifying ? "Verificando..." : "Confirmar Código"}
+                    </Button>
+
+                    <div className="text-center pt-2">
+                      <button
+                        type="button"
+                        onClick={handleResendCode}
+                        disabled={verifying}
+                        className="text-xs font-bold text-indigo-600 hover:underline hover:text-indigo-700 transition"
+                      >
+                        Não recebeu o código? Reenviar código
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <form onSubmit={handleDetailsSubmit} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Nome Completo</label>
+                      <Input
+                        placeholder="Ex: Pedro de Souza"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Telefone celular</label>
+                      <Input
+                        placeholder="Ex: 11999999999"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-500 uppercase">Alguma observação? (Opcional)</label>
+                      <textarea
+                        placeholder="Ex: Cabelo molhado, prefiro corte mais curto na lateral..."
+                        className="flex min-h-[80px] w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 transition-shadow duration-100"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                      />
+                    </div>
+
+                    <Button type="submit" disabled={verifying} className="w-full font-bold">
+                      {verifying ? "Enviando código..." : "Continuar"}
+                    </Button>
+                  </form>
+                )}
               </CardContent>
             </Card>
           </div>

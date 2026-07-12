@@ -65,6 +65,8 @@ export default function IdentidadeVisualMobile() {
     setBlockLunchStart,
     blockLunchEnd,
     setBlockLunchEnd,
+    whatsappVerificationEnabled,
+    setWhatsappVerificationEnabled,
     handleLogoUpload,
     handleSubmit,
   } = useConfigIdentidadeVisual()
@@ -383,6 +385,20 @@ export default function IdentidadeVisualMobile() {
               />
               <label htmlFor="req-login" className="text-sm font-extrabold text-slate-700 cursor-pointer select-none">
                 Exigir login no portal para agendar
+              </label>
+            </div>
+
+            <hr className="border-slate-100" />
+
+            <div className="flex items-center gap-3.5 py-1">
+              <Checkbox
+                id="whatsapp-verification"
+                checked={whatsappVerificationEnabled}
+                onCheckedChange={(c) => { haptic(); setWhatsappVerificationEnabled(!!c) }}
+                className="h-5 w-5 rounded-lg"
+              />
+              <label htmlFor="whatsapp-verification" className="text-sm font-extrabold text-slate-700 cursor-pointer select-none">
+                Exigir código enviado por WhatsApp para agendar
               </label>
             </div>
 

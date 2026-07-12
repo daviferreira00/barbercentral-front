@@ -37,12 +37,27 @@ export function BottomSheet({
     return () => clearTimeout(t)
   }, [open])
 
-  // Trava o scroll da página enquanto o sheet está aberto
+  // Trava o scroll da página enquanto o sheet está aberto (compatível com iOS)
   useEffect(() => {
     if (!mounted) return
+    const originalOverflow = document.body.style.overflow
+    const originalPosition = document.body.style.position
+    const originalHeight = document.body.style.height
+    
+    document.body.style.overflow = "hidden"
+    document.body.style.position = "relative"
+    document.body.style.height = "100%"
+    
     document.documentElement.style.overflow = "hidden"
+    document.documentElement.style.height = "100%"
+
     return () => {
+      document.body.style.overflow = originalOverflow
+      document.body.style.position = originalPosition
+      document.body.style.height = originalHeight
+      
       document.documentElement.style.overflow = ""
+      document.documentElement.style.height = ""
     }
   }, [mounted])
 
@@ -50,7 +65,7 @@ export function BottomSheet({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-end bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${
+      className={`fixed inset-0 z-[999] flex items-end bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${
         shown ? "opacity-100" : "opacity-0"
       }`}
       onClick={onClose}
@@ -68,17 +83,17 @@ export function BottomSheet({
         </div>
 
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3.5">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3">
           <div className="min-w-0">
-            <h3 className="truncate text-base font-extrabold text-slate-800">{title}</h3>
-            {subtitle && <p className="truncate text-xs font-medium text-slate-400">{subtitle}</p>}
+            <h3 className="truncate text-[13px] font-black text-slate-800 uppercase tracking-wider">{title}</h3>
+            {subtitle && <p className="truncate text-[10px] font-bold text-slate-400 mt-0.5">{subtitle}</p>}
           </div>
           <button
             aria-label="Fechar"
             onClick={onClose}
-            className="mobile-tap flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition active:scale-90"
+            className="mobile-tap flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition active:scale-90"
           >
-            <i className="ti ti-x text-base" />
+            <i className="ti ti-x text-sm" />
           </button>
         </div>
 

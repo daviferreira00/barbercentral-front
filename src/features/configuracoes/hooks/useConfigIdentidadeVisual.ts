@@ -29,6 +29,7 @@ export interface ClientConfig {
   block_lunch_enabled?: number
   block_lunch_start?: string
   block_lunch_end?: string
+  whatsapp_verification_enabled?: number
 }
 
 export const FONTS = [
@@ -71,6 +72,7 @@ export function useConfigIdentidadeVisual() {
   const [blockLunchEnabled, setBlockLunchEnabled] = useState(false)
   const [blockLunchStart, setBlockLunchStart] = useState("12:00")
   const [blockLunchEnd, setBlockLunchEnd] = useState("13:00")
+  const [whatsappVerificationEnabled, setWhatsappVerificationEnabled] = useState(false)
 
   const loadConfig = async () => {
     setLoading(true)
@@ -109,6 +111,7 @@ export function useConfigIdentidadeVisual() {
       setBlockLunchEnabled(c.block_lunch_enabled === 1)
       setBlockLunchStart(c.block_lunch_start ? c.block_lunch_start.substring(0, 5) : "12:00")
       setBlockLunchEnd(c.block_lunch_end ? c.block_lunch_end.substring(0, 5) : "13:00")
+      setWhatsappVerificationEnabled(c.whatsapp_verification_enabled === 1)
     }
   }
 
@@ -177,6 +180,7 @@ export function useConfigIdentidadeVisual() {
       block_lunch_enabled: blockLunchEnabled ? 1 : 0,
       block_lunch_start: blockLunchStart ? `${blockLunchStart}:00` : "12:00:00",
       block_lunch_end: blockLunchEnd ? `${blockLunchEnd}:00` : "13:00:00",
+      whatsapp_verification_enabled: whatsappVerificationEnabled ? 1 : 0,
     })
     setSaving(false)
 
@@ -241,6 +245,8 @@ export function useConfigIdentidadeVisual() {
     setBlockLunchStart,
     blockLunchEnd,
     setBlockLunchEnd,
+    whatsappVerificationEnabled,
+    setWhatsappVerificationEnabled,
     handleLogoUpload,
     handleSubmit,
   }

@@ -184,10 +184,10 @@ export default function ClientNotificationsPage() {
         <div>
           <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2">
             <i className="ti ti-bell-ringing text-indigo-500 text-3xl" />
-            Regras de Notificações
+            Notificações e Alertas
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Configure o envio automático de mensagens de WhatsApp para agendamentos, lembretes ou retenção.
+            Configure o envio automático de lembretes de horários e alertas de retorno pelo WhatsApp.
           </p>
         </div>
         <Button
@@ -195,7 +195,7 @@ export default function ClientNotificationsPage() {
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-9 text-xs flex items-center gap-2 shadow-sm transition-all"
         >
           <Plus className="h-4 w-4" />
-          Nova Regra
+          Novo Alerta / Lembrete
         </Button>
       </div>
 
@@ -205,22 +205,22 @@ export default function ClientNotificationsPage() {
       {loading ? (
         <div className="p-12 flex flex-col items-center justify-center gap-2 text-slate-400">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-          <span className="text-xs font-bold mt-2">Buscando regras de notificações...</span>
+          <span className="text-xs font-bold mt-2">Buscando configurações de notificações...</span>
         </div>
       ) : rules.length === 0 ? (
         <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-xl mx-auto shadow-sm">
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border">
             <i className="ti ti-bell-ringing text-slate-400 text-3xl" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900">Nenhuma regra de disparo configurada</h3>
+          <h3 className="text-lg font-bold text-slate-900">Nenhum alerta ou lembrete configurado</h3>
           <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
-            Personalize mensagens de agendamento ou crie regras para lembrar os clientes de voltarem à barbearia.
+            Crie lembretes automáticos e campanhas de retorno para manter contato frequente com seus clientes.
           </p>
           <Button
             onClick={handleOpenCreateModal}
             className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs"
           >
-            Criar Minha Primeira Regra
+            Criar Primeiro Alerta
           </Button>
         </div>
       ) : (
@@ -368,7 +368,6 @@ export default function ClientNotificationsPage() {
                   onChange={(val: any) => setTriggerType(val)}
                   placeholder="Selecione o gatilho"
                   options={[
-                    { value: "booking_confirmation", label: "Confirmação Imediata" },
                     { value: "booking_reminder", label: "Lembrete antes do horário" },
                     { value: "customer_retention", label: "Retenção de clientes" },
                   ]}
@@ -534,7 +533,6 @@ export default function ClientNotificationsPage() {
                     onChange={(val: any) => setTriggerType(val)}
                     placeholder="Selecione o gatilho"
                     options={[
-                      { value: "booking_confirmation", label: "Confirmação Imediata" },
                       { value: "booking_reminder", label: "Lembrete antes do horário" },
                       { value: "customer_retention", label: "Retenção de clientes" },
                     ]}

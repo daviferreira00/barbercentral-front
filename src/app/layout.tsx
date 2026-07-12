@@ -11,7 +11,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "BarberCentral — Gestão de Barbearia",
-  description: "SaaS completo de gestão e agendamento para barbearias premium.",
+  description: "Software de Gestão para Barbearias",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -24,7 +24,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#6366f1",
+  themeColor: "#000000ff",
 }
 
 export default function RootLayout({
