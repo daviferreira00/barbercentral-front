@@ -8,7 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useAgenda } from "@/features/agenda/hooks/useAgenda"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Loader2 } from "lucide-react"
 import { http } from "@/shared/lib/http"
 import {
@@ -71,6 +71,7 @@ export default function AgendaDesktop() {
   const [phoneSelectorOptions, setPhoneSelectorOptions] = useState<string[]>([])
   const [phoneSelectorAction, setPhoneSelectorAction] = useState<"chat" | "reminder" | null>(null)
   const [sendingReminder, setSendingReminder] = useState(false)
+  const sendingReminderRef = useRef(false)
 
   const getPhoneOptions = (phoneStr?: string): string[] => {
     if (!phoneStr) return []
@@ -124,6 +125,8 @@ export default function AgendaDesktop() {
   }
 
   const handleSendReminder = async (app: EnrichedAppointment, phoneForce?: string) => {
+    if (sendingReminderRef.current) return
+    
     const phone = phoneForce || getPhoneOptions(app.customer_phone)[0]
     if (!phone) {
       const opts = getPhoneOptions(app.customer_phone)
@@ -139,6 +142,7 @@ export default function AgendaDesktop() {
       }
     }
 
+    sendingReminderRef.current = true
     setSendingReminder(true)
     try {
       // 1. Buscar regras de notificação
@@ -180,6 +184,7 @@ export default function AgendaDesktop() {
     } catch (err: any) {
       alert("Erro ao enviar: " + err.message)
     } finally {
+      sendingReminderRef.current = false
       setSendingReminder(false)
     }
   }
