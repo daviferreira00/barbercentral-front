@@ -166,12 +166,12 @@ export default function ClientChatPage() {
 	const loadCrmCustomers = async (search = "") => {
 		setLoadingCrm(true)
 		if (search) {
-			const res = await http.get<Customer[]>(`/cliente/customers/search?q=${encodeURIComponent(search)}`)
+			const res = await http.get<Customer[]>(`/customers/search?q=${encodeURIComponent(search)}`)
 			if (res.data) {
 				setCrmCustomers(Array.isArray(res.data) ? res.data : [])
 			}
 		} else {
-			const res = await http.get<{ data: Customer[] }>("/cliente/customers")
+			const res = await http.get<{ data: Customer[] }>("/customers")
 			if (res.data && res.data.data) {
 				setCrmCustomers(Array.isArray(res.data.data) ? res.data.data : [])
 			}
@@ -202,7 +202,7 @@ export default function ClientChatPage() {
 		if (!contactNameInput.trim() || !contactPhoneInput.trim() || savingContact) return
 
 		setSavingContact(true)
-		const res = await http.post<Customer>("/cliente/customers", {
+		const res = await http.post<Customer>("/customers", {
 			name: contactNameInput.trim(),
 			phone: contactPhoneInput.trim(),
 		})
@@ -236,7 +236,7 @@ export default function ClientChatPage() {
 			phoneToSend = contactPhoneInput.trim()
 
 			// 1. Cadastra o novo cliente no CRM
-			const resCust = await http.post<Customer>("/cliente/customers", {
+			const resCust = await http.post<Customer>("/customers", {
 				name: contactNameInput.trim(),
 				phone: phoneToSend,
 			})
