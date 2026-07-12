@@ -368,7 +368,7 @@ export default function ChatMobile() {
 							placeholder="Buscar contato ou celular..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="pl-9 h-9 rounded-xl border-slate-200 text-xs"
+							className="pl-9 h-9 rounded-xl border-slate-200 text-[16px]"
 						/>
 					</div>
 				</div>
@@ -558,7 +558,7 @@ export default function ChatMobile() {
 									placeholder="Escreva sua mensagem..."
 									value={textMessage}
 									onChange={(e) => setTextMessage(e.target.value)}
-									className="flex-1 rounded-xl border-slate-200 text-xs focus:ring-1 focus:ring-slate-400 h-9"
+									className="flex-1 rounded-xl border-slate-200 text-[16px] focus:ring-1 focus:ring-slate-400 h-9"
 									disabled={sending}
 									required
 								/>
@@ -608,7 +608,7 @@ export default function ChatMobile() {
 									value={contactNameInput}
 									onChange={(e) => setContactNameInput(e.target.value)}
 									required
-									className="rounded-xl border-slate-200 text-xs h-9"
+									className="rounded-xl border-slate-200 text-[16px] h-9"
 								/>
 							</div>
 
@@ -619,7 +619,7 @@ export default function ChatMobile() {
 									value={contactPhoneInput}
 									onChange={(e) => setContactPhoneInput(e.target.value)}
 									disabled
-									className="rounded-xl border-slate-100 text-xs h-9 bg-slate-50 text-slate-400"
+									className="rounded-xl border-slate-100 text-[16px] h-9 bg-slate-50 text-slate-400"
 								/>
 							</div>
 						</div>
@@ -701,7 +701,7 @@ export default function ChatMobile() {
 											placeholder="Nome ou celular..."
 											value={customerSearchQuery}
 											onChange={(e) => setCustomerSearchQuery(e.target.value)}
-											className="pl-8 h-9 rounded-xl border-slate-200 text-xs"
+											className="pl-8 h-9 rounded-xl border-slate-200 text-[16px]"
 										/>
 									</div>
 									<div className="border border-slate-100 rounded-xl max-h-[130px] overflow-y-auto mt-2 divide-y divide-slate-50 bg-slate-50/20">
@@ -745,7 +745,7 @@ export default function ChatMobile() {
 											value={contactNameInput}
 											onChange={(e) => setContactNameInput(e.target.value)}
 											required
-											className="rounded-xl border-slate-200 text-xs h-9"
+											className="rounded-xl border-slate-200 text-[16px] h-9"
 										/>
 									</div>
 									<div className="space-y-1">
@@ -755,7 +755,7 @@ export default function ChatMobile() {
 											value={contactPhoneInput}
 											onChange={(e) => setContactPhoneInput(e.target.value)}
 											required
-											className="rounded-xl border-slate-200 text-xs h-9"
+											className="rounded-xl border-slate-200 text-[16px] h-9"
 										/>
 									</div>
 								</div>
@@ -768,7 +768,7 @@ export default function ChatMobile() {
 									value={newChatFirstMsg}
 									onChange={(e) => setNewChatFirstMsg(e.target.value)}
 									required
-									className="rounded-xl border-slate-200 text-xs h-9"
+									className="rounded-xl border-slate-200 text-[16px] h-9"
 								/>
 							</div>
 						</div>
