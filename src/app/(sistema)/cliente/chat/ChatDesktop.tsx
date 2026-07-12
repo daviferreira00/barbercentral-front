@@ -44,6 +44,8 @@ interface Message {
 	direction: "inbound" | "outbound"
 	content: string
 	created_at: string
+	sending?: boolean
+	failed?: boolean
 }
 
 interface Customer {
@@ -106,22 +108,46 @@ export default function ChatDesktop() {
 	// Envia mensagem convencional
 	const handleSendMessage = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (!activeChat || !textMessage.trim() || sending) return
+		if (!activeChat || !textMessage.trim()) return
 
-		setSending(true)
 		const contentToSend = textMessage.trim()
 		setTextMessage("")
 
-		const res = await http.post<Message>("/cliente/chats/send", {
-			contact_number: activeChat.contact_number,
+		// Update otimista: adiciona no chat imediatamente
+		const tempId = "temp_" + Date.now()
+		const tempMsg: Message = {
+			id: tempId,
+			chat_id: activeChat.id,
+			message_id: tempId,
+			direction: "outbound",
 			content: contentToSend,
-		})
-
-		if (res.data) {
-			setMessages((prev) => [...prev, res.data as Message])
-			loadChats(true)
+			created_at: new Date().toISOString(),
+			sending: true,
 		}
-		setSending(false)
+
+		setMessages((prev) => [...prev, tempMsg])
+
+		try {
+			const res = await http.post<Message>("/cliente/chats/send", {
+				contact_number: activeChat.contact_number,
+				content: contentToSend,
+			})
+
+			if (res.data) {
+				setMessages((prev) =>
+					prev.map((msg) => (msg.id === tempId ? { ...res.data!, sending: false } : msg))
+				)
+				loadChats(true)
+			} else {
+				setMessages((prev) =>
+					prev.map((msg) => (msg.id === tempId ? { ...msg, sending: false, failed: true } : msg))
+				)
+			}
+		} catch {
+			setMessages((prev) =>
+				prev.map((msg) => (msg.id === tempId ? { ...msg, sending: false, failed: true } : msg))
+			)
+		}
 	}
 
 	// Seleciona uma conversa
@@ -479,26 +505,38 @@ export default function ChatDesktop() {
 							) : (
 								messages.map((msg) => {
 									const isOutbound = msg.direction === "outbound"
+									const isSending = msg.sending
+									const isFailed = msg.failed
 									return (
 										<div
 											key={msg.id}
 											className={`flex ${isOutbound ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-200`}
 										>
 											<div
-												className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm text-xs font-semibold ${
+												className={`max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm text-xs font-semibold relative ${
 													isOutbound
 														? "bg-indigo-600 text-white rounded-br-none"
 														: "bg-white text-slate-800 border border-slate-100 rounded-bl-none"
+												} ${isSending ? "opacity-60 animate-pulse" : ""} ${
+													isFailed ? "border border-red-200 bg-red-50 text-red-800" : ""
 												}`}
 											>
 												<p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-												<span
-													className={`text-[9px] block text-right mt-1 font-normal ${
-														isOutbound ? "text-indigo-200" : "text-slate-400"
-													}`}
-												>
-													{formatTime(msg.created_at)}
-												</span>
+												<div className="flex items-center justify-end gap-1 mt-1">
+													<span
+														className={`text-[9px] block font-normal ${
+															isOutbound ? "text-indigo-200" : "text-slate-400"
+														} ${isFailed ? "text-red-500" : ""}`}
+													>
+														{formatTime(msg.created_at)}
+													</span>
+													{isOutbound && !isSending && !isFailed && (
+														<CheckCheck className="h-3 w-3 text-indigo-200" />
+													)}
+													{isFailed && (
+														<span className="text-[8px] font-bold text-red-500 uppercase ml-1">Falhou</span>
+													)}
+												</div>
 											</div>
 										</div>
 									)
