@@ -283,7 +283,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
 
     if (res.data?.verified) {
       setShowVerificationStep(false)
-      setStep(5)
+      await handleConfirmBooking()
     }
   }
 
