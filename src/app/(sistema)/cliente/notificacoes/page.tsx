@@ -368,7 +368,7 @@ export default function ClientNotificationsPage() {
                   onChange={(val: any) => setTriggerType(val)}
                   placeholder="Selecione o gatilho"
                   options={[
-                    { value: "booking_reminder", label: "Lembrete antes do horário" },
+                    { value: "booking_reminder", label: "Agendamento" },
                     { value: "customer_retention", label: "Retenção de clientes" },
                   ]}
                 />
@@ -533,7 +533,7 @@ export default function ClientNotificationsPage() {
                     onChange={(val: any) => setTriggerType(val)}
                     placeholder="Selecione o gatilho"
                     options={[
-                      { value: "booking_reminder", label: "Lembrete antes do horário" },
+                      { value: "booking_reminder", label: "Agendamento" },
                       { value: "customer_retention", label: "Retenção de clientes" },
                     ]}
                   />

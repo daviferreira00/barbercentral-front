@@ -272,7 +272,7 @@ export default function SistemaLayoutClient({
                       className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition duration-150"
                     >
                       <i className="ti ti-bell text-base" />
-                      {!sidebarCollapsed && <span className="truncate">Regras de Disparo</span>}
+                      {!sidebarCollapsed && <span className="truncate">Notificações</span>}
                     </Link>
                   </div>
                 </div>

@@ -69,9 +69,47 @@ export default function AgendaDesktop() {
   // Controle de múltiplos telefones e disparo de WhatsApp
   const [phoneSelectorOpen, setPhoneSelectorOpen] = useState(false)
   const [phoneSelectorOptions, setPhoneSelectorOptions] = useState<string[]>([])
-  const [phoneSelectorAction, setPhoneSelectorAction] = useState<"chat" | "reminder" | null>(null)
+  const [phoneSelectorAction, setPhoneSelectorAction] = useState<"chat" | "reminder" | "confirmation" | null>(null)
   const [sendingReminder, setSendingReminder] = useState(false)
   const sendingReminderRef = useRef(false)
+  const [sendingConfirmation, setSendingConfirmation] = useState(false)
+  const sendingConfirmationRef = useRef(false)
+
+  const handleSendConfirmationButtons = async (app: EnrichedAppointment, phoneForce?: string) => {
+    if (sendingConfirmationRef.current) return
+    
+    const phone = phoneForce || getPhoneOptions(app.customer_phone)[0]
+    if (!phone) {
+      const opts = getPhoneOptions(app.customer_phone)
+      if (opts.length === 0) {
+        alert("Este cliente não possui um número de telefone válido.")
+        return
+      }
+      if (opts.length > 1 && !phoneForce) {
+        setPhoneSelectorOptions(opts)
+        setPhoneSelectorAction("confirmation")
+        setPhoneSelectorOpen(true)
+        return
+      }
+    }
+
+    sendingConfirmationRef.current = true
+    setSendingConfirmation(true)
+    try {
+      const res = await http.post(`/cliente/appointments/${app.id}/confirm-buttons`, {})
+      if (res.error) {
+        alert("Erro ao disparar botões de confirmação: " + res.error.message)
+      } else {
+        alert("Botões de confirmação disparados com sucesso via WhatsApp!")
+        setPhoneSelectorOpen(false)
+      }
+    } catch (err: any) {
+      alert("Erro ao enviar: " + err.message)
+    } finally {
+      sendingConfirmationRef.current = false
+      setSendingConfirmation(false)
+    }
+  }
 
   const getPhoneOptions = (phoneStr?: string): string[] => {
     if (!phoneStr) return []
@@ -647,6 +685,21 @@ export default function AgendaDesktop() {
                         )}
                         Enviar Lembrete
                       </Button>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleSendConfirmationButtons(selectedApp)}
+                        disabled={sendingConfirmation}
+                        className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 text-[10px] font-bold h-8 px-2.5"
+                      >
+                        {sendingConfirmation ? (
+                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        ) : (
+                          <i className="ti ti-check mr-1 text-xs" />
+                        )}
+                        Pedir Confirmação
+                      </Button>
                     </>
                   )}
                   {selectedApp.status !== "completed" && selectedApp.status !== "cancelled" && (
@@ -816,6 +869,8 @@ export default function AgendaDesktop() {
                       window.location.href = `/cliente/chat?phone=${phone}&name=${encodeURIComponent(selectedApp?.customer_name || "")}`
                     } else if (phoneSelectorAction === "reminder" && selectedApp) {
                       handleSendReminder(selectedApp, phone)
+                    } else if (phoneSelectorAction === "confirmation" && selectedApp) {
+                      handleSendConfirmationButtons(selectedApp, phone)
                     }
                   }}
                   className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-indigo-600 hover:bg-indigo-50/20 text-xs font-bold text-slate-700 transition"

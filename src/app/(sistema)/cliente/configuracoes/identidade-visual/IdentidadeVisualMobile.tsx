@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ActionBar } from "@/components/mobile/ActionBar"
 import { FilterChips } from "@/components/mobile/FilterChips"
 import { haptic } from "@/shared/lib/haptics"
+import { maskPhone } from "@/shared/lib/utils"
 
 export default function IdentidadeVisualMobile() {
   const {
@@ -322,13 +323,13 @@ export default function IdentidadeVisualMobile() {
                 <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                   Telefone
                 </label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(11) 99999-9999" className="h-11 rounded-xl text-base" />
+                <Input value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} placeholder="(11) 99999-9999" className="h-11 rounded-xl text-base" />
               </div>
               <div>
                 <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                   WhatsApp
                 </label>
-                <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(11) 99999-9999" className="h-11 rounded-xl text-base" />
+                <Input value={whatsapp} onChange={(e) => setWhatsapp(maskPhone(e.target.value))} placeholder="(11) 99999-9999" className="h-11 rounded-xl text-base" />
               </div>
             </div>
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert } from "@/components/ui/alert"
 import { Card, CardContent } from "@/components/ui/card"
+import { maskPhone } from "@/shared/lib/utils"
 
 interface PublicClientData {
   client_id: string
@@ -827,9 +828,9 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-500 uppercase">Telefone celular</label>
                       <Input
-                        placeholder="Ex: 11999999999"
+                        placeholder="Ex: (11) 99999-9999"
                         value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
+                        onChange={(e) => setCustomerPhone(maskPhone(e.target.value))}
                         required
                       />
                     </div>

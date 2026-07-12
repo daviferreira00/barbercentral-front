@@ -7,6 +7,7 @@ import { Alert } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { maskPhone } from "@/shared/lib/utils"
 
 export default function IdentidadeVisualDesktop() {
   const {
@@ -303,11 +304,11 @@ export default function IdentidadeVisualDesktop() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-500 uppercase">Telefone</label>
-                    <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Ex: 11999999999" />
+                    <Input value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} placeholder="Ex: (11) 99999-9999" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-500 uppercase">WhatsApp</label>
-                    <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ex: 11999999999" />
+                    <Input value={whatsapp} onChange={(e) => setWhatsapp(maskPhone(e.target.value))} placeholder="Ex: (11) 99999-9999" />
                   </div>
                 </div>
 

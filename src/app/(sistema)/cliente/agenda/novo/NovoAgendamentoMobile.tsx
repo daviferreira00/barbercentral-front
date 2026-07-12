@@ -9,6 +9,7 @@ import { ActionBar } from "@/components/mobile/ActionBar"
 import { SkeletonList } from "@/components/mobile/Skeleton"
 import { haptic } from "@/shared/lib/haptics"
 import { useNovoAgendamento } from "@/features/agenda/hooks/useNovoAgendamento"
+import { maskPhone } from "@/shared/lib/utils"
 
 export default function NovoAgendamentoMobile() {
   const {
@@ -170,8 +171,8 @@ export default function NovoAgendamentoMobile() {
               </label>
               <Input
                 value={custPhone}
-                onChange={(e) => setCustPhone(e.target.value)}
-                placeholder="Ex: 11999999999"
+                onChange={(e) => setCustPhone(maskPhone(e.target.value))}
+                placeholder="Ex: (11) 99999-9999"
                 className="h-11 rounded-xl text-base"
                 required
               />

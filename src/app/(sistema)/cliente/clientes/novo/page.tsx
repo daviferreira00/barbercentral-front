@@ -8,6 +8,7 @@ import { Alert } from "@/components/ui/alert"
 import { Card, CardContent } from "@/components/ui/card"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { maskPhone } from "@/shared/lib/utils"
 
 export default function NovoClientePage() {
   const router = useRouter()
@@ -84,8 +85,8 @@ export default function NovoClientePage() {
                 <label className="text-xs font-bold text-slate-500 uppercase">Telefone</label>
                 <Input
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ex: 11999999999"
+                  onChange={(e) => setPhone(maskPhone(e.target.value))}
+                  placeholder="Ex: (11) 99999-9999"
                   required
                 />
               </div>

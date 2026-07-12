@@ -83,9 +83,47 @@ export default function AgendaMobile() {
   // Controle de múltiplos telefones e disparo de WhatsApp
   const [phoneSelectorOpen, setPhoneSelectorOpen] = useState(false)
   const [phoneSelectorOptions, setPhoneSelectorOptions] = useState<string[]>([])
-  const [phoneSelectorAction, setPhoneSelectorAction] = useState<"chat" | "reminder" | null>(null)
+  const [phoneSelectorAction, setPhoneSelectorAction] = useState<"chat" | "reminder" | "confirmation" | null>(null)
   const [sendingReminder, setSendingReminder] = useState(false)
   const sendingReminderRef = useRef(false)
+  const [sendingConfirmation, setSendingConfirmation] = useState(false)
+  const sendingConfirmationRef = useRef(false)
+
+  const handleSendConfirmationButtons = async (app: EnrichedAppointment, phoneForce?: string) => {
+    if (sendingConfirmationRef.current) return
+    
+    const phone = phoneForce || getPhoneOptions(app.customer_phone)[0]
+    if (!phone) {
+      const opts = getPhoneOptions(app.customer_phone)
+      if (opts.length === 0) {
+        alert("Este cliente não possui um número de telefone válido.")
+        return
+      }
+      if (opts.length > 1 && !phoneForce) {
+        setPhoneSelectorOptions(opts)
+        setPhoneSelectorAction("confirmation")
+        setPhoneSelectorOpen(true)
+        return
+      }
+    }
+
+    sendingConfirmationRef.current = true
+    setSendingConfirmation(true)
+    try {
+      const res = await http.post(`/cliente/appointments/${app.id}/confirm-buttons`, {})
+      if (res.error) {
+        alert("Erro ao disparar botões de confirmação: " + res.error.message)
+      } else {
+        alert("Botões de confirmação disparados com sucesso via WhatsApp!")
+        setPhoneSelectorOpen(false)
+      }
+    } catch (err: any) {
+      alert("Erro ao enviar: " + err.message)
+    } finally {
+      sendingConfirmationRef.current = false
+      setSendingConfirmation(false)
+    }
+  }
 
   const getPhoneOptions = (phoneStr?: string): string[] => {
     if (!phoneStr) return []
@@ -403,16 +441,16 @@ export default function AgendaMobile() {
           selectedApp && !isEditing && !isCancellingWithReason ? (
             <div className="flex flex-col gap-2">
               {selectedApp.customer_phone && (
-                <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-100">
+                <div className="grid grid-cols-3 gap-1.5 pb-2 border-b border-slate-100">
                   <button
                     onClick={() => {
                       haptic()
                       handleTalkToClient(selectedApp)
                     }}
-                    className="mobile-tap rounded-xl bg-indigo-50 py-2.5 text-[11px] font-extrabold text-indigo-700 transition active:scale-95 flex items-center justify-center gap-1"
+                    className="mobile-tap rounded-xl bg-indigo-50 py-2.5 text-[10px] font-extrabold text-indigo-700 transition active:scale-95 flex items-center justify-center gap-1"
                   >
                     <i className="ti ti-brand-whatsapp text-xs" />
-                    Falar com Cliente
+                    Falar
                   </button>
                   <button
                     disabled={sendingReminder}
@@ -420,14 +458,29 @@ export default function AgendaMobile() {
                       haptic()
                       handleSendReminder(selectedApp)
                     }}
-                    className="mobile-tap rounded-xl bg-emerald-50 py-2.5 text-[11px] font-extrabold text-emerald-700 transition active:scale-95 flex items-center justify-center gap-1 disabled:opacity-50"
+                    className="mobile-tap rounded-xl bg-emerald-50 py-2.5 text-[10px] font-extrabold text-emerald-700 transition active:scale-95 flex items-center justify-center gap-1 disabled:opacity-50"
                   >
                     {sendingReminder ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-600" />
                     ) : (
                       <i className="ti ti-bell text-xs" />
                     )}
-                    Enviar Lembrete
+                    Lembrete
+                  </button>
+                  <button
+                    disabled={sendingConfirmation}
+                    onClick={() => {
+                      haptic()
+                      handleSendConfirmationButtons(selectedApp)
+                    }}
+                    className="mobile-tap rounded-xl bg-indigo-50 py-2.5 text-[10px] font-extrabold text-indigo-700 transition active:scale-95 flex items-center justify-center gap-1 disabled:opacity-50"
+                  >
+                    {sendingConfirmation ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
+                    ) : (
+                      <i className="ti ti-check text-xs" />
+                    )}
+                    Confirmar
                   </button>
                 </div>
               )}
@@ -847,6 +900,8 @@ export default function AgendaMobile() {
                     window.location.href = `/cliente/chat?phone=${phone}&name=${encodeURIComponent(selectedApp?.customer_name || "")}`
                   } else if (phoneSelectorAction === "reminder" && selectedApp) {
                     handleSendReminder(selectedApp, phone)
+                  } else if (phoneSelectorAction === "confirmation" && selectedApp) {
+                    handleSendConfirmationButtons(selectedApp, phone)
                   }
                 }}
                 className="w-full flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-white text-xs font-extrabold text-slate-700 active:bg-slate-50 transition"

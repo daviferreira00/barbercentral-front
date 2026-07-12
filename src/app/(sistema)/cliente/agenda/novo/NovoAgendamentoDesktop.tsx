@@ -8,6 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 import { useNovoAgendamento } from "@/features/agenda/hooks/useNovoAgendamento"
+import { maskPhone } from "@/shared/lib/utils"
 
 export default function NovoAgendamentoDesktop() {
   const {
@@ -158,8 +159,8 @@ export default function NovoAgendamentoDesktop() {
                       <label className="text-xs font-bold text-slate-500 uppercase">Telefone</label>
                       <Input
                         value={custPhone}
-                        onChange={(e) => setCustPhone(e.target.value)}
-                        placeholder="Ex: 11999999999"
+                        onChange={(e) => setCustPhone(maskPhone(e.target.value))}
+                        placeholder="Ex: (11) 99999-9999"
                         required
                       />
                     </div>
