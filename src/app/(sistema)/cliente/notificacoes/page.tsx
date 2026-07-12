@@ -293,7 +293,7 @@ export default function ClientNotificationsPage() {
 
       {/* MODAL FORMULÁRIO DE REGRA */}
       <Dialog open={isRuleModalOpen} onOpenChange={setIsRuleModalOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="w-[95vw] sm:max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>
               {editingRule ? "Editar Regra de Notificação" : "Nova Regra de Notificação"}
@@ -309,7 +309,7 @@ export default function ClientNotificationsPage() {
                   value={ruleName}
                   onChange={(e) => setRuleName(e.target.value)}
                   placeholder="Ex: Lembrete 24h antes"
-                  className="rounded-xl border-slate-200"
+                  className="rounded-xl border-slate-200 text-[16px] sm:text-sm"
                   required
                 />
               </div>
@@ -363,7 +363,7 @@ export default function ClientNotificationsPage() {
                       min="1"
                       value={triggerValue}
                       onChange={(e) => setTriggerValue(e.target.value)}
-                      className="rounded-xl border-slate-200"
+                      className="rounded-xl border-slate-200 text-[16px] sm:text-sm"
                       required
                     />
                   </div>
@@ -403,7 +403,7 @@ export default function ClientNotificationsPage() {
                 placeholder="Escreva sua mensagem..."
                 rows={5}
                 required
-                className="flex min-h-[120px] w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400"
+                className="flex min-h-[120px] w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-[16px] sm:text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-400"
               />
 
               {/* Botões de Tags rápidas */}
@@ -551,7 +551,7 @@ function SearchableSelect({
               placeholder="Pesquisar..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-9 w-full rounded-lg border border-slate-100 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
+              className="h-9 w-full rounded-lg border border-slate-100 pl-9 pr-3 text-[16px] sm:text-sm focus:outline-none focus:ring-1 focus:ring-slate-400 transition"
               autoFocus
             />
           </div>

@@ -8,6 +8,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useAgenda } from "@/features/agenda/hooks/useAgenda"
+import { useState } from "react"
+import { Loader2 } from "lucide-react"
+import { http } from "@/shared/lib/http"
 import {
   VIEW_MODES,
   formatDateString,
@@ -62,6 +65,124 @@ export default function AgendaDesktop() {
     handleCancelWithReason,
     getHeaderDateLabel,
   } = useAgenda()
+
+  // Controle de múltiplos telefones e disparo de WhatsApp
+  const [phoneSelectorOpen, setPhoneSelectorOpen] = useState(false)
+  const [phoneSelectorOptions, setPhoneSelectorOptions] = useState<string[]>([])
+  const [phoneSelectorAction, setPhoneSelectorAction] = useState<"chat" | "reminder" | null>(null)
+  const [sendingReminder, setSendingReminder] = useState(false)
+
+  const getPhoneOptions = (phoneStr?: string): string[] => {
+    if (!phoneStr) return []
+    const normalized = phoneStr
+      .replace(/\//g, ",")
+      .replace(/;/g, ",")
+      .replace(/\sou\s/gi, ",")
+      .replace(/\se\s/gi, ",")
+      .replace(/-/g, ",")
+    
+    const parts = normalized.split(",")
+    const numbers: string[] = []
+    for (const p of parts) {
+      const clean = p.replace(/\D/g, "")
+      if (clean.length >= 8 && clean.length <= 14) {
+        let formatted = clean
+        if (formatted.length === 10 || formatted.length === 11) {
+          formatted = "55" + formatted
+        }
+        if (!numbers.includes(formatted)) {
+          numbers.push(formatted)
+        }
+      }
+    }
+    if (numbers.length === 0) {
+      const cleanAll = phoneStr.replace(/\D/g, "")
+      if (cleanAll.length >= 8) {
+        let formatted = cleanAll
+        if (formatted.length === 10 || formatted.length === 11) {
+          formatted = "55" + formatted
+        }
+        numbers.push(formatted)
+      }
+    }
+    return numbers
+  }
+
+  const handleTalkToClient = (app: EnrichedAppointment) => {
+    const opts = getPhoneOptions(app.customer_phone)
+    if (opts.length === 0) {
+      alert("Este cliente não possui um número de telefone válido.")
+      return
+    }
+    if (opts.length === 1) {
+      window.location.href = `/cliente/chat?phone=${opts[0]}&name=${encodeURIComponent(app.customer_name || "")}`
+      return
+    }
+    setPhoneSelectorOptions(opts)
+    setPhoneSelectorAction("chat")
+    setPhoneSelectorOpen(true)
+  }
+
+  const handleSendReminder = async (app: EnrichedAppointment, phoneForce?: string) => {
+    const phone = phoneForce || getPhoneOptions(app.customer_phone)[0]
+    if (!phone) {
+      const opts = getPhoneOptions(app.customer_phone)
+      if (opts.length === 0) {
+        alert("Este cliente não possui um número de telefone válido.")
+        return
+      }
+      if (opts.length > 1 && !phoneForce) {
+        setPhoneSelectorOptions(opts)
+        setPhoneSelectorAction("reminder")
+        setPhoneSelectorOpen(true)
+        return
+      }
+    }
+
+    setSendingReminder(true)
+    try {
+      // 1. Buscar regras de notificação
+      const resRules = await http.get<any[]>("/cliente/notificacoes")
+      let template = "Olá, {nome_cliente}!\n\nPassando para lembrar do seu agendamento no dia {data_hora} com o profissional {nome_profissional}.\n\nServiços: {nome_servico}.\n\nAté logo!"
+      
+      if (resRules.data && Array.isArray(resRules.data)) {
+        const activeReminderRule = resRules.data.find(r => r.trigger_type === "booking_reminder" && r.active)
+        if (activeReminderRule && activeReminderRule.message_template) {
+          template = activeReminderRule.message_template
+        }
+      }
+
+      // 2. Substituir placeholders
+      const dateFormatted = new Date(cleanDate(app.date) + "T00:00:00").toLocaleDateString("pt-BR")
+      const timeFormatted = app.start_time.substring(0, 5)
+      const servicesStr = (app.services || []).map(s => s.service_name).join(", ")
+      const cancelLink = `${window.location.origin}/agendamento/cancelar/${app.cancel_token || ""}`
+
+      const messageContent = template
+        .replace(/{nome_cliente}/g, app.customer_name || "Cliente")
+        .replace(/{data_hora}/g, `${dateFormatted} às ${timeFormatted}`)
+        .replace(/{nome_profissional}/g, app.professional_name)
+        .replace(/{nome_servico}/g, servicesStr)
+        .replace(/{link_cancelamento}/g, cancelLink)
+
+      // 3. Enviar mensagem
+      const resSend = await http.post("/cliente/chats/send", {
+        contact_number: phone,
+        content: messageContent
+      })
+
+      if (resSend.error) {
+        alert("Erro ao disparar lembrete via WhatsApp: " + resSend.error.message)
+      } else {
+        alert("Lembrete disparado com sucesso via WhatsApp!")
+        setPhoneSelectorOpen(false)
+      }
+    } catch (err: any) {
+      alert("Erro ao enviar: " + err.message)
+    } finally {
+      setSendingReminder(false)
+    }
+  }
 
   return (
     <div className="space-y-6 w-full animate-fade-in">
@@ -496,6 +617,33 @@ export default function AgendaDesktop() {
             {!isEditing && !isCancellingWithReason && (
               <DialogFooter className="flex-col sm:flex-row gap-2 pt-2 border-t border-slate-100">
                 <div className="flex flex-wrap gap-1.5 justify-start flex-1">
+                  {selectedApp.customer_phone && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleTalkToClient(selectedApp)}
+                        className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 text-[10px] font-bold h-8 px-2.5"
+                      >
+                        <i className="ti ti-brand-whatsapp mr-1 text-xs" />
+                        Falar com Cliente
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleSendReminder(selectedApp)}
+                        disabled={sendingReminder}
+                        className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 text-[10px] font-bold h-8 px-2.5"
+                      >
+                        {sendingReminder ? (
+                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        ) : (
+                          <i className="ti ti-bell mr-1 text-xs" />
+                        )}
+                        Enviar Lembrete
+                      </Button>
+                    </>
+                  )}
                   {selectedApp.status !== "completed" && selectedApp.status !== "cancelled" && (
                     <>
                       <Button
@@ -640,6 +788,45 @@ export default function AgendaDesktop() {
             </form>
           </DialogContent>
         )}
+      </Dialog>
+
+      {/* DIALOG DE SELEÇÃO DE TELEFONE */}
+      <Dialog open={phoneSelectorOpen} onOpenChange={setPhoneSelectorOpen}>
+        <DialogContent className="max-w-md rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800 font-bold text-base">
+              Selecionar Telefone
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <p className="text-xs text-slate-500 font-medium">
+              Este cliente possui múltiplos números no cadastro. Escolha um para continuar:
+            </p>
+            <div className="space-y-2">
+              {phoneSelectorOptions.map((phone) => (
+                <button
+                  key={phone}
+                  onClick={() => {
+                    if (phoneSelectorAction === "chat") {
+                      window.location.href = `/cliente/chat?phone=${phone}&name=${encodeURIComponent(selectedApp?.customer_name || "")}`
+                    } else if (phoneSelectorAction === "reminder" && selectedApp) {
+                      handleSendReminder(selectedApp, phone)
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-indigo-600 hover:bg-indigo-50/20 text-xs font-bold text-slate-700 transition"
+                >
+                  <span>{phone}</span>
+                  <i className="ti ti-brand-whatsapp text-lg text-emerald-500" />
+                </button>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPhoneSelectorOpen(false)}>
+              Cancelar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </div>
   )

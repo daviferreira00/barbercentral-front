@@ -22,6 +22,7 @@ export interface EnrichedAppointment {
     price: number
     duration_minutes: number
   }[]
+  cancel_token?: string
 }
 
 export interface BlockedSlot {

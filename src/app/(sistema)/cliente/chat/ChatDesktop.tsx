@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import { http } from "@/shared/lib/http"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -56,6 +57,11 @@ interface Customer {
 }
 
 export default function ChatDesktop() {
+	const searchParams = useSearchParams()
+	const phoneParam = searchParams.get("phone")
+	const nameParam = searchParams.get("name")
+	const hasCheckedPhoneParam = useRef(false)
+
 	const [chats, setChats] = useState<Chat[]>([])
 	const [activeChat, setActiveChat] = useState<Chat | null>(null)
 	const [messages, setMessages] = useState<Message[]>([])
@@ -183,6 +189,32 @@ export default function ChatDesktop() {
 			if (pollingRef.current) clearInterval(pollingRef.current)
 		}
 	}, [])
+
+	// Auto-seleciona ou inicia nova conversa baseado nos parâmetros da URL (?phone=...)
+	useEffect(() => {
+		if (phoneParam && chats.length > 0 && !hasCheckedPhoneParam.current) {
+			hasCheckedPhoneParam.current = true
+			
+			// Normaliza o número recebido
+			const cleanTarget = phoneParam.replace(/\D/g, "")
+			
+			// Procura se já existe chat
+			const match = chats.find((c) => {
+				const cNum = c.contact_number.replace(/\D/g, "")
+				return cNum.endsWith(cleanTarget.slice(-8)) && cNum.slice(0, 4) === cleanTarget.slice(0, 4)
+			})
+
+			if (match) {
+				handleSelectChat(match)
+			} else {
+				// Se não existe, abre o modal de Nova Conversa pré-preenchido
+				setContactPhoneInput(cleanTarget)
+				setContactNameInput(nameParam || "")
+				setNewChatMode("create")
+				setShowNewChatModal(true)
+			}
+		}
+	}, [chats, phoneParam, nameParam])
 
 	// Polling de mensagens da conversa ativa
 	useEffect(() => {
