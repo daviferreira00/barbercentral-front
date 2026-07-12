@@ -338,7 +338,13 @@ export default function ChatMobile() {
 	}
 
 	return (
-		<div className="flex h-[calc(100vh-96px)] overflow-hidden bg-slate-50/50 rounded-2xl border border-slate-200 shadow-sm relative w-full">
+		<div 
+			className={`fixed left-0 right-0 bg-slate-50 flex flex-col w-full overflow-hidden transition-all duration-200 ${
+				activeChat 
+					? "inset-0 h-dvh z-50" 
+					: "top-[calc(56px+env(safe-area-inset-top))] bottom-0 h-[calc(100dvh-56px-env(safe-area-inset-top))] z-30"
+			}`}
+		>
 			
 			{/* LISTA DE CONVERSAS (VISÍVEL APENAS QUANDO NÃO HÁ CHAT ATIVO) */}
 			<div className={`w-full bg-white flex flex-col h-full z-10 ${activeChat ? "hidden" : "flex"}`}>
@@ -445,7 +451,10 @@ export default function ChatMobile() {
 				{activeChat && (
 					<>
 						{/* HEADER DA CONVERSA */}
-						<div className="px-4 py-3 border-b border-slate-200 bg-white flex items-center justify-between z-10 shadow-sm">
+						<div 
+							className="px-4 py-3 border-b border-slate-200 bg-white flex items-center justify-between z-10 shadow-sm flex-shrink-0"
+							style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
+						>
 							<div className="flex items-center gap-2 min-w-0">
 								<button 
 									onClick={() => setActiveChat(null)}
@@ -552,7 +561,10 @@ export default function ChatMobile() {
 						</div>
 
 						{/* INPUT DE MENSAGEM */}
-						<div className="p-3 border-t border-slate-200 bg-white">
+						<div 
+							className="p-3 border-t border-slate-200 bg-white flex-shrink-0"
+							style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+						>
 							<form onSubmit={handleSendMessage} className="flex gap-2">
 								<Input
 									placeholder="Escreva sua mensagem..."
