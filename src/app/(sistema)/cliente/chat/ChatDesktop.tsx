@@ -100,7 +100,14 @@ export default function ChatDesktop() {
 		if (!isSilent) setLoadingMessages(true)
 		const res = await http.get<Message[]>(`/cliente/chats/${chat.id}/messages`)
 		if (res.data) {
-			setMessages(Array.isArray(res.data) ? res.data : [])
+			const serverMsgs = Array.isArray(res.data) ? res.data : []
+			setMessages((prev) => {
+				const sendingMsgs = prev.filter((m) => m.sending)
+				const filteredSending = sendingMsgs.filter(
+					(sm) => !serverMsgs.some((m) => m.content === sm.content && m.direction === "outbound")
+				)
+				return [...serverMsgs, ...filteredSending]
+			})
 		}
 		if (!isSilent) setLoadingMessages(false)
 	}
