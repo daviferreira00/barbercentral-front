@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from "next"
 import { AppProvider } from "@/shared/context/AppContext"
+import { Montserrat } from "next/font/google"
 import "./globals.css"
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
+})
 
 export const metadata: Metadata = {
   title: "BarberCentral — Gestão de Barbearia",
@@ -26,15 +33,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={montserrat.variable}>
       <head>
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
         />
       </head>
       <body>

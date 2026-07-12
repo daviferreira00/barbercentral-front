@@ -41,7 +41,7 @@ body {
   padding: 0;
   margin: 0;
   height: 100%;
-  font-family: 'Montserrat', system-ui, sans-serif;
+  font-family: var(--font-montserrat), 'Montserrat', system-ui, sans-serif;
   background-color: #f8fafc;
   color: hsl(var(--foreground));
   -webkit-font-smoothing: antialiased;
