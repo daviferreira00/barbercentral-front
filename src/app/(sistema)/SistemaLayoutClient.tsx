@@ -81,7 +81,7 @@ export default function SistemaLayoutClient({
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 font-sans">
+    <div className="fixed inset-0 flex overflow-hidden bg-slate-50 font-sans">
       {/* Sidebar Overlay (Mobile only, when open) */}
       {!sidebarCollapsed && (
         <div
@@ -345,7 +345,7 @@ export default function SistemaLayoutClient({
       </aside>
 
       {/* 2. WORKSPACE DIREITA */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         {/* Topbar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 z-20">
           <div className="flex items-center gap-4">
@@ -456,7 +456,7 @@ export default function SistemaLayoutClient({
         </header>
 
         {/* Content Area (Sem max-width!) */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-none w-full h-full">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 scrollbar-none w-full">
           {children}
         </main>
       </div>
