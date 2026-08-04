@@ -426,7 +426,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
             alt=""
             aria-hidden="true"
             onError={() => setWatermarkFailed(true)}
-            className="pointer-events-none fixed left-1/2 top-[55%] z-0 max-h-[60vh] w-[clamp(180px,30vw,460px)] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
+            className="pointer-events-none fixed left-1/2 top-[55%] z-0 max-h-[60vh] w-[clamp(220px,45vw,360px)] lg:w-[clamp(180px,30vw,460px)] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
           />
         )}
         <div className="relative z-10 w-full max-w-2xl mx-auto p-4 md:py-8 space-y-6">
@@ -471,7 +471,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
               {/* Opção Qualquer Profissional */}
               <Card
                 onClick={() => handleProfSelect(null)}
-                className="hover:border-slate-300 transition duration-150 cursor-pointer text-center group border-dashed active:scale-[0.99]"
+                className="w-full max-w-56 mx-auto lg:max-w-none hover:border-slate-300 transition duration-150 cursor-pointer text-center group border-dashed active:scale-[0.99]"
               >
                 <CardContent className="p-6 flex flex-col items-center justify-center gap-3 h-full">
                   <div className="h-14 w-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200 shadow-sm group-hover:scale-105 transition duration-200">
@@ -488,7 +488,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                 <Card
                   key={prof.id}
                   onClick={() => handleProfSelect(prof)}
-                  className="hover:border-slate-300 transition duration-150 cursor-pointer text-center group active:scale-[0.99]"
+                  className="w-full max-w-56 mx-auto lg:max-w-none hover:border-slate-300 transition duration-150 cursor-pointer text-center group active:scale-[0.99]"
                 >
                   <CardContent className="p-6 flex flex-col items-center justify-center gap-3">
                     <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm group-hover:scale-105 transition duration-200">
