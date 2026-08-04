@@ -8,7 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useAgenda } from "@/features/agenda/hooks/useAgenda"
-import { useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Loader2 } from "lucide-react"
 import { http } from "@/shared/lib/http"
 import {
@@ -78,6 +78,13 @@ export default function AgendaDesktop() {
   const sendingReminderRef = useRef(false)
   const [sendingConfirmation, setSendingConfirmation] = useState(false)
   const sendingConfirmationRef = useRef(false)
+  const [showMoreActions, setShowMoreActions] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+
+  useEffect(() => {
+    setShowMoreActions(false)
+    setShowHistory(false)
+  }, [selectedApp?.id])
 
   const handleSendConfirmationButtons = async (app: EnrichedAppointment, phoneForce?: string) => {
     if (sendingConfirmationRef.current) return
@@ -649,8 +656,11 @@ export default function AgendaDesktop() {
 
                 {/* TIMELINE DE LOGS DE STATUS */}
                 <div className="space-y-2 border-t border-slate-100 pt-3">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Histórico de Alterações</span>
-                  {loadingLogs ? (
+                  <button type="button" onClick={() => setShowHistory((value) => !value)} className="flex w-full items-center justify-between rounded-lg border border-slate-100 px-3 py-2 text-left">
+                    <span className="text-xs font-bold text-slate-700"><i className="ti ti-history mr-1.5 text-slate-400" />Histórico de alterações</span>
+                    <span className="text-[10px] text-slate-400">{loadingLogs ? "Carregando" : `${statusLogs.length} ${statusLogs.length === 1 ? "registro" : "registros"}`} <i className={`ti ${showHistory ? "ti-chevron-up" : "ti-chevron-right"}`} /></span>
+                  </button>
+                  {showHistory && (loadingLogs ? (
                     <div className="text-[10px] text-slate-400">Carregando timeline...</div>
                   ) : statusLogs.length === 0 ? (
                     <div className="text-[10px] text-slate-400 italic">Nenhum histórico registrado.</div>
@@ -673,15 +683,15 @@ export default function AgendaDesktop() {
                         </div>
                       ))}
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
 
             {/* Footer de botões padrão do Modal */}
             {!isEditing && !isCancellingWithReason && (
-              <DialogFooter className="flex-col sm:flex-row gap-2 pt-2 border-t border-slate-100">
-                <div className="flex flex-wrap gap-1.5 justify-start flex-1">
+              <DialogFooter className="flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-col">
+                <div className="flex w-full gap-2">
                   {selectedApp.customer_phone && (
                     <>
                       <Button
@@ -708,61 +718,21 @@ export default function AgendaDesktop() {
                         Enviar Lembrete
                       </Button>
 
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleSendConfirmationButtons(selectedApp)}
-                        disabled={sendingConfirmation}
-                        className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 text-[10px] font-bold h-8 px-2.5"
-                      >
-                        {sendingConfirmation ? (
-                          <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                        ) : (
-                          <i className="ti ti-check mr-1 text-xs" />
-                        )}
-                        Pedir Confirmação
-                      </Button>
                     </>
                   )}
-                  {selectedApp.status !== "completed" && selectedApp.status !== "cancelled" && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => changeStatus("confirmed", "Confirmado pelo recepcionista")}
-                        disabled={updatingStatus}
-                        className="bg-blue-50 text-blue-700 hover:bg-blue-100 text-[10px] font-bold h-8 px-2.5"
-                      >
-                        Confirmar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => changeStatus("in_progress", "Profissional iniciou o atendimento")}
-                        disabled={updatingStatus}
-                        className="bg-amber-50 text-amber-700 hover:bg-amber-100 text-[10px] font-bold h-8 px-2.5"
-                      >
-                        Iniciar
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setCheckoutMethod("cash")
-                          setCheckoutNotes("")
-                          setCheckoutModalOpen(true)
-                        }}
-                        disabled={updatingStatus}
-                        className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-[10px] font-bold h-8 px-2.5"
-                      >
-                        Concluir
-                      </Button>
+                </div>
+                {selectedApp.status === "pending" && <Button onClick={() => changeStatus("confirmed", "Confirmado pelo recepcionista")} disabled={updatingStatus} className="w-full bg-indigo-600 text-white hover:bg-indigo-700">Confirmar agendamento</Button>}
+                {selectedApp.status === "confirmed" && <Button onClick={() => changeStatus("in_progress", "Profissional iniciou o atendimento")} disabled={updatingStatus} className="w-full bg-amber-500 text-white hover:bg-amber-600">Iniciar atendimento</Button>}
+                {selectedApp.status === "in_progress" && <Button onClick={() => { setCheckoutMethod("cash"); setCheckoutNotes(""); setCheckoutModalOpen(true) }} disabled={updatingStatus} className="w-full bg-emerald-600 text-white hover:bg-emerald-700">Concluir atendimento</Button>}
+                {selectedApp.status !== "cancelled" && <Button variant="outline" onClick={() => setShowMoreActions((value) => !value)} className="w-full"><i className="ti ti-dots mr-1" />Mais ações</Button>}
+                {showMoreActions && selectedApp.status !== "cancelled" && (
+                  <div className="grid w-full grid-cols-3 gap-2 rounded-lg bg-slate-50 p-2">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => changeStatus("no_show", "Cliente não compareceu")}
                         disabled={updatingStatus}
-                        className="bg-red-950/5 text-red-950 hover:bg-red-950/10 text-[10px] font-bold h-8 px-2.5"
+                        className="bg-white text-slate-600 hover:bg-slate-100 text-[10px] font-bold h-8 px-2.5"
                       >
                         Falta
                       </Button>
@@ -777,13 +747,10 @@ export default function AgendaDesktop() {
                           setIsEditing(true)
                         }}
                         disabled={updatingStatus}
-                        className="bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold h-8 px-2.5"
+                        className="bg-white text-slate-600 hover:bg-slate-100 text-[10px] font-bold h-8 px-2.5"
                       >
                         Editar
                       </Button>
-                    </>
-                  )}
-                  {selectedApp.status !== "cancelled" && (
                     <Button
                       size="sm"
                       variant="ghost"
@@ -792,15 +759,12 @@ export default function AgendaDesktop() {
                         setIsCancellingWithReason(true)
                       }}
                       disabled={updatingStatus}
-                      className="bg-red-50 text-red-700 hover:bg-red-100 text-[10px] font-bold h-8 px-2.5"
+                      className="bg-white text-red-600 hover:bg-red-50 text-[10px] font-bold h-8 px-2.5"
                     >
                       Cancelar
                     </Button>
-                  )}
-                </div>
-                <Button type="button" variant="ghost" onClick={() => setSelectedApp(null)} disabled={updatingStatus}>
-                  Fechar
-                </Button>
+                  </div>
+                )}
               </DialogFooter>
             )}
           </DialogContent>

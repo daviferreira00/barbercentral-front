@@ -40,7 +40,7 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
         />
       </head>
-      <body>
+      <body className="font-sans">
         <AppProvider>{children}</AppProvider>
       </body>
     </html>

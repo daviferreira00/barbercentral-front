@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    --font-family: var(--font-montserrat), Montserrat;
     --background: 0 0% 100%;
     --foreground: 224 71% 4%;
 
@@ -46,6 +47,18 @@ body {
   color: hsl(var(--foreground));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Tipografia única do produto. A exceção mantém o webfont dos ícones Tabler. */
+body *:not(.ti) {
+  font-family: var(--font-family, Montserrat), system-ui, sans-serif !important;
 }
 
 /* Animations helper */
@@ -134,4 +147,3 @@ body {
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 .mobile-tap { -webkit-tap-highlight-color: transparent; }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-

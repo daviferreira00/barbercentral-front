@@ -27,7 +27,6 @@ export default async function SistemaLayout({ children }: { children: React.Reac
     "--color-primary": tenantData?.color_primary || "#6366f1",
     "--color-secondary": tenantData?.color_secondary || "#d97706",
     "--color-button": tenantData?.color_button || tenantData?.color_primary || "#6366f1",
-    "--font-family": tenantData?.font_family || "Montserrat",
   } as React.CSSProperties
 
   return (

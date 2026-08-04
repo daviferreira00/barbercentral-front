@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Loader2 } from "lucide-react"
 import { http } from "@/shared/lib/http"
 import Link from "next/link"
@@ -92,6 +92,13 @@ export default function AgendaMobile() {
   const sendingReminderRef = useRef(false)
   const [sendingConfirmation, setSendingConfirmation] = useState(false)
   const sendingConfirmationRef = useRef(false)
+  const [showMoreActions, setShowMoreActions] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+
+  useEffect(() => {
+    setShowMoreActions(false)
+    setShowHistory(false)
+  }, [selectedApp?.id])
 
   const handleSendConfirmationButtons = async (app: EnrichedAppointment, phoneForce?: string) => {
     if (sendingConfirmationRef.current) return
@@ -445,7 +452,7 @@ export default function AgendaMobile() {
           selectedApp && !isEditing && !isCancellingWithReason ? (
             <div className="flex flex-col gap-2">
               {selectedApp.customer_phone && (
-                <div className="grid grid-cols-3 gap-1.5 pb-2 border-b border-slate-100">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => {
                       haptic()
@@ -471,58 +478,34 @@ export default function AgendaMobile() {
                     )}
                     Lembrete
                   </button>
-                  <button
-                    disabled={sendingConfirmation}
-                    onClick={() => {
-                      haptic()
-                      handleSendConfirmationButtons(selectedApp)
-                    }}
-                    className="mobile-tap rounded-xl bg-indigo-50 py-2.5 text-[10px] font-extrabold text-indigo-700 transition active:scale-95 flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    {sendingConfirmation ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
-                    ) : (
-                      <i className="ti ti-check text-xs" />
-                    )}
-                    Confirmar
-                  </button>
                 </div>
               )}
-              {selectedApp.status !== "completed" && selectedApp.status !== "cancelled" && (
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    disabled={updatingStatus}
-                    onClick={() => changeStatus("confirmed", "Confirmado pelo recepcionista")}
-                    className="mobile-tap rounded-xl bg-blue-50 py-2.5 text-[11px] font-extrabold text-blue-700 transition active:scale-95 disabled:opacity-50"
-                  >
-                    <i className="ti ti-check mr-1" />
-                    Confirmar
-                  </button>
-                  <button
-                    disabled={updatingStatus}
-                    onClick={() => changeStatus("in_progress", "Profissional iniciou o atendimento")}
-                    className="mobile-tap rounded-xl bg-amber-50 py-2.5 text-[11px] font-extrabold text-amber-700 transition active:scale-95 disabled:opacity-50"
-                  >
-                    <i className="ti ti-scissors mr-1" />
-                    Iniciar
-                  </button>
-                  <button
-                    disabled={updatingStatus}
-                    onClick={() => {
-                      haptic()
-                      setCheckoutMethod("cash")
-                      setCheckoutNotes("")
-                      setCheckoutModalOpen(true)
-                    }}
-                    className="mobile-tap rounded-xl bg-emerald-50 py-2.5 text-[11px] font-extrabold text-emerald-700 transition active:scale-95 disabled:opacity-50"
-                  >
-                    <i className="ti ti-cash mr-1" />
-                    Concluir
-                  </button>
+              {selectedApp.status === "pending" && (
+                <button disabled={updatingStatus} onClick={() => changeStatus("confirmed", "Confirmado pelo recepcionista")} className="mobile-tap rounded-xl bg-indigo-600 py-3 text-xs font-extrabold text-white shadow-sm transition active:scale-95 disabled:opacity-50">
+                  <i className="ti ti-check mr-1" /> Confirmar agendamento
+                </button>
+              )}
+              {selectedApp.status === "confirmed" && (
+                <button disabled={updatingStatus} onClick={() => changeStatus("in_progress", "Profissional iniciou o atendimento")} className="mobile-tap rounded-xl bg-amber-500 py-3 text-xs font-extrabold text-white shadow-sm transition active:scale-95 disabled:opacity-50">
+                  <i className="ti ti-scissors mr-1" /> Iniciar atendimento
+                </button>
+              )}
+              {selectedApp.status === "in_progress" && (
+                <button disabled={updatingStatus} onClick={() => { haptic(); setCheckoutMethod("cash"); setCheckoutNotes(""); setCheckoutModalOpen(true) }} className="mobile-tap rounded-xl bg-emerald-600 py-3 text-xs font-extrabold text-white shadow-sm transition active:scale-95 disabled:opacity-50">
+                  <i className="ti ti-cash mr-1" /> Concluir atendimento
+                </button>
+              )}
+              {selectedApp.status !== "cancelled" && (
+                <button type="button" onClick={() => setShowMoreActions((value) => !value)} className="mobile-tap flex items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white py-2.5 text-[11px] font-extrabold text-slate-600 transition active:scale-95">
+                  <i className="ti ti-dots" /> Mais ações <i className={`ti ${showMoreActions ? "ti-chevron-up" : "ti-chevron-down"}`} />
+                </button>
+              )}
+              {showMoreActions && selectedApp.status !== "cancelled" && (
+                <div className="grid grid-cols-3 gap-2 rounded-xl bg-slate-50 p-2">
                   <button
                     disabled={updatingStatus}
                     onClick={() => changeStatus("no_show", "Cliente não compareceu")}
-                    className="mobile-tap rounded-xl bg-red-950/5 py-2.5 text-[11px] font-extrabold text-red-950 transition active:scale-95 disabled:opacity-50"
+                    className="mobile-tap rounded-lg bg-white py-2.5 text-[10px] font-extrabold text-slate-600 transition active:scale-95 disabled:opacity-50"
                   >
                     <i className="ti ti-user-x mr-1" />
                     Falta
@@ -536,7 +519,7 @@ export default function AgendaMobile() {
                       setEditServiceIds(selectedApp.services.map((service) => service.service_id))
                       setIsEditing(true)
                     }}
-                    className="mobile-tap rounded-xl bg-slate-100 py-2.5 text-[11px] font-extrabold text-slate-700 transition active:scale-95 disabled:opacity-50"
+                    className="mobile-tap rounded-lg bg-white py-2.5 text-[10px] font-extrabold text-slate-600 transition active:scale-95 disabled:opacity-50"
                   >
                     <i className="ti ti-edit mr-1" />
                     Editar
@@ -547,7 +530,7 @@ export default function AgendaMobile() {
                       setCancelReason("")
                       setIsCancellingWithReason(true)
                     }}
-                    className="mobile-tap rounded-xl bg-red-50 py-2.5 text-[11px] font-extrabold text-red-700 transition active:scale-95 disabled:opacity-50"
+                    className="mobile-tap rounded-lg bg-white py-2.5 text-[10px] font-extrabold text-red-600 transition active:scale-95 disabled:opacity-50"
                   >
                     <i className="ti ti-x mr-1" />
                     Cancelar
@@ -558,18 +541,6 @@ export default function AgendaMobile() {
                 <p className="text-center text-[11px] font-semibold text-slate-400">
                   Agendamento cancelado — sem ações disponíveis.
                 </p>
-              )}
-              {selectedApp.status === "completed" && (
-                <button
-                  disabled={updatingStatus}
-                  onClick={() => {
-                    setCancelReason("")
-                    setIsCancellingWithReason(true)
-                  }}
-                  className="mobile-tap rounded-xl bg-red-50 py-2.5 text-[11px] font-extrabold text-red-700 transition active:scale-95 disabled:opacity-50"
-                >
-                  Cancelar agendamento
-                </button>
               )}
             </div>
           ) : undefined
@@ -799,10 +770,11 @@ export default function AgendaMobile() {
 
                 {/* Histórico de alterações */}
                 <div>
-                  <p className="mb-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                    Histórico de alterações
-                  </p>
-                  {loadingLogs ? (
+                  <button type="button" onClick={() => setShowHistory((value) => !value)} className="flex w-full items-center justify-between rounded-xl border border-slate-100 bg-white px-3 py-3 text-left">
+                    <span className="flex items-center gap-2 text-xs font-extrabold text-slate-700"><i className="ti ti-history text-base text-slate-400" /> Histórico de alterações</span>
+                    <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">{loadingLogs ? "Carregando" : `${statusLogs.length} ${statusLogs.length === 1 ? "registro" : "registros"}`} <i className={`ti ${showHistory ? "ti-chevron-up" : "ti-chevron-right"}`} /></span>
+                  </button>
+                  {showHistory && (loadingLogs ? (
                     <div className="space-y-2">
                       <div className="skeleton-shimmer h-8 rounded-lg" />
                       <div className="skeleton-shimmer h-8 rounded-lg" />
@@ -827,7 +799,7 @@ export default function AgendaMobile() {
                         </div>
                       ))}
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
