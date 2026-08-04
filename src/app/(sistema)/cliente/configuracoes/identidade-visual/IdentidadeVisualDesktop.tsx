@@ -471,7 +471,7 @@ export default function IdentidadeVisualDesktop() {
                   alt=""
                   aria-hidden="true"
                   onError={(event) => { event.currentTarget.style.display = "none" }}
-                  className="pointer-events-none absolute left-1/2 top-1/2 z-0 w-[62%] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
+                  className="pointer-events-none absolute left-1/2 top-[58%] z-0 max-h-[65%] w-[92%] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
                 />
               )}
 

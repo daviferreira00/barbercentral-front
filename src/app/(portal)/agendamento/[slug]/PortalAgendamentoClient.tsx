@@ -426,7 +426,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
             alt=""
             aria-hidden="true"
             onError={() => setWatermarkFailed(true)}
-            className="pointer-events-none fixed left-1/2 top-[55%] z-0 max-h-[60vh] w-[clamp(220px,45vw,360px)] lg:w-[clamp(180px,30vw,460px)] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
+            className="pointer-events-none fixed left-1/2 top-[58%] z-0 max-h-[65vh] w-[clamp(360px,92vw,400px)] md:w-[clamp(520px,78vw,680px)] lg:w-[clamp(420px,32vw,520px)] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
           />
         )}
         <div className="relative z-10 w-full max-w-2xl mx-auto p-4 md:py-8 space-y-6">
