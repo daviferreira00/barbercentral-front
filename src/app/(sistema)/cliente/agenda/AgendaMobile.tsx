@@ -38,6 +38,7 @@ const statusTone = (status: string): PillTone => STATUS_TONES[status] || "neutra
 export default function AgendaMobile() {
   const {
     professionals,
+    services,
     selectedProfId,
     setSelectedProfId,
     currentDate,
@@ -60,6 +61,9 @@ export default function AgendaMobile() {
     setEditDate,
     editTime,
     setEditTime,
+    editServiceIds,
+    setEditServiceIds,
+    toggleEditService,
     editSlots,
     loadingEditSlots,
     isCancellingWithReason,
@@ -257,7 +261,7 @@ export default function AgendaMobile() {
     (app.services || []).reduce((acc, s) => acc + s.price, 0)
 
   const sheetTitle = isEditing
-    ? "Reagendar"
+    ? "Editar agendamento"
     : isCancellingWithReason
     ? "Confirmar cancelamento"
     : selectedApp?.customer_name || "Cliente Avulso"
@@ -529,12 +533,13 @@ export default function AgendaMobile() {
                       setEditProfId(selectedApp.professional_id)
                       setEditDate(cleanDate(selectedApp.date))
                       setEditTime(selectedApp.start_time.substring(0, 5))
+                      setEditServiceIds(selectedApp.services.map((service) => service.service_id))
                       setIsEditing(true)
                     }}
                     className="mobile-tap rounded-xl bg-slate-100 py-2.5 text-[11px] font-extrabold text-slate-700 transition active:scale-95 disabled:opacity-50"
                   >
-                    <i className="ti ti-calendar-repeat mr-1" />
-                    Reagendar
+                    <i className="ti ti-edit mr-1" />
+                    Editar
                   </button>
                   <button
                     disabled={updatingStatus}
@@ -605,8 +610,33 @@ export default function AgendaMobile() {
                 </div>
               </form>
             ) : isEditing ? (
-              /* MODO REAGENDAMENTO */
+              /* MODO DE EDIÇÃO */
               <form onSubmit={handleReschedule} className="flex flex-col gap-4">
+                <div>
+                  <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
+                    Serviços
+                  </label>
+                  <div className="flex max-h-44 flex-col gap-1.5 overflow-y-auto rounded-xl border border-slate-100 p-2">
+                    {services.map((service) => {
+                      const selected = editServiceIds.includes(service.id)
+                      return (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => toggleEditService(service.id)}
+                          className={`mobile-tap flex items-center justify-between rounded-lg border px-3 py-2.5 text-left transition ${selected ? "border-slate-800 bg-slate-50" : "border-slate-100 bg-white"}`}
+                        >
+                          <span>
+                            <span className="block text-xs font-extrabold text-slate-700">{service.name}</span>
+                            <span className="text-[10px] font-semibold text-slate-400">{service.duration_minutes} min · R$ {service.price.toFixed(2)}</span>
+                          </span>
+                          <i className={`ti ${selected ? "ti-circle-check-filled text-emerald-600" : "ti-circle text-slate-300"}`} />
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {editServiceIds.length === 0 && <p className="mt-1 text-[10px] font-semibold text-red-600">Selecione pelo menos um serviço.</p>}
+                </div>
                 <div>
                   <label className="mb-1.5 block text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                     Profissional
@@ -695,7 +725,7 @@ export default function AgendaMobile() {
                   </button>
                   <button
                     type="submit"
-                    disabled={updatingStatus || !editTime}
+                    disabled={updatingStatus || !editTime || editServiceIds.length === 0}
                     className="mobile-tap rounded-xl py-3 text-xs font-extrabold text-white shadow-md transition active:scale-95 disabled:opacity-50"
                     style={{ backgroundColor: "var(--color-primary)" }}
                   >

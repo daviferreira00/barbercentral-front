@@ -10,9 +10,17 @@ import {
   cleanDate,
 } from "../types"
 
+interface AgendaService {
+  id: string
+  name: string
+  duration_minutes: number
+  price: number
+}
+
 // Estado e ações da agenda, compartilhados pelas views desktop e mobile
 export function useAgenda() {
   const [professionals, setProfessionals] = useState<Professional[]>([])
+  const [services, setServices] = useState<AgendaService[]>([])
   const [selectedProfId, setSelectedProfId] = useState<string>("")
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<"day" | "week">("day")
@@ -34,6 +42,7 @@ export function useAgenda() {
   const [editProfId, setEditProfId] = useState("")
   const [editDate, setEditDate] = useState("")
   const [editTime, setEditTime] = useState("")
+  const [editServiceIds, setEditServiceIds] = useState<string[]>([])
   const [editSlots, setEditSlots] = useState<any[]>([])
   const [loadingEditSlots, setLoadingEditSlots] = useState(false)
 
@@ -47,9 +56,11 @@ export function useAgenda() {
 
   const loadFilterData = async () => {
     const res = await http.get<Professional[]>("/professionals")
+    const resServices = await http.get<AgendaService[]>("/services")
     if (res.data) {
       setProfessionals(res.data)
     }
+    if (resServices.data) setServices(resServices.data)
   }
 
   const activeDateStr = formatDateString(currentDate)
@@ -118,17 +129,31 @@ export function useAgenda() {
 
   // Busca slots livres para reagendamento
   useEffect(() => {
-    if (isEditing && editProfId && editDate && selectedApp) {
+    if (isEditing && editProfId && editDate && editServiceIds.length > 0) {
       setLoadingEditSlots(true)
-      const svcParam = (selectedApp.services || []).map((s) => `service_ids=${s.service_id}`).join("&")
+      const svcParam = editServiceIds.map((id) => `service_ids=${id}`).join("&")
       http.get<any[]>(`/appointments/availability?date=${editDate}&professional_id=${editProfId}&${svcParam}`).then((res) => {
         setLoadingEditSlots(false)
-        if (res.data) setEditSlots(res.data)
+        if (res.data) {
+          const originalTime = selectedApp?.start_time.substring(0, 5)
+          const keepsOriginalPosition = editProfId === selectedApp?.professional_id && editDate === cleanDate(selectedApp?.date)
+          const slots = [...res.data]
+          if (keepsOriginalPosition && originalTime && !slots.some((slot) => slot.start_time.substring(0, 5) === originalTime)) {
+            slots.push({ start_time: originalTime, end_time: selectedApp?.end_time.substring(0, 5) })
+            slots.sort((a, b) => a.start_time.localeCompare(b.start_time))
+          }
+          setEditSlots(slots)
+        }
       })
     } else {
       setEditSlots([])
     }
-  }, [isEditing, editProfId, editDate])
+  }, [isEditing, editProfId, editDate, editServiceIds])
+
+  const toggleEditService = (id: string) => {
+    setEditServiceIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
+    setEditTime("")
+  }
 
   const navigateDate = (dir: "prev" | "next" | "today") => {
     const d = new Date(currentDate)
@@ -194,11 +219,12 @@ export function useAgenda() {
 
   const handleReschedule = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedApp || !editProfId || !editDate || !editTime) return
+    if (!selectedApp || !editProfId || !editDate || !editTime || editServiceIds.length === 0) return
 
     setUpdatingStatus(true)
     const res = await http.put(`/appointments/${selectedApp.id}`, {
       professional_id: editProfId,
+      service_ids: editServiceIds,
       date: editDate,
       start_time: editTime,
     })
@@ -273,6 +299,7 @@ export function useAgenda() {
 
   return {
     professionals,
+    services,
     selectedProfId,
     setSelectedProfId,
     currentDate,
@@ -297,6 +324,9 @@ export function useAgenda() {
     setEditDate,
     editTime,
     setEditTime,
+    editServiceIds,
+    setEditServiceIds,
+    toggleEditService,
     editSlots,
     loadingEditSlots,
     isCancellingWithReason,

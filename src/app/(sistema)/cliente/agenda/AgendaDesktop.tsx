@@ -23,6 +23,7 @@ import {
 export default function AgendaDesktop() {
   const {
     professionals,
+    services,
     selectedProfId,
     setSelectedProfId,
     currentDate,
@@ -46,6 +47,9 @@ export default function AgendaDesktop() {
     setEditDate,
     editTime,
     setEditTime,
+    editServiceIds,
+    setEditServiceIds,
+    toggleEditService,
     editSlots,
     loadingEditSlots,
     isCancellingWithReason,
@@ -455,7 +459,7 @@ export default function AgendaDesktop() {
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
-                {isEditing ? "Reagendar Agendamento" : isCancellingWithReason ? "Confirmar Cancelamento" : "Detalhes do Agendamento"}
+                {isEditing ? "Editar Agendamento" : isCancellingWithReason ? "Confirmar Cancelamento" : "Detalhes do Agendamento"}
               </DialogTitle>
             </DialogHeader>
 
@@ -484,6 +488,24 @@ export default function AgendaDesktop() {
             ) : isEditing ? (
               /* MODO REAGENDAMENTO / EDIÇÃO */
               <form onSubmit={handleReschedule} className="space-y-4 py-2">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-500 uppercase">Serviços</label>
+                  <div className="grid max-h-40 grid-cols-2 gap-2 overflow-y-auto rounded-lg border border-slate-100 p-2">
+                    {services.map((service) => {
+                      const selected = editServiceIds.includes(service.id)
+                      return (
+                        <button key={service.id} type="button" onClick={() => toggleEditService(service.id)} className={`flex items-center justify-between rounded-lg border p-2 text-left ${selected ? "border-slate-800 bg-slate-50" : "border-slate-200 bg-white"}`}>
+                          <span>
+                            <span className="block text-xs font-bold text-slate-700">{service.name}</span>
+                            <span className="text-[10px] text-slate-400">{service.duration_minutes} min · R$ {service.price.toFixed(2)}</span>
+                          </span>
+                          <i className={`ti ${selected ? "ti-circle-check-filled text-emerald-600" : "ti-circle text-slate-300"}`} />
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {editServiceIds.length === 0 && <p className="text-[10px] font-semibold text-red-600">Selecione pelo menos um serviço.</p>}
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-slate-500 uppercase">Profissional</label>
@@ -558,7 +580,7 @@ export default function AgendaDesktop() {
                   <Button type="button" variant="ghost" onClick={() => setIsEditing(false)}>
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={updatingStatus || !editTime} className="font-bold">
+                  <Button type="submit" disabled={updatingStatus || !editTime || editServiceIds.length === 0} className="font-bold">
                     Salvar Alterações
                   </Button>
                 </div>
@@ -751,12 +773,13 @@ export default function AgendaDesktop() {
                           setEditProfId(selectedApp.professional_id)
                           setEditDate(cleanDate(selectedApp.date))
                           setEditTime(selectedApp.start_time.substring(0, 5))
+                          setEditServiceIds(selectedApp.services.map((service) => service.service_id))
                           setIsEditing(true)
                         }}
                         disabled={updatingStatus}
                         className="bg-slate-100 text-slate-700 hover:bg-slate-200 text-[10px] font-bold h-8 px-2.5"
                       >
-                        Reagendar
+                        Editar
                       </Button>
                     </>
                   )}
