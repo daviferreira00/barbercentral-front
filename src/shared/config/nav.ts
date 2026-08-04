@@ -47,3 +47,16 @@ export const clienteNavSections: NavSection[] = [
     ],
   },
 ]
+
+export const adminNavSections: NavSection[] = [
+  {
+    title: "Plataforma",
+    items: [
+      { href: "/admin", icon: "ti-layout-dashboard", label: "Visão Geral" },
+      { href: "/admin/clientes", icon: "ti-building-store", label: "Barbearias" },
+      { href: "/admin/usuarios", icon: "ti-users", label: "Usuários" },
+      { href: "/admin/planos", icon: "ti-credit-card", label: "Planos SaaS" },
+      { href: "/admin/whatsapp", icon: "ti-brand-whatsapp", label: "Conexões WhatsApp" },
+    ],
+  },
+]

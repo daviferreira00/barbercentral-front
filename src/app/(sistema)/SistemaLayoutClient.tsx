@@ -68,8 +68,8 @@ export default function SistemaLayoutClient({
     )
   }
 
-  // Experiência mobile dedicada (painel da barbearia)
-  if (isMobile && !isAdmin) {
+  // Experiência mobile dedicada em formato de app
+  if (isMobile) {
     return (
       <>
         <MobileShell user={user} tenantData={tenantData} onLogout={logout}>

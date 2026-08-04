@@ -2,6 +2,7 @@
 
 import { useApp } from "@/shared/context/AppContext"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { AdminDashboardMobile } from "./AdminDashboardMobile"
 
 export default function AdminPage() {
   const { user } = useApp()
@@ -9,7 +10,9 @@ export default function AdminPage() {
   if (!user) return null
 
   return (
-    <div className="space-y-6 w-full animate-fade-in">
+    <>
+      <div className="xl:hidden"><AdminDashboardMobile /></div>
+      <div className="hidden xl:block space-y-6 w-full animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Visão Geral</h1>
         <p className="text-sm text-slate-500 mt-1">
@@ -119,6 +122,7 @@ export default function AdminPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   )
 }

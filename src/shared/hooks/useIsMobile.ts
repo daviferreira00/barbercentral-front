@@ -2,8 +2,9 @@
 
 import { useSyncExternalStore } from "react"
 
-// Mesmo breakpoint do `md:` do Tailwind — abaixo de 768px é experiência mobile
-const MOBILE_QUERY = "(max-width: 767px)"
+// Celulares e tablets usam a experiência em formato de app. O desktop completo
+// só entra quando há largura suficiente para sidebar e conteúdo lado a lado.
+const MOBILE_QUERY = "(max-width: 1199px)"
 
 function subscribe(onChange: () => void) {
   const mql = window.matchMedia(MOBILE_QUERY)
@@ -18,7 +19,7 @@ const getServerSnapshot = () => null
 
 /**
  * Retorna `null` antes do primeiro paint no cliente (renderize um fallback),
- * depois `true` (<768px) ou `false` (>=768px), reagindo a resize/rotação.
+ * depois `true` (<1200px) ou `false` (>=1200px), reagindo a resize/rotação.
  */
 export function useIsMobile(): boolean | null {
   return useSyncExternalStore<boolean | null>(subscribe, getSnapshot, getServerSnapshot)

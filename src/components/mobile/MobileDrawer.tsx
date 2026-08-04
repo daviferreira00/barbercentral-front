@@ -16,6 +16,7 @@ interface MobileDrawerProps {
   tenantName?: string | null
   onLogout: () => void
   onSwitchClient?: () => void
+  variant?: "admin" | "tenant"
 }
 
 export function MobileDrawer({
@@ -27,6 +28,7 @@ export function MobileDrawer({
   tenantName,
   onLogout,
   onSwitchClient,
+  variant = "tenant",
 }: MobileDrawerProps) {
   const pathname = usePathname()
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
@@ -41,8 +43,10 @@ export function MobileDrawer({
     }
   }, [open])
 
-  const isActive = (href: string) =>
-    href === "/cliente" ? pathname?.endsWith("/cliente") : pathname?.includes(href)
+  const isActive = (href: string) => {
+    if (href === "/cliente" || href === "/admin") return pathname === href
+    return pathname?.includes(href)
+  }
 
   const toggleSection = (title: string) => {
     haptic()
@@ -71,8 +75,9 @@ export function MobileDrawer({
         <div
           className="px-5 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-5 text-white"
           style={{
-            background:
-              "linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 65%, black))",
+            background: variant === "admin"
+              ? "linear-gradient(135deg, #111827, #070b1d)"
+              : "linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 65%, black))",
           }}
         >
           <div className="flex items-center gap-3">
@@ -139,7 +144,7 @@ export function MobileDrawer({
                         }`}
                         style={{
                           animationDelay: delay,
-                          ...(active ? { backgroundColor: "var(--color-primary)" } : {}),
+                          ...(active ? { backgroundColor: variant === "admin" ? "#0b1023" : "var(--color-primary)" } : {}),
                         }}
                       >
                         <i className={`ti ${item.icon} text-lg ${active ? "" : "text-slate-400"}`} />

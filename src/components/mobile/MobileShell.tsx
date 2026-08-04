@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { clienteNavSections } from "@/shared/config/nav"
+import { adminNavSections, clienteNavSections } from "@/shared/config/nav"
 import { haptic } from "@/shared/lib/haptics"
 import { useApp } from "@/shared/context/AppContext"
 import { MobileDrawer } from "./MobileDrawer"
@@ -22,6 +22,7 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
 
   // Só oferece a troca quando há para onde trocar (2+ vínculos ou admin impersonando)
   const canSwitchClient = myClients.length > 1 || !!sessionUser?.impersonating
+  const isAdmin = user.role === "admin"
 
   const logoUrl =
     tenantData && (tenantData.logo_url || tenantData.logo_central)
@@ -34,8 +35,9 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
       <header
         className="fixed inset-x-0 top-0 z-40 text-white"
         style={{
-          background:
-            "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 92%, white), color-mix(in srgb, var(--color-primary) 70%, black))",
+          background: isAdmin
+            ? "linear-gradient(135deg, #0f172a, #020617)"
+            : "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 92%, white), color-mix(in srgb, var(--color-primary) 70%, black))",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
           paddingTop: "env(safe-area-inset-top)",
@@ -79,12 +81,13 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
       <MobileDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        sections={clienteNavSections}
+        sections={isAdmin ? adminNavSections : clienteNavSections}
         userName={user.name}
         userRole={user.role === "admin" ? "Administrador" : "Dono da Barbearia"}
-        tenantName={tenantData?.client_name || null}
+        tenantName={isAdmin ? "BarberCentral" : tenantData?.client_name || null}
         onLogout={onLogout}
         onSwitchClient={canSwitchClient ? () => setSelectorOpen(true) : undefined}
+        variant={isAdmin ? "admin" : "tenant"}
       />
 
       <SplashScreen logoUrl={logoUrl} name={tenantData?.client_name} />
