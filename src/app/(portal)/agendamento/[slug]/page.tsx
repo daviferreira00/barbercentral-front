@@ -8,6 +8,7 @@ interface PublicClientData {
   client_name: string
   client_slug: string
   logo_url?: string
+  logo_central?: string
   color_primary: string
   color_secondary: string
   font_family: string

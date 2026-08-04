@@ -456,18 +456,30 @@ export default function IdentidadeVisualDesktop() {
             </div>
 
             {/* Celular Mockup */}
-            <div className="relative mx-auto max-w-[340px] h-[640px] rounded-[40px] border-[10px] border-slate-900 bg-slate-50 shadow-2xl overflow-hidden flex flex-col font-sans">
+            <div
+              className="relative mx-auto max-w-[340px] h-[640px] rounded-[40px] border-[10px] border-slate-900 bg-slate-50 shadow-2xl overflow-hidden flex flex-col font-sans"
+              style={previewBgStyle}
+            >
               {/* Speaker & Camera Notch */}
               <div className="absolute top-0 inset-x-0 h-4 bg-slate-900 flex justify-center items-center z-50">
                 <div className="w-16 h-2.5 bg-black rounded-full" />
               </div>
 
+              {logoCentral && (
+                <img
+                  src={logoCentral}
+                  alt=""
+                  aria-hidden="true"
+                  onError={(event) => { event.currentTarget.style.display = "none" }}
+                  className="pointer-events-none absolute left-1/2 top-1/2 z-0 w-[62%] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
+                />
+              )}
+
               {/* Portal Content Scrollable */}
               <div
-                className="flex-grow overflow-y-auto pt-6 pb-4"
+                className="relative z-10 flex-grow overflow-y-auto pt-6 pb-4"
                 style={{
-                  fontFamily: fontFamily === "Playfair Display" ? "Georgia, serif" : fontFamily,
-                  ...previewBgStyle
+                  fontFamily: fontFamily === "Playfair Display" ? "Georgia, serif" : fontFamily
                 }}
               >
                 {/* Header do Portal com fundo escurecido translúcido sobre o background geral */}
@@ -541,7 +553,7 @@ export default function IdentidadeVisualDesktop() {
               </div>
 
               {/* Footer Mockup */}
-              <div className="bg-slate-100 py-3 text-center border-t border-slate-200 text-[8px] text-slate-400 font-bold uppercase tracking-widest">
+              <div className="relative z-10 bg-slate-100 py-3 text-center border-t border-slate-200 text-[8px] text-slate-400 font-bold uppercase tracking-widest">
                 Powered by BarberCentral
               </div>
             </div>

@@ -490,19 +490,31 @@ export default function IdentidadeVisualMobile() {
       {activeTab === "preview" && (
         <div className="flex flex-col items-center justify-center py-2 animate-card-enter">
           {/* Celular Mockup */}
-          <div className="relative w-full max-w-[315px] h-[550px] rounded-[36px] border-[8px] border-slate-900 bg-slate-50 shadow-lg overflow-hidden flex flex-col font-sans">
+          <div
+            className="relative w-full max-w-[315px] h-[550px] rounded-[36px] border-[8px] border-slate-900 bg-slate-50 shadow-lg overflow-hidden flex flex-col font-sans"
+            style={previewBgStyle}
+          >
             
             {/* Notch */}
             <div className="absolute top-0 inset-x-0 h-4 bg-slate-900 flex justify-center items-center z-50">
               <div className="w-14 h-2 bg-black rounded-full" />
             </div>
 
+            {logoCentral && (
+              <img
+                src={logoCentral}
+                alt=""
+                aria-hidden="true"
+                onError={(event) => { event.currentTarget.style.display = "none" }}
+                className="pointer-events-none absolute left-1/2 top-1/2 z-0 w-[62%] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
+              />
+            )}
+
             {/* Content */}
             <div
-              className="flex-grow overflow-y-auto pt-5 pb-4"
+              className="relative z-10 flex-grow overflow-y-auto pt-5 pb-4"
               style={{
-                fontFamily: fontFamily === "Playfair Display" ? "Georgia, serif" : fontFamily,
-                ...previewBgStyle
+                fontFamily: fontFamily === "Playfair Display" ? "Georgia, serif" : fontFamily
               }}
             >
               {/* Header do Portal com fundo escurecido translúcido sobre o background geral */}

@@ -13,6 +13,7 @@ interface PublicClientData {
   client_name: string
   client_slug: string
   logo_url?: string
+  logo_central?: string
   color_primary: string
   color_secondary: string
   font_family: string
@@ -88,6 +89,19 @@ const getLocalDateString = (d: Date) => {
   return `${year}-${month}-${day}`
 }
 
+const resolvePublicAssetUrl = (url?: string) => {
+  if (!url) return ""
+  try {
+    const parsed = new URL(url)
+    if ((parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") && parsed.pathname.startsWith("/uploads/")) {
+      return `/backend-uploads/${parsed.pathname.slice("/uploads/".length)}`
+    }
+  } catch {
+    // URLs relativas já são servidas pelo diretório public do frontend.
+  }
+  return url
+}
+
 export default function PortalAgendamentoClient({ config }: { config: PublicClientData }) {
   const [step, setStep] = useState(1)
 
@@ -114,6 +128,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   const [submitting, setSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successApp, setSuccessApp] = useState<AppointmentResponse | null>(null)
+  const [watermarkFailed, setWatermarkFailed] = useState(false)
 
   // Verification states
   const [showVerificationStep, setShowVerificationStep] = useState(false)
@@ -367,7 +382,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border border-white/10">
               {config.logo_url ? (
-                <img src={config.logo_url} alt="Logo" className="h-full w-full object-contain p-1" />
+                <img src={resolvePublicAssetUrl(config.logo_url)} alt="Logo" className="h-full w-full object-contain p-1" />
               ) : (
                 <i className="ti ti-cut text-lg" />
               )}
@@ -404,7 +419,17 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-2xl mx-auto p-4 md:py-8 space-y-6">
+      <main className="relative flex-1 w-full overflow-hidden">
+        {config.logo_central && !watermarkFailed && (
+          <img
+            src={resolvePublicAssetUrl(config.logo_central)}
+            alt=""
+            aria-hidden="true"
+            onError={() => setWatermarkFailed(true)}
+            className="pointer-events-none fixed left-1/2 top-[55%] z-0 max-h-[60vh] w-[clamp(180px,30vw,460px)] -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-[0.05]"
+          />
+        )}
+        <div className="relative z-10 w-full max-w-2xl mx-auto p-4 md:py-8 space-y-6">
         {/* Stepper visual (Passos 1 a 5) */}
         {step <= 5 && (
           <div className="flex justify-between items-center bg-white border border-slate-100 p-3.5 rounded-xl shadow-sm overflow-x-auto whitespace-nowrap gap-4">
@@ -1011,6 +1036,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
             </a>
           </div>
         )}
+        </div>
       </main>
 
       {/* Footer simples do Portal */}
