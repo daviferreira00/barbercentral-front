@@ -142,6 +142,13 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
   const [calendarYear, setCalendarYear] = useState<number>(() => new Date().getFullYear())
   const [calendarMonth, setCalendarMonth] = useState<number>(() => new Date().getMonth())
 
+  const getBookingLimitDate = () => {
+    const limit = new Date()
+    limit.setHours(23, 59, 59, 999)
+    limit.setDate(limit.getDate() + config.max_advance_days)
+    return limit
+  }
+
   const getDaysForCalendar = (year: number, month: number) => {
     const daysInMonth = new Date(year, month + 1, 0).getDate()
     const firstDayIndex = new Date(year, month, 1).getDay()
@@ -661,11 +668,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                     <Button
                       variant="ghost"
                       size="sm"
-                      disabled={(() => {
-                        const limitFuture = new Date(2028, 11, 31)
-                        const nextMonthFirstDay = new Date(calendarYear, calendarMonth + 1, 1)
-                        return nextMonthFirstDay > limitFuture
-                      })()}
+                      disabled={new Date(calendarYear, calendarMonth + 1, 1) > getBookingLimitDate()}
                       onClick={() => {
                         if (calendarMonth === 11) {
                           setCalendarMonth(0)
@@ -707,8 +710,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                     
                     const isPast = day < todayDate
                     
-                    const limitFuture = new Date(2028, 11, 31)
-                    const isTooFar = day > limitFuture
+                    const isTooFar = day > getBookingLimitDate()
                     
                     const isDisabled = isPast || isTooFar
 

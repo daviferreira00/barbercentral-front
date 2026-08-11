@@ -66,7 +66,7 @@ export function useConfigIdentidadeVisual() {
   const [cancelHours, setCancelHours] = useState("2")
   const [requiresLogin, setRequiresLogin] = useState(false)
   const [minAdvance, setMinAdvance] = useState("1")
-  const [maxAdvance, setMaxAdvance] = useState("30")
+  const [maxAdvance, setMaxAdvance] = useState("60")
   const [interval, setInterval] = useState("15")
   const [kdsPin, setKdsPin] = useState("")
   const [blockLunchEnabled, setBlockLunchEnabled] = useState(false)
@@ -174,7 +174,7 @@ export function useConfigIdentidadeVisual() {
       cancellation_policy_hours: parseInt(cancelHours) || 2,
       booking_requires_login: requiresLogin ? 1 : 0,
       min_advance_hours: parseInt(minAdvance) || 1,
-      max_advance_days: parseInt(maxAdvance) || 30,
+      max_advance_days: parseInt(maxAdvance) || 60,
       interval_between_minutes: parseInt(interval) || 0,
       kds_pin: kdsPin || null,
       block_lunch_enabled: blockLunchEnabled ? 1 : 0,
