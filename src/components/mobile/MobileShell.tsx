@@ -46,8 +46,7 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
 
   const isDarkBg =
     tenantData?.background_type === "solid_dark" ||
-    tenantData?.background_type === "dark" ||
-    isDarkColor(tenantData?.color_primary || "#1a1a1a")
+    tenantData?.background_type === "dark"
 
   const getUserRoleLabel = () => {
     if (isAdmin) return "Administrador"

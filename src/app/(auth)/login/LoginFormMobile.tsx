@@ -432,12 +432,12 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
             <button
               type="submit"
               disabled={submitting}
-              className="mobile-tap w-full h-11 rounded-xl text-xs font-black text-slate-900 shadow-md flex items-center justify-center gap-2 active:scale-[0.98] transition disabled:opacity-50"
-              style={{ backgroundColor: "var(--color-primary, #f59e0b)" }}
+              className="mobile-tap w-full h-11 rounded-xl text-xs font-black text-white shadow-md flex items-center justify-center gap-2 active:scale-[0.98] transition disabled:opacity-50"
+              style={{ backgroundColor: "var(--color-button, var(--color-primary, #1a1a1a))", color: "#ffffff" }}
             >
               {submitting ? (
                 <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   <span>Processando...</span>
                 </div>
               ) : mode === "credentials" ? (

@@ -103,8 +103,8 @@ export default function DashboardMobile() {
     <div className="flex flex-col gap-5 animate-fade-in">
       {/* Saudação */}
       <div>
-        <h1 className="text-xl font-extrabold text-slate-800">Olá, {firstName} 👋</h1>
-        <p className="text-xs font-semibold text-slate-400">
+        <h1 className="text-xl font-extrabold text-slate-800 dark:text-slate-100">Olá, {firstName} 👋</h1>
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-400">
           Confira a movimentação da sua barbearia hoje.
         </p>
       </div>
@@ -230,7 +230,7 @@ export default function DashboardMobile() {
 
       {/* Próximos atendimentos */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-500">
+        <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-300">
           Próximos atendimentos
         </h2>
         <Link
