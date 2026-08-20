@@ -14,17 +14,55 @@ import { http } from "@/shared/lib/http"
 
 export default function SistemaLayoutClient({ 
   children,
-  tenantData
+  tenantData: initialTenantData
 }: { 
   children: React.ReactNode
   tenantData: any
 }) {
   const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout, setSelectorOpen } = useApp()
+  const [tenantData, setTenantData] = useState(initialTenantData)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
   const isMobile = useIsMobile()
   const [unreadCount, setUnreadCount] = useState(0)
+
+  // Sincroniza initialTenantData se mudar no SSR
+  useEffect(() => {
+    if (initialTenantData) {
+      setTenantData(initialTenantData)
+    }
+  }, [initialTenantData])
+
+  // Injeta dinamicamente as variáveis CSS no elemento raiz quando tenantData atualizar
+  useEffect(() => {
+    const root = document.documentElement
+    const primary = tenantData?.color_primary || "#1a1a1a"
+    const secondary = tenantData?.color_secondary || "#c9a84c"
+    const button = tenantData?.color_button || primary
+
+    root.style.setProperty("--color-primary", primary)
+    root.style.setProperty("--color-secondary", secondary)
+    root.style.setProperty("--color-button", button)
+  }, [tenantData])
+
+  // Busca branding no cliente se o usuário for de barbearia (dono/barbeiro/profissional)
+  useEffect(() => {
+    if (!user || user.role === "admin") return
+
+    const fetchBranding = async () => {
+      try {
+        const res = await http.get<any>("/config/branding")
+        if (res.data) {
+          setTenantData(res.data)
+        }
+      } catch {
+        // Silencioso em falhas temporárias
+      }
+    }
+
+    fetchBranding()
+  }, [user?.client_id, user?.id, user?.role])
 
   useEffect(() => {
     if (!user || user.role === "admin") return

@@ -24,9 +24,9 @@ export default async function SistemaLayout({ children }: { children: React.Reac
   const tenantData = await getBranding()
 
   const customStyles = {
-    "--color-primary": tenantData?.color_primary || "#6366f1",
-    "--color-secondary": tenantData?.color_secondary || "#d97706",
-    "--color-button": tenantData?.color_button || tenantData?.color_primary || "#6366f1",
+    "--color-primary": tenantData?.color_primary || "#1a1a1a",
+    "--color-secondary": tenantData?.color_secondary || "#c9a84c",
+    "--color-button": tenantData?.color_button || tenantData?.color_primary || "#1a1a1a",
   } as React.CSSProperties
 
   return (
