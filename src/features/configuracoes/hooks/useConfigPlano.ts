@@ -13,6 +13,7 @@ export interface Plan {
   has_stock: number
   has_reports: number
   has_online_booking: number
+  has_whatsapp?: number
   is_public: number
   price: number
 }

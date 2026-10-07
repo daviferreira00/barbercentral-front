@@ -20,6 +20,7 @@ interface Plan {
 	has_stock: number
 	has_reports: number
 	has_online_booking: number
+	has_whatsapp?: number
 	is_public: number
 	price: number
 }
@@ -44,6 +45,7 @@ export default function AdminPlanDetailPage({ params }: { params: { id: string }
 	const [hasStock, setHasStock] = useState(false)
 	const [hasReports, setHasReports] = useState(false)
 	const [hasOnlineBooking, setHasOnlineBooking] = useState(true)
+	const [hasWhatsApp, setHasWhatsApp] = useState(false)
 	const [isPublic, setIsPublic] = useState(true)
 
 	const loadPlan = async () => {
@@ -71,6 +73,7 @@ export default function AdminPlanDetailPage({ params }: { params: { id: string }
 				setHasStock(match.has_stock === 1)
 				setHasReports(match.has_reports === 1)
 				setHasOnlineBooking(match.has_online_booking === 1)
+				setHasWhatsApp(match.has_whatsapp === 1)
 				setIsPublic(match.is_public === 1)
 			} else {
 				setErrorMsg("Plano não encontrado.")
@@ -98,6 +101,7 @@ export default function AdminPlanDetailPage({ params }: { params: { id: string }
 			has_stock: hasStock ? 1 : 0,
 			has_reports: hasReports ? 1 : 0,
 			has_online_booking: hasOnlineBooking ? 1 : 0,
+			has_whatsapp: hasWhatsApp ? 1 : 0,
 			is_public: isPublic ? 1 : 0,
 		}
 
@@ -325,6 +329,28 @@ export default function AdminPlanDetailPage({ params }: { params: { id: string }
 								<span
 									className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
 										hasReports ? "translate-x-5" : "translate-x-0"
+									}`}
+								/>
+							</button>
+						</div>
+
+						<div className="flex items-center justify-between pb-3 border-b">
+							<div className="space-y-0.5">
+								<label className="font-semibold text-slate-700 text-sm">Integração Total WhatsApp & Lembretes</label>
+								<p className="text-xs text-muted-foreground">Habilita disparo de confirmações, alertas automáticos e chat no painel.</p>
+							</div>
+							<button
+								type="button"
+								role="switch"
+								aria-checked={hasWhatsApp}
+								onClick={() => setHasWhatsApp(!hasWhatsApp)}
+								className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+									hasWhatsApp ? "bg-primary" : "bg-slate-200"
+								}`}
+							>
+								<span
+									className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+										hasWhatsApp ? "translate-x-5" : "translate-x-0"
 									}`}
 								/>
 							</button>

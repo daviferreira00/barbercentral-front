@@ -166,6 +166,7 @@ export default function ConfigPlanoDesktop() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {renderFeatureRow("Portal de Auto-Agendamento Online", plan.has_online_booking === 1)}
+          {renderFeatureRow("Automação WhatsApp & Lembretes", plan.has_whatsapp === 1)}
           {renderFeatureRow("Programa de Fidelidade (Pontos/Carimbos)", plan.has_loyalty === 1)}
           {renderFeatureRow("Controle de Estoque & Consumo", plan.has_stock === 1)}
           {renderFeatureRow("Relatórios & Gráficos Financeiros", plan.has_reports === 1)}

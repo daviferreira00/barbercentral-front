@@ -155,6 +155,7 @@ export default function ConfigPlanoMobile() {
         <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Funcionalidades do Plano</h3>
         <div className="flex flex-col gap-2">
           {renderFeatureRow("Agendamento Online", plan.has_online_booking === 1)}
+          {renderFeatureRow("Automação WhatsApp", plan.has_whatsapp === 1)}
           {renderFeatureRow("Programa de Fidelidade", plan.has_loyalty === 1)}
           {renderFeatureRow("Controle de Estoque", plan.has_stock === 1)}
           {renderFeatureRow("Relatórios Financeiros", plan.has_reports === 1)}
