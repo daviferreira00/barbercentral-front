@@ -467,8 +467,14 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
         </form>
       </div>
 
-      {/* Bottom section: Footer */}
-      <div className="text-center pb-4 z-10 shrink-0">
+      {/* Bottom section: Footer & Cadastro */}
+      <div className="text-center pb-4 px-4 z-10 shrink-0 flex flex-col gap-3 items-center">
+        <a
+          href="/cadastro"
+          className="w-full max-w-sm py-2.5 px-4 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
+        >
+          <span>🚀 Não tem conta? Testar 7 Dias Grátis</span>
+        </a>
         <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
           &copy; {new Date().getFullYear()} BarberCentral
         </p>

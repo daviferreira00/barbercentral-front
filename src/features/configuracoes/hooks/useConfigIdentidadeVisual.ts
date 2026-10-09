@@ -132,22 +132,66 @@ export function useConfigIdentidadeVisual() {
 
     const endpoint = type === "header" ? "/config/logo" : "/config/logo-central"
     const res = await http.post<{ logo_url: string }>(endpoint, formData)
-    setUploading(false)
+    
+    // Reseta o valor do input para permitir upload do mesmo arquivo novamente se necessário
+    e.target.value = ""
 
     if (res.error) {
-      setErrorMsg(res.error.message)
+      setUploading(false)
+      setErrorMsg(res.error.message || "Erro ao realizar upload da imagem.")
       return
     }
 
     if (res.data) {
+      const newLogoUrl = res.data.logo_url
+      const updatedHeaderLogo = type === "header" ? newLogoUrl : (logoUrl || null)
+      const updatedCentralLogo = type === "central" ? newLogoUrl : (logoCentral || null)
+
       if (type === "header") {
-        setLogoUrl(res.data.logo_url)
+        setLogoUrl(newLogoUrl)
       } else {
-        setLogoCentral(res.data.logo_url)
+        setLogoCentral(newLogoUrl)
+      }
+
+      // Salva imediatamente no banco de dados para evitar perda ao recarregar a página
+      await http.put<ClientConfig>("/config", {
+        color_primary: colorPrimary,
+        color_secondary: colorSecondary,
+        color_button: colorButton,
+        background_type: backgroundType,
+        font_family: fontFamily,
+        logo_url: updatedHeaderLogo,
+        logo_central: updatedCentralLogo,
+        address: address ? address : null,
+        neighborhood: neighborhood ? neighborhood : null,
+        city: city ? city : null,
+        state: state ? state : null,
+        phone: phone ? phone : null,
+        whatsapp: whatsapp ? whatsapp : null,
+        instagram: instagram ? instagram : null,
+        timezone,
+        cancellation_policy_hours: parseInt(cancelHours) || 2,
+        booking_requires_login: requiresLogin ? 1 : 0,
+        min_advance_hours: parseInt(minAdvance) || 1,
+        max_advance_days: parseInt(maxAdvance) || 60,
+        interval_between_minutes: parseInt(interval) || 0,
+        kds_pin: kdsPin || null,
+        block_lunch_enabled: blockLunchEnabled ? 1 : 0,
+        block_lunch_start: blockLunchStart ? `${blockLunchStart}:00` : "12:00:00",
+        block_lunch_end: blockLunchEnd ? `${blockLunchEnd}:00` : "13:00:00",
+        whatsapp_verification_enabled: whatsappVerificationEnabled ? 1 : 0,
+      })
+
+      setUploading(false)
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("branding_updated"))
       }
       setSuccessMsg("Imagem enviada e salva com sucesso!")
+    } else {
+      setUploading(false)
     }
   }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -189,6 +233,9 @@ export function useConfigIdentidadeVisual() {
       return
     }
 
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("branding_updated"))
+    }
     setSuccessMsg("Configurações atualizadas com sucesso!")
     loadConfig()
   }

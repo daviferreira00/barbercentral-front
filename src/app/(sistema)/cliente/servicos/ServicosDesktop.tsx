@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Alert } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
+import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
 
 export default function ServicosDesktop() {
   const {
@@ -26,9 +28,14 @@ export default function ServicosDesktop() {
 
   return (
     <div className="space-y-6 w-full animate-fade-in">
+      <FirstAccessCard moduleId="servicos" />
+
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Serviços da Barbearia</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-slate-800">Serviços da Barbearia</h1>
+            <QuickTutorialButton moduleId="servicos" />
+          </div>
           <p className="text-sm text-slate-500 mt-1">Defina os cortes, barbas, tratamentos e valores oferecidos aos clientes.</p>
         </div>
         <div className="flex gap-2">

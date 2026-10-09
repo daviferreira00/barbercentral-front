@@ -18,9 +18,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         <div className="flex items-center z-10">
           <img
-            src="/logo/barbercentral-logo-horizontal-white.svg"
+            src="/logo/barbercentral-logo-horizontal-white.png"
             alt="BarberCentral"
-            className="h-16 sm:h-20 max-w-[80%] object-contain"
+            className="h-12 w-auto max-w-[260px] object-contain"
           />
         </div>
 

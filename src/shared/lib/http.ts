@@ -36,8 +36,11 @@ export async function request<T>(
       return { data: {} as T }
     }
 
-    const payload = JSON.parse(text) as ApiResponse<T>
-    return payload
+    const raw = JSON.parse(text)
+    if (raw && typeof raw === "object" && ("data" in raw || "error" in raw)) {
+      return raw as ApiResponse<T>
+    }
+    return { data: raw as T }
   } catch (error) {
     return {
       error: {

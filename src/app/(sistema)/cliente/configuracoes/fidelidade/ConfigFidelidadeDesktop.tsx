@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Alert } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input"
 import { Gift, Award, Star, Loader2 } from "lucide-react"
+import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
+import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
 
 export default function ConfigFidelidadeDesktop() {
   const {
@@ -40,9 +42,14 @@ export default function ConfigFidelidadeDesktop() {
 
   return (
     <div className="container max-w-3xl py-8 space-y-8 animate-in fade-in duration-300 px-1 md:px-0">
+      <FirstAccessCard moduleId="fidelidade" />
+
       <div className="flex items-center justify-between border-b pb-4">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Programa de Fidelidade</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-extrabold tracking-tight">Programa de Fidelidade</h1>
+            <QuickTutorialButton moduleId="fidelidade" />
+          </div>
           <p className="text-muted-foreground text-sm mt-1">Recompense seus clientes e aumente a retenção na sua barbearia.</p>
         </div>
         <Award className="h-10 w-10 text-primary" />

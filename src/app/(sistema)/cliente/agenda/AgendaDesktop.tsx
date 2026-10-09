@@ -11,6 +11,8 @@ import { useAgenda } from "@/features/agenda/hooks/useAgenda"
 import { useEffect, useState, useRef } from "react"
 import { Loader2 } from "lucide-react"
 import { http } from "@/shared/lib/http"
+import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
+import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
 import {
   VIEW_MODES,
   formatDateString,
@@ -240,6 +242,8 @@ export default function AgendaDesktop() {
 
   return (
     <div className="space-y-6 w-full animate-fade-in">
+      <FirstAccessCard moduleId="agenda" />
+
       {/* Controles */}
       <div className="flex justify-between items-center flex-wrap gap-4 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">
         <div className="flex items-center gap-3">
@@ -255,6 +259,7 @@ export default function AgendaDesktop() {
           <span className="text-sm font-bold text-slate-800 capitalize pl-1">
             {getHeaderDateLabel()}
           </span>
+          <QuickTutorialButton moduleId="agenda" />
         </div>
 
         <div className="flex items-center gap-3">

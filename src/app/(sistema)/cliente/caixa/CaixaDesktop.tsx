@@ -9,6 +9,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import Link from "next/link"
 import { useCaixa } from "@/features/caixa/hooks/useCaixa"
 import { getMethodLabel } from "@/features/caixa/types"
+import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
+import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
 
 export default function CaixaDesktop() {
 	const {
@@ -59,10 +61,15 @@ export default function CaixaDesktop() {
 
 	return (
 		<div className="space-y-6 w-full animate-fade-in">
+			<FirstAccessCard moduleId="caixa" />
+
 			{/* Topo */}
 			<div className="flex justify-between items-center flex-wrap gap-4">
 				<div>
-					<h1 className="text-2xl font-bold text-slate-800">Fluxo de Caixa</h1>
+					<div className="flex items-center gap-3">
+						<h1 className="text-2xl font-bold text-slate-800">Fluxo de Caixa</h1>
+						<QuickTutorialButton moduleId="caixa" />
+					</div>
 					<p className="text-sm text-slate-500 mt-1">Gerencie a abertura, fechamento e lançamentos financeiros da barbearia.</p>
 				</div>
 				<div className="flex gap-2.5">

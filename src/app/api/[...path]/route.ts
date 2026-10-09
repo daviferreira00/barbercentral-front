@@ -44,10 +44,10 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
       const url = `/uploads/${filename}`
 
       if (isLogo) {
-        return NextResponse.json({ logo_url: url })
+        return NextResponse.json({ data: { logo_url: url } })
       }
       if (isAdminUpload) {
-        return NextResponse.json({ url: url })
+        return NextResponse.json({ data: { url: url } })
       }
       if (isProfPhoto) {
         // Envia a URL salva para o backend associar com o profissional no banco

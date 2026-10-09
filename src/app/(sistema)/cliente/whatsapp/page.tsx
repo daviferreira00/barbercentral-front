@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Alert } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Loader2, Search, ChevronDown, Check } from "lucide-react"
+import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
+import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
 
 interface WhatsAppInstance {
   id: string
@@ -192,13 +194,18 @@ export default function ClientWhatsAppPage() {
 
   return (
     <div className="space-y-6 w-full animate-fade-in px-1 md:px-0">
+      <FirstAccessCard moduleId="whatsapp" />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2">
-            <i className="ti ti-brand-whatsapp text-emerald-500 text-3xl" />
-            Canais de Envio (WhatsApp)
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+              <i className="ti ti-brand-whatsapp text-emerald-500 text-3xl" />
+              Canais de Envio (WhatsApp)
+            </h1>
+            <QuickTutorialButton moduleId="whatsapp" />
+          </div>
           <p className="text-sm text-slate-500 mt-1">
             Conecte celulares da barbearia ou dos barbeiros para disparar lembretes e agendamentos automaticamente.
           </p>

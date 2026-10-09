@@ -163,8 +163,8 @@ export default function LoginFormDesktop({ logoUrl = "/logo/barbercentral-logo-h
         </Button>
       </form>
 
-      {/* Switch de modo */}
-      <div className="text-center pt-2 border-t border-slate-100">
+      {/* Switch de modo & Cadastro */}
+      <div className="text-center pt-3 border-t border-slate-100 flex flex-col gap-3">
         <button
           type="button"
           onClick={() => {
@@ -172,11 +172,18 @@ export default function LoginFormDesktop({ logoUrl = "/logo/barbercentral-logo-h
             setFormError(null)
             setFormSuccess(null)
           }}
-          className="text-xs font-semibold text-primary hover:underline"
+          className="text-xs font-semibold text-slate-500 hover:underline"
           disabled={submitting}
         >
           {mode === "credentials" ? "Entrar com magic link" : "Entrar com e-mail e senha"}
         </button>
+
+        <a
+          href="/cadastro"
+          className="py-2.5 px-4 bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-500/20 hover:to-amber-500/30 text-amber-700 border border-amber-500/40 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
+        >
+          <span>🚀 Não tem conta ainda? Testar 7 Dias Grátis</span>
+        </a>
       </div>
     </div>
   )

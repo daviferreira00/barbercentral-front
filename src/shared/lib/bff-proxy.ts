@@ -18,6 +18,7 @@ export async function bffProxy(
   // Rotas que passam direto pelo proxy sem cookie de sessão
   const isPublic = [
     "/auth/login",
+    "/auth/register-trial",
     "/auth/magic-link",
     "/auth/magic-link/verify",
     "/auth/password-reset",
@@ -65,7 +66,19 @@ export async function bffProxy(
     }
 
     const payload = await res.json().catch(() => ({}))
-    return NextResponse.json(payload, { status: res.status })
+    const response = NextResponse.json(payload, { status: res.status })
+
+    if (res.ok && payload.data?.token) {
+      const token = payload.data.token
+      response.cookies.set("bc_session", token, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 12, // 12 horas
+      })
+    }
+
+    return response
   } catch (error) {
     return NextResponse.json(
       {

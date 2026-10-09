@@ -4,15 +4,22 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert } from "@/components/ui/alert"
 import { useProfissionaisList } from "@/features/profissionais/hooks/useProfissionaisList"
+import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
+import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
 
 export default function ProfissionaisDesktop() {
   const { professionals, loading, statusFilter, setStatusFilter, errorMsg } = useProfissionaisList()
 
   return (
     <div className="space-y-6 w-full animate-fade-in">
+      <FirstAccessCard moduleId="profissionais" />
+
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Profissionais da Barbearia</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-slate-800">Profissionais da Barbearia</h1>
+            <QuickTutorialButton moduleId="profissionais" />
+          </div>
           <p className="text-sm text-slate-500 mt-1">Gerencie a equipe de barbeiros, estilistas e a disponibilidade de agenda.</p>
         </div>
         <a href="/cliente/profissionais/novo">

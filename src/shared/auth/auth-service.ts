@@ -10,6 +10,9 @@ export interface AuthUser {
   impersonating?: boolean
   needs_client_selection?: boolean
   photo_url?: string
+  completed_onboarding?: boolean
+  subscription_status?: string
+  trial_ends_at?: string
 }
 
 export interface ClientMembership {
@@ -26,9 +29,38 @@ export interface LoginCredentials {
   password?: string
 }
 
+export interface RegisterTrialCredentials {
+  barber_name: string
+  name: string
+  email: string
+  phone: string
+  password: string
+}
+
+export interface OnboardingStatus {
+  completed_onboarding: boolean
+  seen_tutorials: string[]
+  subscription_status: string
+  trial_ends_at?: string
+  days_remaining: number
+}
+
+export interface WizardOnboardingData {
+  barber_name: string
+  phone: string
+  service_name?: string
+  price?: number
+  duration?: number
+  owner_name?: string
+}
+
 export const authService = {
   login(credentials: LoginCredentials): Promise<ApiResponse<AuthUser>> {
     return http.post<AuthUser>("/auth/login", credentials)
+  },
+
+  registerTrial(credentials: RegisterTrialCredentials): Promise<ApiResponse<AuthUser>> {
+    return http.post<AuthUser>("/auth/register-trial", credentials)
   },
 
   logout(): Promise<ApiResponse<{ ok: true }>> {
@@ -41,6 +73,18 @@ export const authService = {
 
   myClients(): Promise<ApiResponse<ClientMembership[]>> {
     return http.get<ClientMembership[]>("/auth/my-clients")
+  },
+
+  getOnboardingStatus(): Promise<ApiResponse<OnboardingStatus>> {
+    return http.get<OnboardingStatus>("/auth/onboarding")
+  },
+
+  finishWizard(data: WizardOnboardingData): Promise<ApiResponse<{ ok: boolean }>> {
+    return http.post<{ ok: boolean }>("/auth/onboarding/wizard", data)
+  },
+
+  markTutorialSeen(tutorialId: string): Promise<ApiResponse<{ seen_tutorials: string[] }>> {
+    return http.post<{ seen_tutorials: string[] }>("/auth/tutorials/mark-seen", { tutorial_id: tutorialId })
   },
 
   // Troca a barbearia ativa: o BFF sobrescreve o cookie bc_session com o novo token
@@ -69,3 +113,4 @@ export const authService = {
     return http.post<AuthUser>("/auth/magic-link/verify", { token })
   },
 }
+

@@ -2,7 +2,13 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { authService, type AuthUser, type ClientMembership } from "@/shared/auth/auth-service"
+import {
+  authService,
+  type AuthUser,
+  type ClientMembership,
+  type OnboardingStatus,
+  type WizardOnboardingData,
+} from "@/shared/auth/auth-service"
 import { http } from "@/shared/lib/http"
 
 interface AppContextType {
@@ -21,6 +27,11 @@ interface AppContextType {
   switchClient: (clientId: string) => Promise<string | null>
   returnToAdmin: () => Promise<string | null>
   impersonate: (clientId: string) => Promise<string | null>
+  // Onboarding & Tutoriais
+  onboarding: OnboardingStatus | null
+  refetchOnboarding: () => Promise<void>
+  finishWizard: (data: WizardOnboardingData) => Promise<boolean>
+  markTutorialSeen: (tutorialId: string) => Promise<void>
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -34,13 +45,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [myClients, setMyClients] = useState<ClientMembership[]>([])
   const [selectorOpen, setSelectorOpen] = useState(false)
+  const [onboarding, setOnboarding] = useState<OnboardingStatus | null>(null)
 
   // Evita checagem de auth nas rotas públicas
   const isPublicRoute =
     pathname === "/login" ||
+    pathname === "/cadastro" ||
     pathname === "/esqueci-senha" ||
     pathname === "/criar-senha" ||
     pathname === "/magic-link"
+
+  const refetchOnboarding = async () => {
+    if (!user || !user.client_id) return
+    const res = await authService.getOnboardingStatus()
+    if (res.data) {
+      setOnboarding(res.data)
+    }
+  }
 
   const refreshSession = async () => {
     if (isPublicRoute) {
@@ -52,6 +73,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (res.error) {
       setUser(null)
       setMyClients([])
+      setOnboarding(null)
       if (!isPublicRoute) {
         router.push("/login")
       }
@@ -61,12 +83,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (res.data) {
       setUser(res.data)
-      // Admin usa /admin/clients no seletor; usuário comum lista os vínculos dele
       if (res.data.role !== "admin" && !res.data.impersonating) {
         const clientsRes = await authService.myClients()
         setMyClients(clientsRes.data ?? [])
       } else {
         setMyClients([])
+      }
+
+      if (res.data.client_id) {
+        const onbRes = await authService.getOnboardingStatus()
+        if (onbRes.data) {
+          setOnboarding(onbRes.data)
+        }
       }
     }
     setLoading(false)
@@ -77,13 +105,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await authService.logout()
     setUser(null)
     setMyClients([])
+    setOnboarding(null)
     router.push("/login")
     setLoading(false)
   }
 
-  // As três ações reemitem o JWT e sobrescrevem o cookie httpOnly no BFF;
-  // navegação com reload completo para o layout server-side rebuscar o branding.
-  // Retornam a mensagem de erro (ou null em sucesso) para a UI exibir.
+  const finishWizard = async (data: WizardOnboardingData): Promise<boolean> => {
+    const res = await authService.finishWizard(data)
+    if (res.data?.ok) {
+      await refreshSession()
+      return true
+    }
+    return false
+  }
+
+  const markTutorialSeen = async (tutorialId: string) => {
+    const res = await authService.markTutorialSeen(tutorialId)
+    if (res.data?.seen_tutorials && onboarding) {
+      setOnboarding({
+        ...onboarding,
+        seen_tutorials: res.data.seen_tutorials,
+      })
+    }
+  }
+
   const switchClient = async (clientId: string): Promise<string | null> => {
     const res = await authService.switchClient(clientId)
     if (res.error) return res.error.message
@@ -110,7 +155,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const mustSelectClient = !!user?.needs_client_selection
 
-  // Seleção obrigatória: força o seletor aberto até o usuário escolher
   useEffect(() => {
     if (mustSelectClient) {
       setSelectorOpen(true)
@@ -138,6 +182,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         switchClient,
         returnToAdmin,
         impersonate,
+        onboarding,
+        refetchOnboarding,
+        finishWizard,
+        markTutorialSeen,
       }}
     >
       {children}
@@ -152,3 +200,4 @@ export function useApp() {
   }
   return context
 }
+

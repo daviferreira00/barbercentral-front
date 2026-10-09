@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/shared/hooks/useIsMobile"
 import { MobileShell } from "@/components/mobile/MobileShell"
 import { EstablishmentSelectorModal } from "./EstablishmentSelectorModal"
+import { TrialBanner } from "@/features/onboarding/components/TrialBanner"
+import { WizardOnboarding } from "@/features/onboarding/components/WizardOnboarding"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { http } from "@/shared/lib/http"
@@ -19,13 +21,22 @@ export default function SistemaLayoutClient({
   children: React.ReactNode
   tenantData: any
 }) {
-  const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout, setSelectorOpen } = useApp()
+  const { user, loading, sidebarCollapsed, setSidebarCollapsed, logout, setSelectorOpen, onboarding } = useApp()
   const [tenantData, setTenantData] = useState(initialTenantData)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
   const isMobile = useIsMobile()
   const [unreadCount, setUnreadCount] = useState(0)
+  const [wizardOpen, setWizardOpen] = useState(false)
+
+  useEffect(() => {
+    if (user && user.role !== "admin" && onboarding && onboarding.completed_onboarding === false) {
+      setWizardOpen(true)
+    } else {
+      setWizardOpen(false)
+    }
+  }, [user, onboarding])
 
   // Sincroniza initialTenantData se mudar no SSR
   useEffect(() => {
@@ -62,6 +73,14 @@ export default function SistemaLayoutClient({
     }
 
     fetchBranding()
+
+    const handleBrandingUpdated = () => {
+      fetchBranding()
+    }
+    window.addEventListener("branding_updated", handleBrandingUpdated)
+    return () => {
+      window.removeEventListener("branding_updated", handleBrandingUpdated)
+    }
   }, [user?.client_id, user?.id, user?.role])
 
   useEffect(() => {
@@ -80,18 +99,47 @@ export default function SistemaLayoutClient({
     return () => clearInterval(interval)
   }, [user])
 
-
-
   if (loading || isMobile === null) {
+    const logoSrc =
+      tenantData && (tenantData.logo_central || tenantData.logo_url)
+        ? tenantData.logo_central || tenantData.logo_url
+        : "/logo/barbercentral-logo-horizontal-white.svg"
+
+    const primaryColor = tenantData?.color_primary || "#0f172a"
+
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary border-t-transparent" />
-          <span className="text-sm font-semibold text-slate-500">Carregando painel...</span>
+      <div
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 p-4 text-white animate-fade-in"
+        style={{
+          background: `linear-gradient(160deg, ${primaryColor}, color-mix(in srgb, ${primaryColor} 60%, black))`,
+        }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative flex items-center justify-center p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-xl max-w-[240px]">
+            {logoSrc ? (
+              <img
+                src={logoSrc}
+                alt="Logo Barbearia"
+                className="h-16 w-auto max-w-[200px] object-contain animate-pulse"
+                onError={(e) => {
+                  e.currentTarget.src = "/logo/barbercentral-logo-horizontal-white.svg"
+                }}
+              />
+            ) : (
+              <span className="text-xl font-bold tracking-tight">BarberCentral</span>
+            )}
+          </div>
+          <div className="h-1.5 w-36 overflow-hidden rounded-full bg-white/20">
+            <div className="h-full w-full bg-white/80 animate-loading-bar" />
+          </div>
+          <span className="text-xs font-bold text-white/70 tracking-widest uppercase">
+            Carregando painel...
+          </span>
         </div>
       </div>
     )
   }
+
 
   if (!user) return null
 
@@ -384,6 +432,9 @@ export default function SistemaLayoutClient({
 
       {/* 2. WORKSPACE DIREITA */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        {/* Banner de Trial de 7 Dias */}
+        <TrialBanner />
+
         {/* Topbar */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 z-20">
           <div className="flex items-center gap-4">
@@ -500,6 +551,7 @@ export default function SistemaLayoutClient({
       </div>
 
       <EstablishmentSelectorModal />
+      <WizardOnboarding isOpen={wizardOpen} onClose={() => setWizardOpen(false)} />
     </div>
   )
 }
