@@ -93,7 +93,13 @@ export default function ProfissionalDetailMobile({ professionalId }: { professio
               <i className="ti ti-camera mr-1.5" />
               {uploading ? "Enviando..." : "Alterar Foto"}
             </span>
-            <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={uploading} className="hidden" />
+            <input
+              type="file"
+              accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
+              onChange={handlePhotoUpload}
+              disabled={uploading}
+              className="hidden"
+            />
           </label>
           <p className="text-[10px] font-semibold text-slate-400">PNG, JPG até 5MB</p>
         </div>

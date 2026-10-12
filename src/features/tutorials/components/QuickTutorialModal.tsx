@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { TUTORIALS_DATA, type TutorialModule } from "../data/tutorials"
 import { useApp } from "@/shared/context/AppContext"
 import {
@@ -16,14 +17,32 @@ interface QuickTutorialModalProps {
   onClose: () => void
 }
 
+const MODULE_TABS = [
+  { id: "agenda", label: "Agenda" },
+  { id: "caixa", label: "Caixa" },
+  { id: "profissionais", label: "Equipe" },
+  { id: "servicos", label: "Serviços" },
+  { id: "whatsapp", label: "WhatsApp" },
+  { id: "fidelidade", label: "Fidelidade" },
+  { id: "estoque", label: "Estoque" },
+]
+
 export function QuickTutorialModal({ moduleId, isOpen, onClose }: QuickTutorialModalProps) {
   const { markTutorialSeen } = useApp()
-  const tutorial: TutorialModule | undefined = TUTORIALS_DATA[moduleId]
+  const [activeModuleId, setActiveModuleId] = useState(moduleId)
+
+  useEffect(() => {
+    if (moduleId) {
+      setActiveModuleId(moduleId)
+    }
+  }, [moduleId])
+
+  const tutorial: TutorialModule | undefined = TUTORIALS_DATA[activeModuleId] || TUTORIALS_DATA[moduleId]
 
   if (!isOpen || !tutorial) return null
 
   const handleGotIt = async () => {
-    await markTutorialSeen(moduleId)
+    await markTutorialSeen(activeModuleId)
     onClose()
   }
 
@@ -56,17 +75,38 @@ export function QuickTutorialModal({ moduleId, isOpen, onClose }: QuickTutorialM
           </button>
         </div>
 
+        {/* Barra de Módulos (Navegação Rápida entre Dúvidas) */}
+        <div className="shrink-0 px-5 py-2.5 bg-slate-100/60 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 overflow-x-auto no-scrollbar flex items-center gap-1.5">
+          {MODULE_TABS.map((tab) => {
+            const isActive = tab.id === activeModuleId
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveModuleId(tab.id)}
+                className={`px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-slate-900 text-white dark:bg-indigo-600 shadow-xs"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/70 hover:bg-slate-50"
+                }`}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
+
         {/* Body (Rolável e com min-h-0) */}
         <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Guia Passo a Passo Explicativo</span>
+              <span>Passo a Passo: {tutorial.title}</span>
             </h3>
             <span className="text-[11px] text-slate-400 font-medium">
-              {tutorial.steps.length} passos simples
+              {tutorial.steps.length} passos
             </span>
           </div>
+
 
           <div className="space-y-3">
             {tutorial.steps.map((step) => (

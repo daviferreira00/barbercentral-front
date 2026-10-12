@@ -16,6 +16,7 @@ interface PublicClientData {
   logo_central?: string
   color_primary: string
   color_secondary: string
+  color_button?: string
   font_family: string
   address?: string
   neighborhood?: string
@@ -615,8 +616,8 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                 </div>
                 <Button
                   onClick={handleServicesContinue}
-                  className="font-bold flex-shrink-0"
-                  style={{ backgroundColor: "var(--bc-secondary)" }}
+                  className="font-bold flex-shrink-0 text-white shadow-sm"
+                  style={{ backgroundColor: "var(--bc-button, var(--bc-primary))" }}
                 >
                   Continuar
                 </Button>
@@ -825,7 +826,12 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                       />
                     </div>
 
-                    <Button type="submit" disabled={verifying} className="w-full font-bold h-11">
+                    <Button
+                      type="submit"
+                      disabled={verifying}
+                      className="w-full font-bold h-11 text-white shadow-sm"
+                      style={{ backgroundColor: "var(--bc-button, var(--bc-primary))" }}
+                    >
                       {verifying ? "Verificando..." : "Confirmar Código"}
                     </Button>
 
@@ -872,7 +878,12 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                       />
                     </div>
 
-                    <Button type="submit" disabled={verifying} className="w-full font-bold">
+                    <Button
+                      type="submit"
+                      disabled={verifying}
+                      className="w-full font-bold text-white shadow-sm"
+                      style={{ backgroundColor: "var(--bc-button, var(--bc-primary))" }}
+                    >
                       {verifying ? "Enviando código..." : "Continuar"}
                     </Button>
                   </form>
@@ -947,9 +958,9 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
 
                 <Button
                   onClick={handleConfirmBooking}
-                  className="w-full font-bold h-11 text-base mt-2 shadow-md transition active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="w-full font-bold h-11 text-base mt-2 shadow-md transition active:scale-[0.98] flex items-center justify-center gap-1.5 text-white"
                   disabled={submitting}
-                  style={{ backgroundColor: "var(--bc-primary)" }}
+                  style={{ backgroundColor: "var(--bc-button, var(--bc-primary))" }}
                 >
                   {submitting ? (
                     <>

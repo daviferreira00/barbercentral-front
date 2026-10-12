@@ -140,9 +140,9 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
 
       if (res.data) {
         if (res.data.role === "admin") {
-          router.push("/admin")
+          window.location.href = "/admin"
         } else {
-          router.push("/cliente")
+          window.location.href = "/cliente"
         }
       }
     } catch (err) {
@@ -191,9 +191,9 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
 
       if (res.data) {
         if (res.data.role === "admin") {
-          router.push("/admin")
+          window.location.href = "/admin"
         } else {
-          router.push("/cliente")
+          window.location.href = "/cliente"
         }
       }
     } else {

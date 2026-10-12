@@ -92,7 +92,7 @@ export default function ProfissionalDetailDesktop({ professionalId }: { professi
                   </span>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
                     onChange={handlePhotoUpload}
                     disabled={uploading}
                     className="hidden"

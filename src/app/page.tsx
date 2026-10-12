@@ -12,15 +12,15 @@ export default function RootPage() {
     if (!loading) {
       if (user) {
         if (user.role === "admin") {
-          router.push("/admin")
+          window.location.href = "/admin"
         } else {
-          router.push("/cliente")
+          window.location.href = "/cliente"
         }
       } else {
-        router.push("/login")
+        window.location.href = "/login"
       }
     }
-  }, [user, loading, router])
+  }, [user, loading])
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-slate-50">

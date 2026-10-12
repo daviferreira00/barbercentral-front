@@ -158,7 +158,7 @@ export default function LayoutConfigPage() {
                     type="file" 
                     className="hidden" 
                     ref={fileInputHeaderRef}
-                    accept="image/*"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
                     onChange={e => {
                       if (e.target.files && e.target.files[0]) {
                         handleUpload(e.target.files[0], "header")
@@ -188,7 +188,7 @@ export default function LayoutConfigPage() {
                     type="file" 
                     className="hidden" 
                     ref={fileInputCentralRef}
-                    accept="image/*"
+                    accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
                     onChange={e => {
                       if (e.target.files && e.target.files[0]) {
                         handleUpload(e.target.files[0], "central")

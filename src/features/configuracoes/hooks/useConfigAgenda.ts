@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { http } from "@/shared/lib/http"
+import { useApp } from "@/shared/context/AppContext"
 
 export interface Professional {
   id: string
@@ -30,6 +31,7 @@ export const WEEKDAYS = [
 ]
 
 export function useConfigAgenda() {
+  const { user } = useApp()
   const searchParams = useSearchParams()
   const initialProfId = searchParams.get("professional_id") || ""
 
@@ -88,7 +90,7 @@ export function useConfigAgenda() {
 
   useEffect(() => {
     loadProfessionals()
-  }, [])
+  }, [user?.client_id])
 
   useEffect(() => {
     loadSchedules()

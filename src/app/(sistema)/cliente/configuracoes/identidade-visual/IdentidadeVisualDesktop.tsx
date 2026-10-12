@@ -15,6 +15,7 @@ export default function IdentidadeVisualDesktop() {
     loading,
     saving,
     uploading,
+    uploadingType,
     errorMsg,
     successMsg,
     logoUrl,
@@ -110,31 +111,32 @@ export default function IdentidadeVisualDesktop() {
                   <div className="space-y-3">
                     <label className="text-xs font-bold text-slate-500 uppercase">Logo do Cabeçalho (Header)</label>
                     <div className="flex items-center gap-3">
-                      <div className="h-14 w-14 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0">
+                      <div className="h-16 w-16 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:8px_8px]">
                         {logoUrl ? (
                           <img src={logoUrl} alt="Logo Cabeçalho" className="h-full w-full object-contain p-1" />
                         ) : (
                           <i className="ti ti-camera text-xl" />
                         )}
-                        {uploading && (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        {uploadingType === "header" && (
+                          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center text-white">
+                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           </div>
                         )}
                       </div>
                       <div>
                         <label className="cursor-pointer">
                           <span className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
-                            Upload
+                            {uploadingType === "header" ? "Enviando..." : "Upload"}
                           </span>
                           <input
                             type="file"
-                            accept="image/*"
+                            accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
                             onChange={(e) => handleLogoUpload(e, "header")}
                             disabled={uploading}
                             className="hidden"
                           />
                         </label>
+                        <p className="text-[10px] text-slate-400 mt-1 font-medium">PNG, JPEG, WEBP ou SVG (máx. 15MB)</p>
                       </div>
                     </div>
                   </div>
@@ -143,31 +145,32 @@ export default function IdentidadeVisualDesktop() {
                   <div className="space-y-3">
                     <label className="text-xs font-bold text-slate-500 uppercase">Logo Central (Principal)</label>
                     <div className="flex items-center gap-3">
-                      <div className="h-14 w-14 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0">
+                      <div className="h-16 w-16 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:8px_8px]">
                         {logoCentral ? (
                           <img src={logoCentral} alt="Logo Central" className="h-full w-full object-contain p-1" />
                         ) : (
                           <i className="ti ti-camera text-xl" />
                         )}
-                        {uploading && (
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        {uploadingType === "central" && (
+                          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center text-white">
+                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           </div>
                         )}
                       </div>
                       <div>
                         <label className="cursor-pointer">
                           <span className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
-                            Upload
+                            {uploadingType === "central" ? "Enviando..." : "Upload"}
                           </span>
                           <input
                             type="file"
-                            accept="image/*"
+                            accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
                             onChange={(e) => handleLogoUpload(e, "central")}
                             disabled={uploading}
                             className="hidden"
                           />
                         </label>
+                        <p className="text-[10px] text-slate-400 mt-1 font-medium">PNG, JPEG, WEBP ou SVG (máx. 15MB)</p>
                       </div>
                     </div>
                   </div>
@@ -441,7 +444,12 @@ export default function IdentidadeVisualDesktop() {
               </CardContent>
             </Card>
 
-            <Button type="submit" className="w-full font-bold" disabled={saving}>
+            <Button
+              type="submit"
+              className="w-full font-bold text-white shadow-sm"
+              disabled={saving}
+              style={{ backgroundColor: colorButton || "var(--color-button, var(--color-primary))" }}
+            >
               {saving ? "Salvando Configurações..." : "Salvar Configurações"}
             </Button>
           </form>

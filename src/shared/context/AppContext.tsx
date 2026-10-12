@@ -75,7 +75,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setMyClients([])
       setOnboarding(null)
       if (!isPublicRoute) {
-        router.push("/login")
+        window.location.href = "/login"
       }
       setLoading(false)
       return
@@ -106,8 +106,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
     setMyClients([])
     setOnboarding(null)
-    router.push("/login")
-    setLoading(false)
+    if (typeof document !== "undefined") {
+      const root = document.documentElement
+      root.style.removeProperty("--color-primary")
+      root.style.removeProperty("--color-secondary")
+      root.style.removeProperty("--color-button")
+    }
+    window.location.href = "/login"
   }
 
   const finishWizard = async (data: WizardOnboardingData): Promise<boolean> => {

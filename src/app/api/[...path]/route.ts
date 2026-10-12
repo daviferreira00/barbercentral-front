@@ -29,7 +29,37 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
 
-      const ext = path.extname(file.name)
+      let ext = path.extname(file.name || "").toLowerCase()
+      if (!ext || ext === ".") {
+        const mime = (file.type || "").toLowerCase()
+        if (mime.includes("png")) ext = ".png"
+        else if (mime.includes("jpeg") || mime.includes("jpg")) ext = ".jpg"
+        else if (mime.includes("webp")) ext = ".webp"
+        else if (mime.includes("svg")) ext = ".svg"
+        else if (mime.includes("gif")) ext = ".gif"
+        else if (mime.includes("avif")) ext = ".avif"
+        else if (mime.includes("bmp")) ext = ".bmp"
+        else {
+          // Detecta por magic numbers no buffer da imagem
+          if (buffer.length >= 4 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
+            ext = ".png"
+          } else if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+            ext = ".jpg"
+          } else if (buffer.length >= 4 && buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) {
+            ext = ".gif"
+          } else if (buffer.toString("utf8", 0, 100).includes("<svg")) {
+            ext = ".svg"
+          } else {
+            ext = ".png"
+          }
+        }
+      }
+
+      const allowedExts = [".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif", ".avif", ".bmp", ".ico"]
+      if (!allowedExts.includes(ext)) {
+        return NextResponse.json({ error: { message: "Formato de arquivo não suportado. Por favor, envie uma imagem PNG, JPEG, WEBP ou SVG." } }, { status: 400 })
+      }
+
       const prefix = isLogo ? (pathParts[1] === "logo" ? "logo" : "logo_central") : isProfPhoto ? "photo" : "upload"
       const filename = `${prefix}_${Date.now()}${ext}`
       

@@ -20,6 +20,7 @@ import {
 	ArrowLeft,
 	CheckCheck
 } from "lucide-react"
+import { useApp } from "@/shared/context/AppContext"
 
 interface Chat {
 	id: string
@@ -57,6 +58,14 @@ interface Customer {
 }
 
 export default function ChatMobile() {
+	const { onboarding, user: sessionUser } = useApp()
+	const isTrial =
+		sessionUser?.role !== "admin" &&
+		(onboarding?.subscription_status === "trial" ||
+			sessionUser?.subscription_status === "trial" ||
+			(onboarding?.days_remaining !== undefined && onboarding.days_remaining >= 0))
+	const headerOffset = isTrial ? "92px" : "56px"
+
 	const searchParams = useSearchParams()
 	const phoneParam = searchParams.get("phone")
 	const nameParam = searchParams.get("name")
@@ -374,8 +383,16 @@ export default function ChatMobile() {
 			className={`fixed left-0 right-0 bg-slate-50 flex flex-col w-full overflow-hidden transition-all duration-200 ${
 				activeChat 
 					? "inset-0 h-dvh z-50" 
-					: "top-[calc(56px+env(safe-area-inset-top))] bottom-0 h-[calc(100dvh-56px-env(safe-area-inset-top))] z-30"
+					: "bottom-0 z-30"
 			}`}
+			style={
+				activeChat
+					? undefined
+					: {
+							top: `calc(var(--mobile-header-height, ${headerOffset}) + env(safe-area-inset-top))`,
+							height: `calc(100dvh - var(--mobile-header-height, ${headerOffset}) - env(safe-area-inset-top))`,
+					  }
+			}
 		>
 			
 			{/* LISTA DE CONVERSAS (VISÍVEL APENAS QUANDO NÃO HÁ CHAT ATIVO) */}
@@ -412,7 +429,7 @@ export default function ChatMobile() {
 				</div>
 
 				{/* CONVERSAS */}
-				<div className="flex-1 overflow-y-auto divide-y divide-slate-50">
+				<div className="flex-1 overflow-y-auto divide-y divide-slate-50 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
 					{loadingChats ? (
 						<div className="flex flex-col items-center justify-center py-12 gap-2 text-slate-400">
 							<Loader2 className="h-6 w-6 animate-spin text-indigo-600" />

@@ -19,6 +19,7 @@ export default function IdentidadeVisualMobile() {
     loading,
     saving,
     uploading,
+    uploadingType,
     errorMsg,
     successMsg,
     logoUrl,
@@ -134,30 +135,33 @@ export default function IdentidadeVisualMobile() {
               <div className="flex flex-col gap-2">
                 <label className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">Logo Cabeçalho</label>
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0">
+                  <div className="h-14 w-14 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:8px_8px]">
                     {logoUrl ? (
                       <img src={logoUrl} alt="Logo" className="h-full w-full object-contain p-1" />
                     ) : (
                       <i className="ti ti-camera text-lg" />
                     )}
-                    {uploading && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                    {uploadingType === "header" && (
+                      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center text-white">
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       </div>
                     )}
                   </div>
-                  <label className="cursor-pointer">
-                    <span className="inline-flex h-8 items-center justify-center rounded-xl border border-slate-250 bg-white px-2.5 text-[10px] font-extrabold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
-                      Alterar
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleLogoUpload(e, "header")}
-                      disabled={uploading}
-                      className="hidden"
-                    />
-                  </label>
+                  <div>
+                    <label className="cursor-pointer">
+                      <span className="inline-flex h-8 items-center justify-center rounded-xl border border-slate-250 bg-white px-3 text-[10px] font-extrabold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
+                        {uploadingType === "header" ? "Enviando..." : "Alterar"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
+                        onChange={(e) => handleLogoUpload(e, "header")}
+                        disabled={uploading}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-[9px] text-slate-400 mt-0.5">PNG, JPG, WEBP, SVG</p>
+                  </div>
                 </div>
               </div>
 
@@ -165,30 +169,33 @@ export default function IdentidadeVisualMobile() {
               <div className="flex flex-col gap-2">
                 <label className="text-[9px] font-extrabold uppercase tracking-widest text-slate-400">Logo Central</label>
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0">
+                  <div className="h-14 w-14 bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 overflow-hidden relative shadow-sm shrink-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:8px_8px]">
                     {logoCentral ? (
                       <img src={logoCentral} alt="Logo" className="h-full w-full object-contain p-1" />
                     ) : (
                       <i className="ti ti-camera text-lg" />
                     )}
-                    {uploading && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white">
+                    {uploadingType === "central" && (
+                      <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center text-white">
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       </div>
                     )}
                   </div>
-                  <label className="cursor-pointer">
-                    <span className="inline-flex h-8 items-center justify-center rounded-xl border border-slate-250 bg-white px-2.5 text-[10px] font-extrabold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
-                      Alterar
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleLogoUpload(e, "central")}
-                      disabled={uploading}
-                      className="hidden"
-                    />
-                  </label>
+                  <div>
+                    <label className="cursor-pointer">
+                      <span className="inline-flex h-8 items-center justify-center rounded-xl border border-slate-250 bg-white px-3 text-[10px] font-extrabold text-slate-700 hover:bg-slate-50 transition active:scale-[0.98]">
+                        {uploadingType === "central" ? "Enviando..." : "Alterar"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml, image/gif, image/avif, image/bmp, .png, .jpg, .jpeg, .webp, .svg, .gif, .avif, .bmp, image/*"
+                        onChange={(e) => handleLogoUpload(e, "central")}
+                        disabled={uploading}
+                        className="hidden"
+                      />
+                    </label>
+                    <p className="text-[9px] text-slate-400 mt-0.5">PNG, JPG, WEBP, SVG</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -478,7 +485,7 @@ export default function IdentidadeVisualMobile() {
               type="submit"
               disabled={saving}
               className="mobile-tap w-full rounded-xl py-3.5 text-sm font-extrabold text-white shadow-md transition active:scale-[0.98] disabled:opacity-50"
-              style={{ backgroundColor: "var(--color-primary)" }}
+              style={{ backgroundColor: colorButton || "var(--color-button, var(--color-primary))" }}
             >
               {saving ? "Salvando..." : "Salvar Configurações"}
             </button>

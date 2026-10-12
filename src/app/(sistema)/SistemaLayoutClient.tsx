@@ -48,18 +48,30 @@ export default function SistemaLayoutClient({
   // Injeta dinamicamente as variáveis CSS no elemento raiz quando tenantData atualizar
   useEffect(() => {
     const root = document.documentElement
-    const primary = tenantData?.color_primary || "#1a1a1a"
-    const secondary = tenantData?.color_secondary || "#c9a84c"
-    const button = tenantData?.color_button || primary
+    if (user?.role === "admin" && !user?.impersonating) {
+      root.style.removeProperty("--color-primary")
+      root.style.removeProperty("--color-secondary")
+      root.style.removeProperty("--color-button")
+      return
+    }
 
-    root.style.setProperty("--color-primary", primary)
-    root.style.setProperty("--color-secondary", secondary)
-    root.style.setProperty("--color-button", button)
-  }, [tenantData])
+    if (tenantData) {
+      const primary = tenantData.color_primary || "#1a1a1a"
+      const secondary = tenantData.color_secondary || "#c9a84c"
+      const button = tenantData.color_button || primary
+
+      root.style.setProperty("--color-primary", primary)
+      root.style.setProperty("--color-secondary", secondary)
+      root.style.setProperty("--color-button", button)
+    }
+  }, [tenantData, user?.role, user?.impersonating])
 
   // Busca branding no cliente se o usuário for de barbearia (dono/barbeiro/profissional)
   useEffect(() => {
-    if (!user || user.role === "admin") return
+    if (!user || (user.role === "admin" && !user.impersonating)) {
+      setTenantData(null)
+      return
+    }
 
     const fetchBranding = async () => {
       try {
@@ -81,7 +93,7 @@ export default function SistemaLayoutClient({
     return () => {
       window.removeEventListener("branding_updated", handleBrandingUpdated)
     }
-  }, [user?.client_id, user?.id, user?.role])
+  }, [user?.client_id, user?.id, user?.role, user?.impersonating])
 
   useEffect(() => {
     if (!user || user.role === "admin") return

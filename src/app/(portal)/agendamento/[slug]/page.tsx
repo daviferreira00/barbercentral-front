@@ -11,6 +11,7 @@ interface PublicClientData {
   logo_central?: string
   color_primary: string
   color_secondary: string
+  color_button?: string
   font_family: string
   address?: string
   neighborhood?: string
@@ -64,6 +65,7 @@ export default async function PortalAgendamentoPage({ params }: { params: { slug
           :root {
             --bc-primary: ${config.color_primary};
             --bc-secondary: ${config.color_secondary};
+            --bc-button: ${config.color_button || config.color_primary};
             --bc-font: ${config.font_family};
           }
           body {

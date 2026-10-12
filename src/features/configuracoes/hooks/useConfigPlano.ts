@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { http } from "@/shared/lib/http"
+import { useApp } from "@/shared/context/AppContext"
 
 export interface Plan {
   id: string
@@ -27,6 +28,7 @@ export interface UsageResponse {
 }
 
 export function useConfigPlano() {
+  const { user } = useApp()
   const [usage, setUsage] = useState<UsageResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -48,7 +50,7 @@ export function useConfigPlano() {
 
   useEffect(() => {
     loadUsage()
-  }, [])
+  }, [user?.client_id])
 
   const getProgressValue = (current: number, max: number) => {
     if (max === -1) return 0

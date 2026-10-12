@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { http } from "@/shared/lib/http"
+import { useApp } from "@/shared/context/AppContext"
 
 export interface LoyaltyProgram {
   id?: string
@@ -14,6 +15,7 @@ export interface LoyaltyProgram {
 }
 
 export function useConfigFidelidade() {
+  const { user } = useApp()
   const [program, setProgram] = useState<LoyaltyProgram | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -54,7 +56,7 @@ export function useConfigFidelidade() {
 
   useEffect(() => {
     loadProgram()
-  }, [])
+  }, [user?.client_id])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()

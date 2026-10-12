@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { http } from "@/shared/lib/http"
+import { useApp } from "@/shared/context/AppContext"
 
 export interface ClientConfig {
   client_id: string
@@ -40,10 +41,12 @@ export const FONTS = [
 ]
 
 export function useConfigIdentidadeVisual() {
+  const { user } = useApp()
   const [config, setConfig] = useState<ClientConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingType, setUploadingType] = useState<"header" | "central" | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
@@ -117,78 +120,101 @@ export function useConfigIdentidadeVisual() {
 
   useEffect(() => {
     loadConfig()
-  }, [])
+  }, [user?.client_id])
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "header" | "central") => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    setUploading(true)
     setErrorMsg(null)
     setSuccessMsg(null)
 
-    const formData = new FormData()
-    formData.append("logo", file)
+    // Validar tipo de imagem suportado (PNG, JPG, JPEG, WEBP, SVG, GIF, AVIF)
+    const validExtensions = [".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif", ".avif", ".bmp"]
+    const fileExt = "." + (file.name.split(".").pop() || "").toLowerCase()
+    const isImageMime = !file.type || file.type.toLowerCase().startsWith("image/")
 
-    const endpoint = type === "header" ? "/config/logo" : "/config/logo-central"
-    const res = await http.post<{ logo_url: string }>(endpoint, formData)
-    
-    // Reseta o valor do input para permitir upload do mesmo arquivo novamente se necessário
-    e.target.value = ""
-
-    if (res.error) {
-      setUploading(false)
-      setErrorMsg(res.error.message || "Erro ao realizar upload da imagem.")
+    if (!validExtensions.includes(fileExt) && !isImageMime) {
+      setErrorMsg("Formato de arquivo não suportado. Por favor, selecione uma imagem PNG, JPEG, WEBP ou SVG.")
+      e.target.value = ""
       return
     }
 
-    if (res.data) {
-      const newLogoUrl = res.data.logo_url
-      const updatedHeaderLogo = type === "header" ? newLogoUrl : (logoUrl || null)
-      const updatedCentralLogo = type === "central" ? newLogoUrl : (logoCentral || null)
+    // Limite de 15MB
+    if (file.size > 15 * 1024 * 1024) {
+      setErrorMsg("O arquivo excede o limite de 15MB. Por favor, escolha uma imagem menor.")
+      e.target.value = ""
+      return
+    }
 
-      if (type === "header") {
-        setLogoUrl(newLogoUrl)
-      } else {
-        setLogoCentral(newLogoUrl)
+    setUploading(true)
+    setUploadingType(type)
+
+    try {
+      const formData = new FormData()
+      formData.append("logo", file)
+
+      const endpoint = type === "header" ? "/config/logo" : "/config/logo-central"
+      const res = await http.post<{ logo_url: string }>(endpoint, formData)
+
+      // Reseta o valor do input para permitir upload do mesmo arquivo novamente se necessário
+      e.target.value = ""
+
+      if (res.error) {
+        setErrorMsg(res.error.message || "Erro ao realizar upload da imagem.")
+        return
       }
 
-      // Salva imediatamente no banco de dados para evitar perda ao recarregar a página
-      await http.put<ClientConfig>("/config", {
-        color_primary: colorPrimary,
-        color_secondary: colorSecondary,
-        color_button: colorButton,
-        background_type: backgroundType,
-        font_family: fontFamily,
-        logo_url: updatedHeaderLogo,
-        logo_central: updatedCentralLogo,
-        address: address ? address : null,
-        neighborhood: neighborhood ? neighborhood : null,
-        city: city ? city : null,
-        state: state ? state : null,
-        phone: phone ? phone : null,
-        whatsapp: whatsapp ? whatsapp : null,
-        instagram: instagram ? instagram : null,
-        timezone,
-        cancellation_policy_hours: parseInt(cancelHours) || 2,
-        booking_requires_login: requiresLogin ? 1 : 0,
-        min_advance_hours: parseInt(minAdvance) || 1,
-        max_advance_days: parseInt(maxAdvance) || 60,
-        interval_between_minutes: parseInt(interval) || 0,
-        kds_pin: kdsPin || null,
-        block_lunch_enabled: blockLunchEnabled ? 1 : 0,
-        block_lunch_start: blockLunchStart ? `${blockLunchStart}:00` : "12:00:00",
-        block_lunch_end: blockLunchEnd ? `${blockLunchEnd}:00` : "13:00:00",
-        whatsapp_verification_enabled: whatsappVerificationEnabled ? 1 : 0,
-      })
+      if (res.data) {
+        const newLogoUrl = res.data.logo_url
+        const updatedHeaderLogo = type === "header" ? newLogoUrl : (logoUrl || null)
+        const updatedCentralLogo = type === "central" ? newLogoUrl : (logoCentral || null)
 
-      setUploading(false)
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("branding_updated"))
+        if (type === "header") {
+          setLogoUrl(newLogoUrl)
+        } else {
+          setLogoCentral(newLogoUrl)
+        }
+
+        // Salva imediatamente no banco de dados para evitar perda ao recarregar a página
+        await http.put<ClientConfig>("/config", {
+          color_primary: colorPrimary,
+          color_secondary: colorSecondary,
+          color_button: colorButton,
+          background_type: backgroundType,
+          font_family: fontFamily,
+          logo_url: updatedHeaderLogo,
+          logo_central: updatedCentralLogo,
+          address: address ? address : null,
+          neighborhood: neighborhood ? neighborhood : null,
+          city: city ? city : null,
+          state: state ? state : null,
+          phone: phone ? phone : null,
+          whatsapp: whatsapp ? whatsapp : null,
+          instagram: instagram ? instagram : null,
+          timezone,
+          cancellation_policy_hours: parseInt(cancelHours) || 2,
+          booking_requires_login: requiresLogin ? 1 : 0,
+          min_advance_hours: parseInt(minAdvance) || 1,
+          max_advance_days: parseInt(maxAdvance) || 60,
+          interval_between_minutes: parseInt(interval) || 0,
+          kds_pin: kdsPin || null,
+          block_lunch_enabled: blockLunchEnabled ? 1 : 0,
+          block_lunch_start: blockLunchStart ? `${blockLunchStart}:00` : "12:00:00",
+          block_lunch_end: blockLunchEnd ? `${blockLunchEnd}:00` : "13:00:00",
+          whatsapp_verification_enabled: whatsappVerificationEnabled ? 1 : 0,
+        })
+
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("branding_updated"))
+        }
+        setSuccessMsg(type === "header" ? "Logo do cabeçalho enviada e salva com sucesso!" : "Logo central enviada e salva com sucesso!")
       }
-      setSuccessMsg("Imagem enviada e salva com sucesso!")
-    } else {
+    } catch (err: any) {
+      setErrorMsg("Erro inesperado ao enviar o arquivo: " + (err?.message || "Tente novamente."))
+    } finally {
       setUploading(false)
+      setUploadingType(null)
     }
   }
 
@@ -245,6 +271,7 @@ export function useConfigIdentidadeVisual() {
     loading,
     saving,
     uploading,
+    uploadingType,
     errorMsg,
     successMsg,
     logoUrl,
