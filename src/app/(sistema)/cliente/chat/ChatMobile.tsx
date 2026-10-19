@@ -59,11 +59,12 @@ interface Customer {
 
 export default function ChatMobile() {
 	const { onboarding, user: sessionUser } = useApp()
+	const subscriptionStatus = onboarding?.subscription_status || sessionUser?.subscription_status
 	const isTrial =
 		sessionUser?.role !== "admin" &&
-		(onboarding?.subscription_status === "trial" ||
-			sessionUser?.subscription_status === "trial" ||
-			(onboarding?.days_remaining !== undefined && onboarding.days_remaining >= 0))
+		subscriptionStatus === "trial" &&
+		sessionUser?.subscription_status !== "active" &&
+		onboarding?.subscription_status !== "active"
 	const headerOffset = isTrial ? "92px" : "56px"
 
 	const searchParams = useSearchParams()

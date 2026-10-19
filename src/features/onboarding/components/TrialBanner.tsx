@@ -7,10 +7,16 @@ import { Clock, Zap, ArrowRight } from "lucide-react"
 export function TrialBanner() {
   const { onboarding, user } = useApp()
 
-  if (!onboarding || onboarding.subscription_status !== "trial") {
-    if (user?.subscription_status !== "trial") {
-      return null
-    }
+  const status = onboarding?.subscription_status || user?.subscription_status
+
+  // Exibe apenas se estiver em período de trial e não for admin ou assinante ativo
+  if (
+    status !== "trial" ||
+    user?.role === "admin" ||
+    user?.subscription_status === "active" ||
+    onboarding?.subscription_status === "active"
+  ) {
+    return null
   }
 
   const daysRemaining = onboarding?.days_remaining ?? 7
@@ -23,7 +29,13 @@ export function TrialBanner() {
         </div>
         <span>
           <strong>Período de Testes Grátis Ativo:</strong> Você possui{" "}
-          <span className="underline decoration-slate-950 font-bold">{daysRemaining} dias restantes</span>{" "}
+          <span className="underline decoration-slate-950 font-bold">
+            {daysRemaining <= 0
+              ? "período expirado"
+              : daysRemaining === 1
+                ? "1 dia restante"
+                : `${daysRemaining} dias restantes`}
+          </span>{" "}
           com acesso ilimitado ao Plano Pro.
         </span>
       </div>

@@ -57,12 +57,13 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
   }
   const currentModule = getModuleFromPath(pathname)
 
-  // Status de período grátis (Trial)
+  // Status de período grátis (Trial): apenas se o status for "trial" e o usuário não for assinante ativo ou admin
+  const subscriptionStatus = onboarding?.subscription_status || sessionUser?.subscription_status
   const isTrial =
     !isAdmin &&
-    (onboarding?.subscription_status === "trial" ||
-      sessionUser?.subscription_status === "trial" ||
-      (onboarding?.days_remaining !== undefined && onboarding.days_remaining >= 0))
+    subscriptionStatus === "trial" &&
+    sessionUser?.subscription_status !== "active" &&
+    onboarding?.subscription_status !== "active"
   const daysRemaining = onboarding?.days_remaining ?? 7
 
   const logoUrl =
@@ -154,7 +155,14 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
             <div className="flex items-center gap-1.5 min-w-0">
               <Clock className="w-3.5 h-3.5 text-slate-950 shrink-0" />
               <span className="truncate text-slate-950">
-                Teste Grátis: <strong className="font-extrabold">{daysRemaining} dias restantes</strong>
+                Teste Grátis:{" "}
+                <strong className="font-extrabold">
+                  {daysRemaining <= 0
+                    ? "Expirado"
+                    : daysRemaining === 1
+                      ? "1 dia restante"
+                      : `${daysRemaining} dias restantes`}
+                </strong>
               </span>
             </div>
             <Link
