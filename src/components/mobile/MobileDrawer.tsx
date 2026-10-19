@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { haptic } from "@/shared/lib/haptics"
 import type { NavSection } from "@/shared/config/nav"
 import { useApp } from "@/shared/context/AppContext"
+import { resolveImageUrl } from "@/shared/lib/utils"
 
 interface MobileDrawerProps {
   open: boolean
@@ -84,7 +85,7 @@ export function MobileDrawer({
             <div className="h-12 w-12 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-lg font-extrabold overflow-hidden">
               {sessionUser?.photo_url ? (
                 <img
-                  src={sessionUser.photo_url.startsWith("/uploads") ? `http://localhost:8080${sessionUser.photo_url}` : sessionUser.photo_url}
+                  src={resolveImageUrl(sessionUser.photo_url)}
                   alt={userName}
                   className="w-full h-full object-cover select-none"
                 />

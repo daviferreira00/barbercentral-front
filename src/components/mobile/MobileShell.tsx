@@ -10,6 +10,7 @@ import { MobileDrawer } from "./MobileDrawer"
 import { SplashScreen } from "./SplashScreen"
 import { QuickTutorialModal } from "@/features/tutorials/components/QuickTutorialModal"
 import { BookOpen, Clock, Zap, ArrowRight } from "lucide-react"
+import { resolveImageUrl } from "@/shared/lib/utils"
 
 interface MobileShellProps {
   children: React.ReactNode
@@ -66,10 +67,11 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
     onboarding?.subscription_status !== "active"
   const daysRemaining = onboarding?.days_remaining ?? 7
 
-  const logoUrl =
+  const logoUrl = resolveImageUrl(
     tenantData && (tenantData.logo_url || tenantData.logo_central)
       ? tenantData.logo_url || tenantData.logo_central
       : "/logo/barbercentral-logo-horizontal-white.svg"
+  )
 
   const isDarkBg =
     tenantData?.background_type === "solid_dark" ||
@@ -138,7 +140,7 @@ export function MobileShell({ children, user, tenantData, onLogout }: MobileShel
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 border border-white/30 text-sm font-extrabold overflow-hidden shrink-0">
               {sessionUser?.photo_url ? (
                 <img
-                  src={sessionUser.photo_url.startsWith("/uploads") ? `http://localhost:8080${sessionUser.photo_url}` : sessionUser.photo_url}
+                  src={resolveImageUrl(sessionUser.photo_url)}
                   alt={user.name}
                   className="w-full h-full object-cover select-none"
                 />

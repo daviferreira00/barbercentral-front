@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert } from "@/components/ui/alert"
+import { resolveImageUrl } from "@/shared/lib/utils"
 import { useProfissionaisList } from "@/features/profissionais/hooks/useProfissionaisList"
 import { FirstAccessCard } from "@/features/tutorials/components/FirstAccessCard"
 import { QuickTutorialButton } from "@/features/tutorials/components/QuickTutorialButton"
@@ -87,7 +88,7 @@ export default function ProfissionaisDesktop() {
               <CardContent className="p-6 flex gap-4 items-start">
                 <div className="h-16 w-16 rounded-full bg-slate-100 flex-shrink-0 flex items-center justify-center text-slate-400 overflow-hidden border border-slate-200/60">
                   {p.photo_url ? (
-                    <img src={p.photo_url} alt={p.name} className="h-full w-full object-cover" />
+                    <img src={resolveImageUrl(p.photo_url)} alt={p.name} className="h-full w-full object-cover" />
                   ) : (
                     <i className="ti ti-user text-2xl" />
                   )}

@@ -95,10 +95,10 @@ const resolvePublicAssetUrl = (url?: string) => {
   try {
     const parsed = new URL(url)
     if ((parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") && parsed.pathname.startsWith("/uploads/")) {
-      return `/backend-uploads/${parsed.pathname.slice("/uploads/".length)}`
+      return parsed.pathname
     }
   } catch {
-    // URLs relativas já são servidas pelo diretório public do frontend.
+    // URLs relativas já são servidas diretamente pela rota /uploads
   }
   return url
 }
@@ -501,7 +501,7 @@ export default function PortalAgendamentoClient({ config }: { config: PublicClie
                   <CardContent className="p-6 flex flex-col items-center justify-center gap-3">
                     <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm group-hover:scale-105 transition duration-200">
                       {prof.photo_url ? (
-                        <img src={prof.photo_url} alt={prof.name} className="h-full w-full object-cover" />
+                        <img src={resolvePublicAssetUrl(prof.photo_url)} alt={prof.name} className="h-full w-full object-cover" />
                       ) : (
                         <i className="ti ti-user text-xl text-slate-400" />
                       )}

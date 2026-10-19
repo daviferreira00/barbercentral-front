@@ -39,7 +39,15 @@ export default function AdminPlansListPage() {
 			return
 		}
 		if (res.data) {
-			setPlans(res.data)
+			// Evita duplicatas de planos com o mesmo nome (ex: resquício de migração)
+			const uniquePlansMap = new Map<string, Plan>()
+			for (const plan of res.data) {
+				const key = plan.name.trim().toLowerCase()
+				if (!uniquePlansMap.has(key) || plan.id.startsWith("plan-")) {
+					uniquePlansMap.set(key, plan)
+				}
+			}
+			setPlans(Array.from(uniquePlansMap.values()))
 		}
 	}
 

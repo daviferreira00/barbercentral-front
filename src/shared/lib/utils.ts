@@ -21,3 +21,16 @@ export function maskPhone(value: string): string {
   }
   return `(${cleanDigits.substring(0, 2)}) ${cleanDigits.substring(2, 7)}-${cleanDigits.substring(7)}`
 }
+
+/**
+ * Normaliza URLs de imagem para garantir exibição correta em produção e local.
+ * Se a URL contiver referências a localhost, 127.0.0.1 ou host.docker.internal
+ * (com qualquer porta) seguido de /uploads/..., converte para o caminho relativo "/uploads/...".
+ */
+export function resolveImageUrl(url?: string | null): string {
+  if (!url) return ""
+  if (/^https?:\/\/(localhost|127\.0\.0\.1|host\.docker\.internal)(:\d+)?\/uploads\//i.test(url)) {
+    return url.replace(/^https?:\/\/(localhost|127\.0\.0\.1|host\.docker\.internal)(:\d+)?/i, "")
+  }
+  return url
+}

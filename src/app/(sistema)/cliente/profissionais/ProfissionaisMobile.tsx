@@ -8,6 +8,7 @@ import { FilterChips } from "@/components/mobile/FilterChips"
 import { SkeletonList } from "@/components/mobile/Skeleton"
 import { StatusPill } from "@/components/mobile/StatusPill"
 import { haptic } from "@/shared/lib/haptics"
+import { resolveImageUrl } from "@/shared/lib/utils"
 import { useProfissionaisList } from "@/features/profissionais/hooks/useProfissionaisList"
 
 export default function ProfissionaisMobile() {
@@ -55,7 +56,7 @@ export default function ProfissionaisMobile() {
             >
               <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200/60 bg-slate-100 text-slate-400">
                 {p.photo_url ? (
-                  <img src={p.photo_url} alt={p.name} className="h-full w-full object-cover" />
+                  <img src={resolveImageUrl(p.photo_url)} alt={p.name} className="h-full w-full object-cover" />
                 ) : (
                   <i className="ti ti-user text-2xl" />
                 )}

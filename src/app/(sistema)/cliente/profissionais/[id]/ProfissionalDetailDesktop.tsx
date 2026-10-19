@@ -6,6 +6,7 @@ import { Alert } from "@/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { resolveImageUrl } from "@/shared/lib/utils"
 import { useProfissionalDetail } from "@/features/profissionais/hooks/useProfissionalDetail"
 
 export default function ProfissionalDetailDesktop({ professionalId }: { professionalId: string }) {
@@ -74,7 +75,7 @@ export default function ProfissionalDetailDesktop({ professionalId }: { professi
             <CardContent className="flex flex-col items-center gap-4 text-center">
               <div className="h-28 w-28 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 overflow-hidden border border-slate-200 shadow-sm relative group">
                 {professional.photo_url ? (
-                  <img src={professional.photo_url} alt={professional.name} className="h-full w-full object-cover" />
+                  <img src={resolveImageUrl(professional.photo_url)} alt={professional.name} className="h-full w-full object-cover" />
                 ) : (
                   <i className="ti ti-user text-4xl" />
                 )}

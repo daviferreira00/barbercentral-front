@@ -76,9 +76,17 @@ export default function AdminClientesPage() {
 
     if (clientsRes.data) setClients(clientsRes.data)
     if (plansRes.data) {
-      setPlans(plansRes.data)
-      if (plansRes.data.length > 0) {
-        setNewPlan(plansRes.data[0].id)
+      const uniquePlansMap = new Map<string, Plan>()
+      for (const plan of plansRes.data) {
+        const key = plan.name.trim().toLowerCase()
+        if (!uniquePlansMap.has(key) || plan.id.startsWith("plan-")) {
+          uniquePlansMap.set(key, plan)
+        }
+      }
+      const dedupedPlans = Array.from(uniquePlansMap.values())
+      setPlans(dedupedPlans)
+      if (dedupedPlans.length > 0) {
+        setNewPlan(dedupedPlans[0].id)
       }
     }
   }

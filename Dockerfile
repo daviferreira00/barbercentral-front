@@ -24,10 +24,12 @@ ENV PORT=3002
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
+COPY --chown=nextjs:nodejs --from=builder /app/package*.json ./
+COPY --chown=nextjs:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=nextjs:nodejs --from=builder /app/public ./public
+COPY --chown=nextjs:nodejs --from=builder /app/.next ./.next
+
+RUN mkdir -p /app/public/uploads && chown -R nextjs:nodejs /app/public/uploads
 
 USER nextjs
 

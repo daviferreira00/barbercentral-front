@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { http } from "@/shared/lib/http"
+import { resolveImageUrl } from "@/shared/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -61,8 +62,8 @@ export default function LayoutConfigPage() {
 
     if (res.data) {
       setConfig(res.data)
-      setLogoHeader(res.data.logo_url || "")
-      setLogoCentral(res.data.logo_central || "")
+      setLogoHeader(resolveImageUrl(res.data.logo_url) || "")
+      setLogoCentral(resolveImageUrl(res.data.logo_central) || "")
       setColorPrimary(res.data.color_primary || "#7C3AED")
       setColorSecondary(res.data.color_secondary || "#EC4899")
       setColorButton(res.data.color_button || res.data.color_primary || "#7C3AED")

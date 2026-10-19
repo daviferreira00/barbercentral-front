@@ -11,9 +11,16 @@ services:
         published: 3002
         protocol: tcp
         mode: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - barbercentral-front-uploads:/app/public/uploads
     deploy:
       replicas: 1
       restart_policy:
         condition: any
       update_config:
         order: stop-first
+
+volumes:
+  barbercentral-front-uploads:

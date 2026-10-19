@@ -129,7 +129,16 @@ export default function AdminClienteDetailPage({ params }: { params: { id: strin
       setEditClientPlan(resClient.data.plan_id)
     }
     if (resUsers.data) setUsers(resUsers.data)
-    if (resPlans.data) setPlans(resPlans.data)
+    if (resPlans.data) {
+      const uniquePlansMap = new Map<string, Plan>()
+      for (const plan of resPlans.data) {
+        const key = plan.name.trim().toLowerCase()
+        if (!uniquePlansMap.has(key) || plan.id.startsWith("plan-")) {
+          uniquePlansMap.set(key, plan)
+        }
+      }
+      setPlans(Array.from(uniquePlansMap.values()))
+    }
     if (resConfig.data) {
       setConfig(resConfig.data)
     }

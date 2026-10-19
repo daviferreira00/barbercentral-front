@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/mobile/EmptyState"
 import { SkeletonList } from "@/components/mobile/Skeleton"
 import { StatusPill } from "@/components/mobile/StatusPill"
 import { haptic } from "@/shared/lib/haptics"
+import { resolveImageUrl } from "@/shared/lib/utils"
 import { useProfissionalDetail } from "@/features/profissionais/hooks/useProfissionalDetail"
 
 export default function ProfissionalDetailMobile({ professionalId }: { professionalId: string }) {
@@ -73,7 +74,7 @@ export default function ProfissionalDetailMobile({ professionalId }: { professio
       <div className="animate-card-enter flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
         <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 text-slate-400 shadow-sm">
           {professional.photo_url ? (
-            <img src={professional.photo_url} alt={professional.name} className="h-full w-full object-cover" />
+            <img src={resolveImageUrl(professional.photo_url)} alt={professional.name} className="h-full w-full object-cover" />
           ) : (
             <i className="ti ti-user text-3xl" />
           )}

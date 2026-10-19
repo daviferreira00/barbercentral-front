@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { http } from "@/shared/lib/http"
 import { useApp } from "@/shared/context/AppContext"
+import { resolveImageUrl } from "@/shared/lib/utils"
 
 export interface ClientConfig {
   client_id: string
@@ -90,8 +91,8 @@ export function useConfigIdentidadeVisual() {
     if (res.data) {
       const c = res.data
       setConfig(c)
-      setLogoUrl(c.logo_url || "")
-      setLogoCentral(c.logo_central || "")
+      setLogoUrl(resolveImageUrl(c.logo_url) || "")
+      setLogoCentral(resolveImageUrl(c.logo_central) || "")
       setColorPrimary(c.color_primary || "#1a1a1a")
       setColorSecondary(c.color_secondary || "#c9a84c")
       setColorButton(c.color_button || c.color_primary || "#1a1a1a")

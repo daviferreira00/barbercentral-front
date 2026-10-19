@@ -13,6 +13,7 @@ import { WizardOnboarding } from "@/features/onboarding/components/WizardOnboard
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { http } from "@/shared/lib/http"
+import { resolveImageUrl } from "@/shared/lib/utils"
 
 export default function SistemaLayoutClient({ 
   children,
@@ -112,10 +113,10 @@ export default function SistemaLayoutClient({
   }, [user])
 
   if (loading || isMobile === null) {
-    const logoSrc =
-      tenantData && (tenantData.logo_central || tenantData.logo_url)
-        ? tenantData.logo_central || tenantData.logo_url
-        : "/logo/barbercentral-logo-horizontal-white.svg"
+    const rawLogo = tenantData && (tenantData.logo_central || tenantData.logo_url)
+      ? tenantData.logo_central || tenantData.logo_url
+      : "/logo/barbercentral-logo-horizontal-white.svg"
+    const logoSrc = resolveImageUrl(rawLogo)
 
     const primaryColor = tenantData?.color_primary || "#0f172a"
 
@@ -203,13 +204,13 @@ export default function SistemaLayoutClient({
             <Link href={isAdmin ? "/admin" : "/cliente"} className="flex items-center min-w-0 justify-center w-full">
               {sidebarCollapsed ? (
                 <img
-                  src={tenantData && (tenantData.logo_central || tenantData.logo_url) ? (tenantData.logo_central || tenantData.logo_url) : "/logo/barbercentral-icon-white.svg"}
+                  src={resolveImageUrl(tenantData && (tenantData.logo_central || tenantData.logo_url) ? (tenantData.logo_central || tenantData.logo_url) : "/logo/barbercentral-icon-white.svg")}
                   alt="Logo Icon"
                   className="h-8 w-auto max-w-[2rem] object-contain"
                 />
               ) : (
                 <img
-                  src={tenantData && (tenantData.logo_url || tenantData.logo_central) ? (tenantData.logo_url || tenantData.logo_central) : "/logo/barbercentral-logo-horizontal-white.svg"}
+                  src={resolveImageUrl(tenantData && (tenantData.logo_url || tenantData.logo_central) ? (tenantData.logo_url || tenantData.logo_central) : "/logo/barbercentral-logo-horizontal-white.svg")}
                   alt="Logo"
                   className="max-h-12 w-auto max-w-[80%] object-contain"
                 />
@@ -498,7 +499,7 @@ export default function SistemaLayoutClient({
               <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-amber-500 flex items-center justify-center text-white text-sm font-bold shadow-sm overflow-hidden border border-slate-200">
                 {user.photo_url ? (
                   <img
-                    src={user.photo_url.startsWith("/uploads") ? `http://localhost:8080${user.photo_url}` : user.photo_url}
+                    src={resolveImageUrl(user.photo_url)}
                     alt={user.name}
                     className="w-full h-full object-cover select-none"
                   />

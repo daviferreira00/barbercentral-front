@@ -63,7 +63,7 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
       const prefix = isLogo ? (pathParts[1] === "logo" ? "logo" : "logo_central") : isProfPhoto ? "photo" : "upload"
       const filename = `${prefix}_${Date.now()}${ext}`
       
-      const uploadDir = path.join(process.cwd(), "public", "uploads")
+      const uploadDir = process.env.UPLOADS_DIR || path.join(process.cwd(), "public", "uploads")
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true })
       }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { http } from "@/shared/lib/http"
+import { resolveImageUrl } from "@/shared/lib/utils"
 
 export default function PerfilPage() {
   const { user, refreshSession } = useApp()
@@ -112,12 +113,7 @@ export default function PerfilPage() {
   const getAvatarSource = () => {
     if (photoBase64) return photoBase64
     if (user?.photo_url) {
-      // Resolve caso a URL da imagem seja relativa ao backend
-      if (user.photo_url.startsWith("/uploads")) {
-        // Se a url for "/uploads/filename.png"
-        return `http://localhost:8080${user.photo_url}`
-      }
-      return user.photo_url
+      return resolveImageUrl(user.photo_url)
     }
     return null
   }
