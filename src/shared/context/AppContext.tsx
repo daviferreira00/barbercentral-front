@@ -47,13 +47,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectorOpen, setSelectorOpen] = useState(false)
   const [onboarding, setOnboarding] = useState<OnboardingStatus | null>(null)
 
-  // Evita checagem de auth nas rotas públicas
-  const isPublicRoute =
+  // Rotas puramente de autenticação (não precisam de verificação prévia)
+  const isAuthOnlyRoute =
     pathname === "/login" ||
     pathname === "/cadastro" ||
     pathname === "/esqueci-senha" ||
     pathname === "/criar-senha" ||
     pathname === "/magic-link"
+
+  // Rotas que deslogados podem acessar sem serem redirecionados
+  const isPublicRoute = pathname === "/" || isAuthOnlyRoute
 
   const refetchOnboarding = async () => {
     if (!user || !user.client_id) return
@@ -64,7 +67,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   const refreshSession = async () => {
-    if (isPublicRoute) {
+    if (isAuthOnlyRoute) {
       setLoading(false)
       return
     }

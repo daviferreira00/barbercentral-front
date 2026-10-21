@@ -243,8 +243,8 @@ export default function LoginFormMobile({ logoUrl = "/logo/barbercentral-logo-ho
       {/* Background circular glowing elements (Visíveis apenas em Dark) */}
       {isDark && (
         <>
-          <div className="absolute top-[-10%] left-[-20%] w-[80%] h-[50%] rounded-full bg-indigo-650/15 blur-[90px] pointer-events-none animate-pulse duration-[4000ms]" />
-          <div className="absolute bottom-[10%] right-[-20%] w-[80%] h-[50%] rounded-full bg-amber-500/10 blur-[100px] pointer-events-none animate-pulse duration-[6000ms]" />
+          <div className="absolute top-[-10%] left-[-20%] w-[80%] h-[50%] rounded-full bg-indigo-650/15 blur-[90px] pointer-events-none animate-pulse" style={{ animationDuration: "4000ms" }} />
+          <div className="absolute bottom-[10%] right-[-20%] w-[80%] h-[50%] rounded-full bg-amber-500/10 blur-[100px] pointer-events-none animate-pulse" style={{ animationDuration: "6000ms" }} />
         </>
       )}
 

@@ -19,6 +19,8 @@ interface ClientSaaS {
   name: string
   slug: string
   status: string
+  subscription_status?: string | null
+  trial_ends_at?: string | null
   phone?: string | null
   created_at: string
 }
@@ -262,14 +264,21 @@ export default function AdminClientesPage() {
                         </span>
                       </td>
                       <td className="p-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border ${c.status === "active"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                            : "bg-red-50 text-red-700 border-red-100"
-                            }`}
-                        >
-                          {c.status === "active" ? "Ativo" : "Bloqueado"}
-                        </span>
+                        <div className="flex flex-col gap-1 items-start">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold border ${c.status === "active"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                              : "bg-red-50 text-red-700 border-red-100"
+                              }`}
+                          >
+                            {c.status === "active" ? "Ativo" : "Bloqueado"}
+                          </span>
+                          {c.subscription_status === "trial" && (
+                            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                              Trial 7 dias
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4 text-slate-400 text-xs">
                         {new Date(c.created_at).toLocaleDateString("pt-BR")}
