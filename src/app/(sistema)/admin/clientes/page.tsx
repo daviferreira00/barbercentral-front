@@ -53,6 +53,7 @@ export default function AdminClientesPage() {
   const [selectedClient, setSelectedClient] = useState<ClientSaaS | null>(null)
   const [isPlanOpen, setIsPlanOpen] = useState(false)
   const [changePlanId, setChangePlanId] = useState("")
+  const [changeStatus, setChangeStatus] = useState("active")
   const [updatingPlan, setUpdatingPlan] = useState(false)
 
   // Dialog de Bloqueio/Desbloqueio com Motivo
@@ -158,6 +159,7 @@ export default function AdminClientesPage() {
   const openPlanDialog = (client: ClientSaaS) => {
     setSelectedClient(client)
     setChangePlanId(client.plan_id)
+    setChangeStatus(client.subscription_status === "trial" ? "active" : (client.subscription_status || "active"))
     setIsPlanOpen(true)
   }
 
@@ -167,7 +169,7 @@ export default function AdminClientesPage() {
     setUpdatingPlan(true)
     const res = await http.put<{ ok: boolean }>(
       `/admin/clients/${selectedClient.id}/plan`,
-      { plan_id: changePlanId }
+      { plan_id: changePlanId, subscription_status: changeStatus }
     )
     setUpdatingPlan(false)
 
@@ -438,6 +440,25 @@ export default function AdminClientesPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase">Situação da Assinatura</label>
+              <Select value={changeStatus} onValueChange={setChangeStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione a situação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Ativo (Plano Pago / Liberado)</SelectItem>
+                  <SelectItem value="trial">Em Teste (Trial 7 dias)</SelectItem>
+                  <SelectItem value="past_due">Atrasado / Pendente</SelectItem>
+                  <SelectItem value="canceled">Cancelado</SelectItem>
+                  <SelectItem value="blocked">Bloqueado</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-slate-400">
+                Ao salvar como <strong>Ativo</strong>, o aviso de teste expirado é removido e todas as operações são liberadas.
+              </p>
             </div>
 
             <DialogFooter className="pt-2">
